@@ -9,9 +9,11 @@ const {
   disableChunk,
   adjustWorkbox,
   // setWebpackPublicPath,
+  addDecoratorsLegacy,
   addBundleVisualizer,
   disableEsLint,
-  addWebpackExternals
+  addWebpackExternals,
+  addPostcssPlugins
 } = require('customize-cra')
 
 const path = require('path')
@@ -32,7 +34,7 @@ const Dashboard = require('webpack-dashboard')
 const DashboardPlugin = require('webpack-dashboard/plugin')
 const dashboard = new Dashboard()
 
-// const theme = require('./theme')
+const theme = require('./theme')
 // SKIP_PREFLIGHT_CHECK = true
 
 /**
@@ -161,27 +163,32 @@ const proxyApi = {
 
 module.exports = {
   webpack: override(
-    // fixBabelImports('import', {
-    //   libraryName: 'material-ui',
-    //   libraryDirectory: '.',
-    //   style: true
-    // }),
+    fixBabelImports('import', {
+      libraryName: 'antd',
+      libraryDirectory: 'es',
+      style: "less"
+    }),
     addLessLoader({
       // strictMath: true,
       noIeCompat: true,
       javascriptEnabled: true,
-      // modifyVars: { ...theme }
+      modifyVars: { ...theme },
+      cssModules: {
+        localIdentName: "[path][name]__[local]--[hash:base64:5]", // if you use CSS Modules, and custom `localIdentName`, default is '[local]--[hash:base64:5]'.
+      },
       // localIdentName: '[local]--[hash:base64:5]', // 自定义 CSS Modules 的 localIdentName
     }),
     // setWebpackPublicPath('/hostsec'), // 修改 publicPath 
-    addWebpackExternals({
-      React: 'React',
-      lodash: 'Lodash'
-    }),
+    // addWebpackExternals({
+    //   react: 'React',
+    //   'react-dom': 'ReactDOM',
+    //   lodash: 'window._',
+    // }),
     // addWebpackModules(),
     addWebpackAlias({
       '@': resolveAlias('src'),
       pages: resolveAlias('pages'),
+      "utils": resolveAlias('src/utils'),
       lib: resolveAlias('src/lib'),
       components: resolveAlias('src/components'),
       images: resolveAlias('src/assets/images'),
@@ -209,6 +216,7 @@ module.exports = {
     //启用ES7的修改器语法（babel 7）
     // ['@babel/plugin-proposal-decorators', {legacy: true}],
     // ['@babel/plugin-proposal-class-properties', {loose: true}],
+    // addPostcssPlugins([require("postcss-px2rem")({ remUnit: 37.5 })]),
     // 打包编译完成提醒
     addWebpackPlugin(
       new WebpackBuildNotifierPlugin({
@@ -235,7 +243,7 @@ module.exports = {
     rewireUglifyjs,
     // rewireCompressionPlugin,
     // 允许使用.babelrc文件进行Babel配置。
-    useBabelRc(),
+    // useBabelRc(),
     // add webpack bundle visualizer if BUNDLE_VISUALIZE flag is enabled
     process.env.BUNDLE_VISUALIZE == 1 && addBundleVisualizer(),
 
@@ -244,7 +252,7 @@ module.exports = {
         skipWaiting: true,
         exclude: (wb.exclude || []).concat('index.html')
       })
-    )
+    ),
     // addDecoratorsLegacy() // 解析器,
   ),
   // 配置devServer

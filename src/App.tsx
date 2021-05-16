@@ -1,27 +1,46 @@
-import React from 'react';
-import { Button } from '@material-ui/core'
-import logo from './logo.svg'
+import React from 'react'
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import Login from './pages/Login'
+import HomePage from './pages/IndexPage'
+import Chat from './pages/Chat'
+import Register from './pages/Register'
+import NotFound from './pages/404'
+import store from './store'
 import './App.css'
 
-function App() {
-  console.log('start the app')
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/">
+            <HomePage />
+          </Route>
+          <Route 
+            path="/login" 
+            exact
+          >
+            <Login />
+          </Route>
+          <Route 
+            path="/register" 
+            exact
+          >
+            <Register />
+          </Route>
+          <Route 
+            path="/main" 
+          >
+            <Chat />
+          </Route>
+          <Route path="/404">
+            <NotFound />
+          </Route>
+          <Redirect from="/*" to="/404" />
+        </Switch>
+      </BrowserRouter>
+    </Provider>
   )
 }
 

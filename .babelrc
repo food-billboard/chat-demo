@@ -1,0 +1,34 @@
+
+{
+  "presets": ["react-app"],
+  // 开发环境下配置项
+  "env": {
+    "development": {
+      "plugins": ["dynamic-import-node"]
+    }
+  },
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "src": ["./src/"]
+        }
+      }
+    ],
+    [
+      "import",
+      {
+        "libraryName": "lodash",
+        "libraryDirectory": "",
+        "camel2DashComponentName": false
+      }
+    ],
+    [
+      "@babel/plugin-transform-modules-commonjs",
+      {
+        "allowTopLevelThis": true
+      }
+    ]
+  ]
+}
