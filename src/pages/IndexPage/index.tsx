@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { merge } from 'lodash-es'
 import { mapStateToProps, mapDispatchToProps } from './connect'
-import './index.less'
+import style from './index.less'
 
 export default connect(mapStateToProps, mapDispatchToProps)(
   memo((props: any) => {
@@ -17,7 +17,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
     }, [])
   
     return (
-      <div className={"aa"}>
+      <div className={style["aa"]}>
         homepage
         <div>用户{props.userInfo.username}</div>
       </div>

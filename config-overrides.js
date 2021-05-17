@@ -15,6 +15,7 @@ const {
   addWebpackExternals,
   addPostcssPlugins
 } = require('customize-cra')
+const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent')
 
 const path = require('path')
 const paths = require('react-scripts/config/paths')
@@ -128,6 +129,67 @@ const delConflictingOrder = () => {
   }
 }
 
+const getStyleLoaders = (cssOptions, preProcessor, lessOptions) => { // 这个是use里要设置的，封装了下
+  const loaders = [
+    require.resolve('style-loader'),
+    {
+      loader: require.resolve('css-loader'),
+      options: cssOptions
+    },
+    {
+      // Options for PostCSS as we reference these options twice
+      // Adds vendor prefixing based on your specified browser support in
+      // package.json
+      loader: require.resolve('postcss-loader'),
+      options: {
+        // Necessary for external CSS imports to work
+        // https://github.com/facebook/create-react-app/issues/2677
+        ident: 'postcss',
+        plugins: () => [
+          require('postcss-flexbugs-fixes'),
+          require('postcss-preset-env')({
+            autoprefixer: {
+              flexbox: 'no-2009'
+            },
+            stage: 3
+          })
+        ]
+      }
+    }
+  ];
+  if (preProcessor) {
+    loaders.push({
+      loader: require.resolve(preProcessor),
+      options: lessOptions
+    });
+  }
+  return loaders;
+}
+
+//less modules
+const addLessConfig = () => {
+  return config => {
+    const oneOf_loc= config.module.rules.findIndex(n=>n.oneOf) // 这里的config是全局的
+    config.module.rules[oneOf_loc].oneOf=[
+      {
+        test: /\.less$/,
+        use: getStyleLoaders(
+          {
+            importLoaders: 2,
+            modules: {
+              getLocalIdent: getCSSModuleLocalIdent
+            }
+          },
+          'less-loader'
+        )
+      },
+      ...config.module.rules[oneOf_loc].oneOf
+    ]
+
+    return config
+  }
+}
+
 const addMiniCssExtractPlugin = () => {
   return config => {
     config.plugins.unshift(
@@ -169,15 +231,18 @@ module.exports = {
       style: "less"
     }),
     addLessLoader({
-      // strictMath: true,
-      noIeCompat: true,
-      javascriptEnabled: true,
-      modifyVars: { ...theme },
-      cssModules: {
-        localIdentName: "[path][name]__[local]--[hash:base64:5]", // if you use CSS Modules, and custom `localIdentName`, default is '[local]--[hash:base64:5]'.
-      },
-      // localIdentName: '[local]--[hash:base64:5]', // 自定义 CSS Modules 的 localIdentName
+      lessOptions: {
+        // strictMath: true,
+        noIeCompat: true,
+        javascriptEnabled: true,
+        modifyVars: { ...theme },
+        cssModules: {
+          localIdentName: "[path][name]__[local]--[hash:base64:5]", // if you use CSS Modules, and custom `localIdentName`, default is '[local]--[hash:base64:5]'.
+        },
+        // localIdentName: '[local]--[hash:base64:5]', // 自定义 CSS Modules 的 localIdentName
+      }
     }),
+    addLessConfig(),
     // setWebpackPublicPath('/hostsec'), // 修改 publicPath 
     // addWebpackExternals({
     //   react: 'React',

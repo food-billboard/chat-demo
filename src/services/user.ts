@@ -32,3 +32,45 @@ export const getUserInfo = () => {
     method: 'GET'
   })
 }
+
+export const black2User = (data: API_USER.IBlackUserParams) => {
+  return request('/api/customer/manage/black', {
+    data,
+    method: 'PUT'
+  })
+}
+
+export const unBlack2User = (params: API_USER.IUnBlackUserParams) => {
+  return request('/api/customer/manage/black', {
+    params,
+    method: 'DELETE'
+  })
+}
+
+export const getBlackUser = (params: API_USER.IGetBlackUserParams) => {
+  return request<API_USER.IGetBlackUserRes[]>('/api/customer/manage/black', {
+    params,
+    method: 'GET'
+  })
+}
+
+export const getRelation = (params: API_USER.IGetFriendsParams) => {
+  return request<API_USER.IGetFriendsRes[]>('/api/customer/manage/friends', {
+    params,
+    method: 'GET'
+  })
+}
+
+export const postRelation = (data: API_USER.IPostFriendsParams) => {
+  return request('/api/customer/manage/friends', {
+    data,
+    method: 'POST'
+  })
+}
+
+export const deleteRelation = (params: API_USER.IDeleteFriendsParams) => {
+  return request('/api/customer/manage/friends', {
+    params,
+    method: 'DELETE'
+  })
+}
