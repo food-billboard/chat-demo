@@ -2,11 +2,12 @@ import axios, { Method, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { message, notification } from 'antd'
 import { createBrowserHistory } from 'history'
 import { debounce } from 'lodash-es'
+import { stringify } from 'querystring'
 import Qs from 'qs'
-import store from '@/store'
+import store, { fetchLogout } from '@/store'
 import { formatQuery } from '../tool'
 
-export const history = createBrowserHistory()
+export const history: any = createBrowserHistory()
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -162,11 +163,11 @@ export const request = async <ResBody>(url: string, setting: IRequestOptions={})
   // 未登录的多次触发处理
   const dispatchLogin = debounce(function(err){
     const dispatch = store.dispatch
-    const querystring = JSON.stringify({
+    const querystring = stringify({
       redirect: window.location.href,
     })
     history.replace(`/login?${querystring}`)
-    // dispatch({ type: 'user/logout' })
+    dispatch(fetchLogout() as any)
     message.error(err.msg || '未登录请先登录');
   }, 1000, {'leading': true, 'trailing': false} )
   

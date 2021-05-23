@@ -127,7 +127,7 @@ const Upload: ReactFC<IProps> = ({
         xhr.withCredentials = true
     
         const method = req.getMethod().toLowerCase()
-        let metadata = {}
+        let metadata: any = {}
         
         if(method === 'head') {
           metadata = uploadMetadata

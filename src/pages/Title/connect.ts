@@ -1,4 +1,4 @@
-import { fetchLogin } from '../../store'
+import { fetchLogout } from '@/store'
 
 export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
   return {
@@ -8,6 +8,6 @@ export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
 
 export const mapDispatchToProps = (dispatch: any) => {
   return {
-    fetchLogin: (params: API_USER.ILoginParams) => dispatch(fetchLogin(params))
+    logout: () => dispatch(fetchLogout())
   }
 }

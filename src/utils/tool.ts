@@ -1,6 +1,12 @@
+// import { parse } from 'qs'
+import { parse } from 'querystring'
 import {
   API_DOMAIN
 } from './constants'
+
+export const getPageQuery = () => {
+  return parse(window.location.href.split('?')[1])
+}
 
 // 处理query 传参的时候导致的空字符串查询问题（后端不愿意给处理）
 export const formatQuery = (query: any ={})=>{

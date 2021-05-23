@@ -7,6 +7,12 @@ declare namespace API_USER {
 
   export interface IGetUserInfoResData extends STORE_USER.IUserInfo {}
 
+  export interface IForgetParams {
+    password: string 
+    email: string 
+    captcha: string 
+  }
+
   export interface IRegisterParams {
     mobile: string | number 
     password: string 
@@ -35,15 +41,18 @@ declare namespace API_USER {
     pageSize?: number 
   }
 
-  export interface IGetBlackUserRes {
+  export interface IGetUserListData {
     username: string 
     avatar: string 
     _id: string 
+    description: string 
   }
+
+  export interface IGetBlackUserRes extends IGetUserListData {}
 
   export interface IGetFriendsParams extends IGetBlackUserParams {}
 
-  export interface IGetFriendsRes extends IGetBlackUserRes {}
+  export interface IGetFriendsRes extends IGetUserListData {}
 
   export interface IPostFriendsParams extends IBlackUserParams {}
 

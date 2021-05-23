@@ -32,9 +32,9 @@ class ImagePreview extends PureComponent<any> {
   }
 
   public componentDidMount = async () => {
-    const urls = this.getUrl()
-    const result = await this.fetchData(urls)
-    if(Array.isArray(result) && result.length) this.instanceInit()
+    // const urls = this.getUrl()
+    // const result = await this.fetchData(urls)
+    // if(Array.isArray(result) && result.length) this.instanceInit()
   }
 
   public componentWillUnmount = () => {
@@ -89,13 +89,13 @@ class ImagePreview extends PureComponent<any> {
   }
 
   public getUrl = () => {
-    const { location: { query } } = history
-    const { url=[] } = query as { url: string[] | undefined } || {}
-    return (Array.isArray(url) ? url : [url])?.map(url => {
-      return {
-        src: url
-      }
-    })
+    // const { location: { query } } = history
+    // const { url=[] } = query as { url: string[] | undefined } || {}
+    // return (Array.isArray(url) ? url : [url])?.map(url => {
+    //   return {
+    //     src: url
+    //   }
+    // })
   }
 
   public goback = () => {

@@ -180,7 +180,7 @@ const addLessConfig = () => {
               getLocalIdent: getCSSModuleLocalIdent
             }
           },
-          'less-loader'
+          'less-loader',
         )
       },
       ...config.module.rules[oneOf_loc].oneOf
@@ -204,7 +204,8 @@ const addMiniCssExtractPlugin = () => {
 
 const proxyApi = {
   '/api': {
-    target: 'http://47.111.229.250', // prod
+    // target: 'http://47.111.229.250', // prod
+    target: "http://localhost:4000",
     changeOrigin: true,
     secure: false,
     xfwd: false,
@@ -228,20 +229,20 @@ module.exports = {
     fixBabelImports('import', {
       libraryName: 'antd',
       libraryDirectory: 'es',
-      style: "less"
+      style: true
     }),
-    addLessLoader({
-      lessOptions: {
-        // strictMath: true,
-        noIeCompat: true,
-        javascriptEnabled: true,
-        modifyVars: { ...theme },
-        cssModules: {
-          localIdentName: "[path][name]__[local]--[hash:base64:5]", // if you use CSS Modules, and custom `localIdentName`, default is '[local]--[hash:base64:5]'.
-        },
-        // localIdentName: '[local]--[hash:base64:5]', // 自定义 CSS Modules 的 localIdentName
-      }
-    }),
+    // addLessLoader({
+    //   lessOptions: {
+    //     // strictMath: true,
+    //     noIeCompat: true,
+    //     javascriptEnabled: true,
+    //     modifyVars: { ...theme },
+    //     cssModules: {
+    //       localIdentName: "[path][name]__[local]--[hash:base64:5]", // if you use CSS Modules, and custom `localIdentName`, default is '[local]--[hash:base64:5]'.
+    //     },
+    //     // localIdentName: '[local]--[hash:base64:5]', // 自定义 CSS Modules 的 localIdentName
+    //   }
+    // }),
     addLessConfig(),
     // setWebpackPublicPath('/hostsec'), // 修改 publicPath 
     // addWebpackExternals({

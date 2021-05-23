@@ -20,6 +20,13 @@ export const register = (data: API_USER.IRegisterParams) => {
   })
 }
 
+export const forgot = (data: API_USER.IForgetParams) => {
+  return request('/api/user/logon/forget', {
+    data,
+    method: 'PUT'
+  })
+}
+
 export const sendEmail = (data: API_USER.ISendEmailParams) => {
   return request('/api/user/logon/email', {
     data,

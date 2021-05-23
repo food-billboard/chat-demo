@@ -1,14 +1,15 @@
 import React, { useCallback, useMemo } from 'react'
 import { message } from 'antd'
 import ProForm, { ProFormText, ProFormCaptcha } from '@ant-design/pro-form'
-import { MobileOutlined, MailOutlined, UserOutlined, LockOutlined, MessageOutlined } from '@ant-design/icons'
+import { MailOutlined, LockOutlined, MessageOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 import { sendEmail } from '@/services'
+import { EMAIL_REGEXP } from '@/utils'
 import { mapDispatchToProps, mapStateToProps } from './connect'
 
-const Register = (props: any) => {
+const Forget = (props: any) => {
 
-  const { fetchRegister } = useMemo(() => {
+  const { fetchForget } = useMemo(() => {
     return props 
   }, [props])
 
@@ -16,7 +17,7 @@ const Register = (props: any) => {
     try {
       await sendEmail({
         email,
-        type: "register"
+        type: "forget"
       })
       message.success(`邮箱 ${email} 验证码发送成功!`)
     }catch(err) {
@@ -26,7 +27,7 @@ const Register = (props: any) => {
 
   const onSubmit = useCallback(async (values) => {
     message.success('提交成功')
-    await fetchRegister(values)
+    await fetchForget(values)
   }, [])
 
   return (
@@ -40,7 +41,7 @@ const Register = (props: any) => {
         onFinish={onSubmit}
         submitter={{
           searchConfig: {
-            submitText: '注册',
+            submitText: '提交',
           },
           render: (_, dom) => dom.pop(),
           submitButtonProps: {
@@ -78,47 +79,6 @@ const Register = (props: any) => {
         <ProFormText
           fieldProps={{
             size: 'large',
-            prefix: <MobileOutlined />,
-          }}
-          name="username"
-          placeholder="请输入用户名"
-        />
-        <ProFormText
-          fieldProps={{
-            size: 'large',
-            prefix: <UserOutlined />
-          }}
-          name="mobile"
-          placeholder="请输入手机号"
-          rules={[
-            {
-              required: true,
-              message: '请输入手机号!',
-            },
-            {
-              pattern: /^1\d{10}$/,
-              message: '不合法的手机号格式!',
-            },
-          ]}
-        />
-        <ProFormText.Password
-          fieldProps={{
-            type: "password",
-            size: 'large',
-            prefix: <LockOutlined />,
-          }}
-          name="password"
-          placeholder="请输入密码"
-          rules={[
-            {
-              required: true,
-              message: '请输入密码!',
-            },
-          ]}
-        />
-        <ProFormText
-          fieldProps={{
-            size: 'large',
             prefix: <MailOutlined />
           }}
           name="email"
@@ -129,7 +89,7 @@ const Register = (props: any) => {
               message: '请输入邮箱!',
             },
             {
-              pattern: /^1\d{10}$/,
+              pattern: EMAIL_REGEXP,
               message: '不合法的手机号格式!',
             },
           ]}
@@ -154,9 +114,24 @@ const Register = (props: any) => {
           placeholder="请输入验证码"
           onGetCaptcha={sendEmailMethod}
         />
+        <ProFormText.Password
+          fieldProps={{
+            type: "password",
+            size: 'large',
+            prefix: <LockOutlined />,
+          }}
+          name="password"
+          placeholder="请输入密码"
+          rules={[
+            {
+              required: true,
+              message: '请输入密码!',
+            },
+          ]}
+        />
       </ProForm>
     </div>
   )
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Register)
+export default connect(mapStateToProps, mapDispatchToProps)(Forget)
