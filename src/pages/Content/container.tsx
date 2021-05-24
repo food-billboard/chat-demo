@@ -5,7 +5,7 @@ import styles from './index.less'
 
 const Container = memo((props: any) => {
 
-  const { getUserInfo } = useMemo(() => {
+  const { getUserInfo, userInfo } = useMemo(() => {
     return props 
   }, [props])
 

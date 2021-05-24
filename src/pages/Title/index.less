@@ -8,7 +8,8 @@
   width: 100%;
   height: 100%;
   padding: 0 20px;
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
 }
 .page-title-user {
   display: flex;
@@ -22,4 +23,27 @@
 .page-title-user-title {
   margin-left: 8px;
   font-weight: bold;
+}
+.page-title-log {
+  padding: 5px 0;
+  box-sizing: border-box;
+  img {
+    height: 100%;
+    object-fit: contain;
+    cursor: pointer;
+    display: block;
+  }
+  img:hover {
+    animation: rotateImg 2s infinite linear;
+  }
+  @keyframes rotateImg {
+    0% { 
+      transform: rotate(0);
+      box-shadow: 0 0 0 black;
+    }
+    100% { 
+      transform: rotate(360deg); 
+      // box-shadow: 0 0 5px black;
+    }
+  }
 }

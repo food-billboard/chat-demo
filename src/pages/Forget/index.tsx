@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { Fragment, useCallback, useMemo } from 'react'
 import { message } from 'antd'
 import ProForm, { ProFormText, ProFormCaptcha } from '@ant-design/pro-form'
 import { MailOutlined, LockOutlined, MessageOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 import { sendEmail } from '@/services'
 import { EMAIL_REGEXP } from '@/utils'
+import Title from '../Title'
 import { mapDispatchToProps, mapStateToProps } from './connect'
 
 const Forget = (props: any) => {

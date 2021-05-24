@@ -1,14 +1,16 @@
 import React, { memo, useCallback, useMemo } from 'react'
 import { connect } from 'react-redux'
-import { Space, Button, Badge, Avatar, Image, Menu, Dropdown } from 'antd'
+import { Space, Button, Badge, Avatar, Menu, Dropdown, Tooltip } from 'antd'
 import { BellOutlined } from '@ant-design/icons'
-import { IMAGE_FALLBACK, history } from '@/utils'
+import { history } from '@/utils'
+import Message from './components/message'
 import { mapDispatchToProps, mapStateToProps } from './connect'
+import { LOGO } from './constants'
 import styles from './index.less'
 
 const Title = memo((props: any) => {
 
-  const { isLogin, userInfo, logout: fetchLogout } = useMemo(() => {
+  const { isLogin, userInfo={}, logout: fetchLogout } = useMemo(() => {
     const { userInfo } = props
     return {
       ...props,
@@ -21,10 +23,6 @@ const Title = memo((props: any) => {
     history.replace('/login')
   }, [fetchLogout])
 
-  const fetchMessage = useCallback(() => {
-    history.push('/main')
-  }, [])
-
   const DropDownOverlay = useMemo(() => {
     return (
       <Menu>
@@ -36,6 +34,10 @@ const Title = memo((props: any) => {
       </Menu>
     )
   }, [userInfo])
+
+  const goIndex = useCallback(() => {
+    history.push('/home')
+  }, [])
   
   return (
     <div
@@ -44,30 +46,46 @@ const Title = memo((props: any) => {
       {
         isLogin && (
           <div className={styles["page-title-container"]}>
-            <Space>
-              <div
-                style={{
-                  boxSizing: 'border-box'
-                }}
-                className={styles["page-title-hover"]}
-              >
-                <Badge
-                  offset={[0, 5]}
-                  count={10}
-                  size={"small"}
+            <div
+              className={styles["page-title-log"]}
+            >
+              <img onClick={goIndex} src={LOGO} />
+            </div>
+            <div>
+              <Space>
+                <Tooltip
+                  title={<Message />}
+                  trigger="click"
+                  overlayStyle={{
+                    maxWidth: 500
+                  }}
+                  color="white"
                 >
-                  <Button onClick={fetchMessage} type="link" icon={<BellOutlined />} />
-                </Badge>
-              </div>
-              <Dropdown
-                overlay={DropDownOverlay}
-              >
-                <div className={`${styles["page-title-user"]} ${styles["page-title-hover"]}`}>
-                  <Avatar size={30} src={<Image preview={false} src={userInfo.avatar} fallback={IMAGE_FALLBACK} />}>{userInfo.username}</Avatar>
-                  <div className={styles["page-title-user-title"]}>{userInfo.username}</div>
-                </div>
-              </Dropdown>
-            </Space>
+                  <div
+                    style={{
+                      boxSizing: 'border-box'
+                    }}
+                    className={styles["page-title-hover"]}
+                  >
+                    <Badge
+                      offset={[0, 5]}
+                      count={10}
+                      size={"small"}
+                    >
+                      <Button type="link" icon={<BellOutlined />} />
+                    </Badge>
+                  </div>
+                </Tooltip>
+                <Dropdown
+                  overlay={DropDownOverlay}
+                >
+                  <div className={`${styles["page-title-user"]} ${styles["page-title-hover"]}`}>
+                    <Avatar size={30} src={userInfo.avatar}>{userInfo.username}</Avatar>
+                    <div className={styles["page-title-user-title"]}>{userInfo.username}</div>
+                  </div>
+                </Dropdown>
+              </Space>
+            </div>
           </div>
         )
       }
