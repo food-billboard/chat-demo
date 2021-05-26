@@ -213,15 +213,6 @@ const proxyApi = {
     //   '^/api': '/'
     // }
   },
-  '/store': {
-    // target: '', // staging
-    changeOrigin: true,
-    secure: false,
-    xfwd: false,
-    pathRewrite: {
-      '^/store': '/'
-    }
-  }
 }
 
 module.exports = {

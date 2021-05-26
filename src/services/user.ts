@@ -54,7 +54,7 @@ export const unBlack2User = (params: API_USER.IUnBlackUserParams) => {
   })
 }
 
-export const getBlackUser = (params: API_USER.IGetBlackUserParams) => {
+export const getBlackUser = (params: API_USER.IGetBlackUserParams={}) => {
   return request<API_USER.IGetBlackUserRes[]>('/api/customer/manage/black', {
     params,
     method: 'GET'

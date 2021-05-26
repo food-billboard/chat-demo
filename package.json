@@ -44,7 +44,8 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "mock": "node ./src/mock/index.js"
   },
   "eslintConfig": {
     "extends": [
@@ -82,6 +83,8 @@
     "babel-plugin-import": "^1.13.3",
     "compression-webpack-plugin": "^7.1.2",
     "customize-cra": "^1.0.0",
+    "express": "^4.17.1",
+    "faker": "^5.5.3",
     "less": "^2.7.3",
     "less-loader": "^5.0.0",
     "lodash-webpack-plugin": "^0.11.6",

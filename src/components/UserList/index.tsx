@@ -6,7 +6,7 @@ import styles from './index.less'
 
 interface IProps {
   fetchData:() => Promise<API_USER.IGetUserListData[]>
-  actions?: React.ReactNode[]
+  actions?: (data: API_USER.IGetUserListData) => React.ReactNode[]
   userAction?: (data: API_USER.IGetUserListData) => any
 }
 
@@ -45,10 +45,11 @@ const UserList = forwardRef<IUserListRef, IProps>((props, ref) => {
       dataSource={list}
       renderItem={item => {
         const { avatar, username, description, _id } = item 
+        const actionsNode = actions?.(item) || []
         return (
           <List.Item
             key={_id}
-            actions={actions || []}
+            actions={actionsNode}
           >
             <Skeleton avatar title={false} loading={false} active>
               <List.Item.Meta
