@@ -6,6 +6,14 @@ import { getBlackUser, unBlack2User, deleteRelation } from '@/services'
 export default memo(() => {
 
   const fetchData = useCallback(async () => {
+    return [
+      {
+        username: "伙食棒棒", 
+        avatar: "https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=2035980560,2598993403&fm=58", 
+        _id: '1',
+        description: "我是天天才才hhhhhh" 
+      }
+    ]
     return await getBlackUser()
   }, [])
 
@@ -51,7 +59,9 @@ export default memo(() => {
   }, [])
 
   return (
-    <Row gutter={24}>
+    <Row 
+      gutter={24}
+    >
       <Col span={6}>
         <UserList 
           fetchData={fetchData} 

@@ -1,6 +1,7 @@
 import React, { forwardRef, memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { List, Avatar, Skeleton, Image } from 'antd'
+import { List, Avatar, Skeleton, Image, Tooltip } from 'antd'
 import { unstable_batchedUpdates } from 'react-dom'
+import UserDetail from './components/UserDetail'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
 
@@ -55,10 +56,18 @@ const UserList = forwardRef<IUserListRef, IProps>((props, ref) => {
               <List.Item.Meta
                 avatar={
                   <Avatar src={
-                    <Image src={avatar} fallback={IMAGE_FALLBACK} />
+                    <Image src={avatar} preview={false} fallback={IMAGE_FALLBACK} />
                   } >{username}</Avatar>
                 }
-                title={<a onClick={userAction?.bind(this, item)}>{username}</a>}
+                title={
+                  <Tooltip
+                    title={
+                      <UserDetail />
+                    }
+                  >
+                    <a className={styles["user-list-username"]} onClick={userAction?.bind(this, item)}>{username}</a>
+                  </Tooltip>
+                }
                 description={description}
               />
               {/* <div>content</div> */}
