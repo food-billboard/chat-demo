@@ -16,6 +16,7 @@ declare namespace STORE_USER {
     username: string 
     createdAt: string 
     updatedAt: string 
+    member: string 
   }
 
   export interface IBaseState<T=any> {

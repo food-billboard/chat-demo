@@ -11,5 +11,5 @@ mockList.forEach(function(m) {
 })
 
 app.listen('3737', function () {
-  console.log('localhost:3737/index.html')
+  
 })
