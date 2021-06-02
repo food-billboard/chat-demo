@@ -1,4 +1,4 @@
-import React, { memo, useMemo, FC } from 'react'
+import React, { memo, useMemo, FC, useCallback } from 'react'
 import { Tooltip, Card, Avatar } from 'antd'
 import { TooltipPropsWithTitle } from 'antd/es/tooltip'
 import { SettingOutlined, DeleteOutlined } from '@ant-design/icons'
@@ -17,13 +17,22 @@ export interface IUserData {
 export interface IProps extends Partial<TooltipPropsWithTitle>{
   children?: any
   value: IUserData
+  actions?: React.ReactNode[]
 }
 
 const UserDetail: FC<IProps> = memo((props: IProps) => {
 
-  const { children, value, ...nextProps } = useMemo(() => {
+  const { children, value, actions, ...nextProps } = useMemo(() => {
     return props 
   }, [props])
+
+  const handleSetting = useCallback((id: string) => {
+    console.log('用户设置')
+  }, [])
+
+  const handleDelete = useCallback((id: string) => {
+    console.log('用户删除')
+  }, [])
 
   const CardData = useMemo(() => {
 
@@ -37,9 +46,9 @@ const UserDetail: FC<IProps> = memo((props: IProps) => {
             src={avatar || IMAGE_FALLBACK}
           />
         }
-        actions={[
-          <SettingOutlined key="setting" />,
-          <DeleteOutlined key="delete" />
+        actions={actions || [
+          <SettingOutlined key="setting" onClick={handleSetting.bind(this, _id)} />,
+          <DeleteOutlined key="delete" onClick={handleDelete.bind(this, _id)} />
         ]}
       >
         <Meta
@@ -49,7 +58,7 @@ const UserDetail: FC<IProps> = memo((props: IProps) => {
         />
       </Card>
     )
-  }, [value])
+  }, [value, actions])
 
   return (
     <Tooltip

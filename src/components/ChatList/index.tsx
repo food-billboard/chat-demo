@@ -1,9 +1,14 @@
-import React, { memo, useMemo, FC, Fragment } from 'react'
+import React, { memo, useMemo, FC, Fragment, useEffect, useCallback, useState } from 'react'
 import { Avatar } from 'antd'
 import { connect } from 'react-redux'
 import Day from 'dayjs'
+import * as Scroll from 'react-scroll'
+import { Link, Element, Events, animateScroll as scroll, scrollSpy, scroller } from 'react-scroll'
 import UserDetail from '../UserDetail'
+import ImageView from './components/ViewImage'
+import ChatInput from '../ChatList'
 import { mapStateToProps, mapDispatchToProps } from './connect'
+import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
 
 export interface IChatData {
@@ -25,6 +30,10 @@ export interface IChatData {
 export interface IProps {
   value: IChatData[]
   userInfo: STORE_USER.IUserInfo
+  fetchData: (params: Partial<{
+    currPage: number 
+    pageSize: number 
+  }>) => Promise<IChatData[]>
 }
 
 const ChatData: FC<{
@@ -59,7 +68,6 @@ const ChatData: FC<{
           description,
           _id
         }}
-        trigger="click"
       >
         {UserAvatar}
       </UserDetail>
@@ -87,7 +95,10 @@ const ChatData: FC<{
         }
         {
           (type === 'IMAGE' || type === 'VIDEO') && (
-            '图片视频消息'
+            <ImageView
+              type={'VIDEO'}
+              src={type === 'IMAGE' ? value : (poster || IMAGE_FALLBACK)}
+            />
           )
         }
         {
@@ -121,7 +132,10 @@ const ChatData: FC<{
 
 const ChatList = memo((props: IProps) => {
 
-  const { value, userInfo } = useMemo(() => {
+  const [ currPage, setCurrPage ] = useState<number>(0)
+  // const [ value, setValue ] = useState<IChatData[]>([])
+
+  const { userInfo, fetchData, value } = useMemo(() => {
     return props 
   }, [props])
 
@@ -132,17 +146,47 @@ const ChatList = memo((props: IProps) => {
       const { _id } = user
       return {
         ...item,
-        // isMine: member == _id
+        isMine: member == _id
       } 
     })
   }, [value, userInfo])
+
+  const internalFetchData = useCallback(async(params: Partial<{ currPage: number, pageSize: number }>) => {
+    const value = await fetchData(params)
+
+  }, [])
+
+  const scrollToTop = useCallback(() => {
+    scroll.scrollToTop()
+  }, [])
+
+  const scrollToBottom = useCallback(() => {
+    scroll.scrollToBottom()
+  }, [])
+
+  useEffect(() => {
+    Events.scrollEvent.register('begin', function(to, element) {
+      console.log('begin', arguments)
+    })
+
+    Events.scrollEvent.register('end', function(to, element) {
+      console.log('end', arguments)
+    })
+
+    scrollSpy.update()
+
+    return () => {
+      Events.scrollEvent.remove('begin')
+      Events.scrollEvent.remove('end')
+    }
+  }, [])
   
   return (
     <Fragment>
       {
         realValue.map(item => {
           return (
-            <ChatData value={item} />
+            <ChatData key={item.message.createdAt} value={item} />
           )
         })
       }
@@ -152,3 +196,15 @@ const ChatList = memo((props: IProps) => {
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatList)
+
+export const GroupChat = memo(() => {
+
+  return (
+    <div>
+      聊天框组合
+      {/* <ChatList />
+      <ChatInput/> */}
+    </div>
+  )
+
+})

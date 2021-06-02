@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from 'react'
-import { Row, Col, Button, Modal, message } from 'antd'
+import { Row, Col, Button, Modal, message, Result } from 'antd'
 import UserList from '@/components/UserList'
 import { getBlackUser, unBlack2User, deleteRelation } from '@/services'
 
@@ -54,13 +54,26 @@ export default memo(() => {
   const actions = useCallback((item) => {
     return [
       <Button onClick={cancelBlack.bind(this, item)} type="link" ghost key="list-edit">取消</Button>, 
-      <Button onClick={deleteUser.bind(this, item)} danger ghost type="link" key="list-delete">删除</Button>
+      <Button onClick={deleteUser.bind(this, item)} danger type="link" key="list-delete">删除</Button>
     ]
+  }, [])
+
+  const ResultPage = useMemo(() => {
+    return (
+      <Result
+        style={{backgroundColor: 'white', height: '100%'}}
+        status="404"
+        title="提示"
+        subTitle="黑名单用户无法聊天哦，可以将好友请出黑名单😊"
+        // extra={<Button type="primary">Back Home</Button>}
+      />
+    )
   }, [])
 
   return (
     <Row 
       gutter={24}
+      style={{width: '100%', padding: 10, boxSizing: 'border-box', margin: 0}}
     >
       <Col span={6}>
         <UserList 
@@ -68,8 +81,8 @@ export default memo(() => {
           actions={actions}
         />
       </Col>
-      <Col span={18}>
-        聊天框
+      <Col span={18} style={{padding: 0}}>
+        {ResultPage}
       </Col>
     </Row>
   )

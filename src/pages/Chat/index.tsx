@@ -9,12 +9,25 @@ import {
   MenuFoldOutlined
 } from '@ant-design/icons'
 import { debounce } from 'lodash-es'
-import { Switch, Route, withRouter } from 'react-router-dom'
+import classnames from 'classnames'
+import { Switch, Route, withRouter, Redirect } from 'react-router-dom'
 import Black from '../BlackUser'
+import Friends from '../Friends'
+import Room from '../RoomList'
+import Recent from '../RecuntUser'
+import ChatHeader from '@/components/UserHeader'
 import List from '@/components/ChatList'
+import { history } from '@/utils'
 import styles from './index.less'
 
 const { Item } = Menu
+
+const CHAT_ROUTE_MAP = {
+  room: '/main/room',
+  user: '/main/friends',
+  recent: '/main/recent',
+  black: '/main/black'
+}
 
 export default withRouter(memo(() => {
 
@@ -48,6 +61,8 @@ export default withRouter(memo(() => {
   const onMenuChange = useCallback(({ item, key }) => {
     console.log(item, key, '路由跳转')
     setSelectedKeys([key])
+    const route = CHAT_ROUTE_MAP[key as keyof typeof CHAT_ROUTE_MAP]
+    if(route) history.push(route)
   }, [])
 
   const resize = useCallback((e?) => {
@@ -60,7 +75,16 @@ export default withRouter(memo(() => {
   }, [])
 
   useEffect(() => {
-    console.log('检查当前路由')
+    const url = new URL(window.location.href)
+    const { pathname } = url
+    Object.entries(CHAT_ROUTE_MAP).some(item => {
+      const [ key, value ] = item
+      if(pathname.includes(value)) {
+        setSelectedKeys([key])
+        return true 
+      }
+      return false 
+    })
   }, [])
 
   useEffect(() => {
@@ -101,46 +125,16 @@ export default withRouter(memo(() => {
         />
       </div>
       <div 
-        className={styles["chat-transition"]}
+        className={classnames(styles["chat-transition"], styles["chat-content"])}
         style={{width: collapsed ? 'calc(100% - 80px)' : 'calc(100% - 230px)'}}
       >
-        <List  
-          value={[{
-            user: {
-              avatar: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fyouimg1.c-ctrip.com%2Ftarget%2Ftg%2F035%2F063%2F726%2F3ea4031f045945e1843ae5156749d64c.jpg&refer=http%3A%2F%2Fyouimg1.c-ctrip.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1624938513&t=c2c45e41131c582ab105bf2c6f581aed",
-              _id: '1',
-              username: "用户名",
-              description: '描述', 
-            },
-            message: {
-              value: "1111".repeat(50), 
-              type: 'TEXT',
-              poster: "", 
-              createdAt: "2020-11-22", 
-            },
-            isMine: false 
-          }, 
-          {
-            user: {
-              avatar: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fyouimg1.c-ctrip.com%2Ftarget%2Ftg%2F035%2F063%2F726%2F3ea4031f045945e1843ae5156749d64c.jpg&refer=http%3A%2F%2Fyouimg1.c-ctrip.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1624938513&t=c2c45e41131c582ab105bf2c6f581aed",
-              _id: '1',
-              username: "用户名",
-              description: '描述', 
-            },
-            message: {
-              value: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fyouimg1.c-ctrip.com%2Ftarget%2Ftg%2F035%2F063%2F726%2F3ea4031f045945e1843ae5156749d64c.jpg&refer=http%3A%2F%2Fyouimg1.c-ctrip.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1624938513&t=c2c45e41131c582ab105bf2c6f581aed", 
-              type: 'IMAGE',
-              poster: "", 
-              createdAt: "2020-11-22", 
-            },
-            isMine: true 
-          }, 
-        ]}
-        />
-        {/* <Switch>
-          <Route component={Black} path="/black" />
-          <Black />
-        </Switch> */}
+        <Switch>
+          <Route component={Black} path="/main/black" />
+          <Route component={Friends} path="/main/friends" />
+          <Route component={Recent} path="/main/recent" />
+          <Route component={Room} path="/main/room" />
+          <Redirect from="/main" to="/main/friends" />
+        </Switch>
       </div>
     </div>
   )

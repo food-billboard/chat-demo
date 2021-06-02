@@ -1,0 +1,68 @@
+.chat-view-image-container {
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+}
+.chat-view-image-container-item {
+  width: 100%;
+}
+.chat-view-cover {
+  width: 100%;
+  height: 100%;
+}
+.chat-view-image-cover,
+.chat-view-video-cover,
+.chat-view-cover{
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.chat-view-image-cover:hover,
+.chat-view-video-cover:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.chat-view-image-cover:hover::after {
+  content: '图片预览';
+  color: white;
+  font-size: 3em;
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.chat-view-video-cover::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 5em;
+  height: 5em;
+  border: 3px solid white;
+  border-radius: 50%;
+}
+.chat-view-video-cover::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-20%, -50%);
+  border-left: 1.6em solid white;
+  border-top: 1.6em solid transparent;
+  border-bottom: 1.6em solid transparent;
+  border-right: 1.6em solid transparent;
+}
+.chat-view-video-cover:hover::before {
+  content: '';
+  display: none;
+}
+.chat-view-video-cover:hover::after {
+  content: '视频预览';
+  color: white;
+  border: none;
+  font-size: 3em;
+  transform: translate(-50%, -50%);
+}
