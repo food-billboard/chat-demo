@@ -1,6 +1,8 @@
 import React, { forwardRef, memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { List, Avatar, Skeleton, Image, Tooltip } from 'antd'
+import { List, Avatar, Skeleton, Image, Tooltip, Button, Popover, PopoverProps } from 'antd'
 import { unstable_batchedUpdates } from 'react-dom'
+import { merge } from 'lodash-es'
+import { UserOutlined } from '@ant-design/icons'
 import UserDetail from './components/UserDetail'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
@@ -15,7 +17,7 @@ interface IUserListRef {
 
 }
 
-const UserList = forwardRef<IUserListRef, IProps>((props, ref) => {
+const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
 
   const [ loading, setLoading ] = useState<boolean>(true)
   const [ list, setList ] = useState<API_USER.IGetUserListData[]>([])
@@ -78,6 +80,35 @@ const UserList = forwardRef<IUserListRef, IProps>((props, ref) => {
     />
   )
 
-})
+}))
 
-export default memo(UserList)
+interface IWrapperProps extends IProps {
+  popover?: Partial<PopoverProps>
+  style?: React.CSSProperties
+}
+
+export default memo((props: IWrapperProps) => {
+
+  const { popover, style={}, ...nextProps } = useMemo(() => {
+    return props
+  }, [props])
+
+  const UserListContent = useMemo(() => {
+    return (
+      <UserList {...nextProps} />
+    )
+  }, [])
+
+  return (
+    <Popover
+      placement="rightBottom"
+      title="好友列表"
+      content={UserListContent}
+      trigger="click"
+      {...popover}
+    >
+      <Button style={merge({}, { position: 'absolute', zIndex: 2, left: 12 }, style)} icon={<UserOutlined />}></Button>
+    </Popover>
+  )
+
+})

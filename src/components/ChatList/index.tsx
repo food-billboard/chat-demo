@@ -2,11 +2,14 @@ import React, { memo, useMemo, FC, Fragment, useEffect, useCallback, useState } 
 import { Avatar } from 'antd'
 import { connect } from 'react-redux'
 import Day from 'dayjs'
+import { merge } from 'lodash-es'
 import * as Scroll from 'react-scroll'
 import { Link, Element, Events, animateScroll as scroll, scrollSpy, scroller } from 'react-scroll'
 import UserDetail from '../UserDetail'
+import ChatHeader from '../UserHeader'
 import ImageView from './components/ViewImage'
-import ChatInput from '../ChatList'
+import ChatInput from '../ChatInput'
+import ObserverDom from './components/Intersection'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
@@ -28,8 +31,9 @@ export interface IChatData {
 }
 
 export interface IProps {
-  value: IChatData[]
-  userInfo: STORE_USER.IUserInfo
+  // value: IChatData[]
+  style?: React.CSSProperties
+  userInfo?: STORE_USER.IUserInfo
   fetchData: (params: Partial<{
     currPage: number 
     pageSize: number 
@@ -133,14 +137,18 @@ const ChatData: FC<{
 const ChatList = memo((props: IProps) => {
 
   const [ currPage, setCurrPage ] = useState<number>(0)
-  // const [ value, setValue ] = useState<IChatData[]>([])
+  const [ value, setValue ] = useState<IChatData[]>([])
 
-  const { userInfo, fetchData, value } = useMemo(() => {
+  const { userInfo, fetchData, style={} } = useMemo(() => {
     return props 
   }, [props])
 
+  const globalStyle = useMemo(() => {
+    return merge({}, { height: '300vh' }, style)
+  }, [style])
+
   const realValue = useMemo(() => {
-    const { member } = userInfo
+    const { member } = userInfo || {}
     return value.map(item => {
       const { user } = item
       const { _id } = user
@@ -151,9 +159,9 @@ const ChatList = memo((props: IProps) => {
     })
   }, [value, userInfo])
 
-  const internalFetchData = useCallback(async(params: Partial<{ currPage: number, pageSize: number }>) => {
+  const internalFetchData = useCallback(async(params: Partial<{ currPage: number, pageSize: number, end: number }>={}) => {
     const value = await fetchData(params)
-
+    setValue(value)
   }, [])
 
   const scrollToTop = useCallback(() => {
@@ -162,6 +170,10 @@ const ChatList = memo((props: IProps) => {
 
   const scrollToBottom = useCallback(() => {
     scroll.scrollToBottom()
+  }, [])
+
+  useEffect(() => {
+    internalFetchData()
   }, [])
 
   useEffect(() => {
@@ -182,7 +194,9 @@ const ChatList = memo((props: IProps) => {
   }, [])
   
   return (
-    <Fragment>
+    <div
+      style={globalStyle}
+    >
       {
         realValue.map(item => {
           return (
@@ -190,20 +204,79 @@ const ChatList = memo((props: IProps) => {
           )
         })
       }
-    </Fragment>
+      <div 
+        style={{marginTop: '200vh'}}
+        onClick={() => {
+          Scroll.animateScroll.scrollMore(10)
+        }}
+      >11111</div>
+    </div>
   )
 
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatList)
 
-export const GroupChat = memo(() => {
+interface IGroupProps extends IProps{
+
+}
+
+export const GroupChat = memo((props: IGroupProps) => {
+
+  const [ isFirstFetch, setIsFirstFetch ] = useState(true)
+
+  const internalFetchData = useCallback((fetch: any) => {
+    return async (...args: any[]) => {
+      const data = await fetch(...args)
+      return data 
+    }
+  }, [])
+
+  const { ...nextProps } = useMemo(() => {
+    const { style, fetchData, ...nextProps } = props 
+    return merge({}, nextProps, { 
+      style: merge({}, style, 
+        {
+        paddingBottom: '30vh'
+      }),
+      fetchData: internalFetchData(fetchData)
+    }) 
+  }, [props, internalFetchData])
+
+  const onBack = useCallback(() => {
+    console.log('返回哈哈哈哈')
+  }, [])
+
+  const ChatHeaderDom = useMemo(() => {
+    return (
+      <ChatHeader 
+        style={{
+          position: 'sticky',
+          top: 0,
+          backgroundColor: 'rgb(236, 239, 243)',
+          zIndex: 1
+        }} 
+        title={"用户民"}
+        subTitle={""}
+        onBack={onBack}
+      />
+    )
+  }, [onBack])
 
   return (
-    <div>
-      聊天框组合
-      {/* <ChatList />
-      <ChatInput/> */}
+    <div style={{height: '100%', overflow: 'auto'}}>
+      <div
+        style={{
+          height: 'calc(100% - 30vh)',
+          overflow: 'auto'
+        }}
+        id="chat-list-wrapper"
+      >
+        {ChatHeaderDom}
+        <ObserverDom />
+        <ChatList {...nextProps} />
+      </div>
+      <ChatInput style={{height: '30vh'}} />
     </div>
   )
 
