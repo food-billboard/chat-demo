@@ -207,9 +207,10 @@ const ChatList = memo((props: IProps) => {
       <div 
         style={{marginTop: '200vh'}}
         onClick={() => {
-          Scroll.animateScroll.scrollMore(10)
+          Scroll
         }}
       >11111</div>
+
     </div>
   )
 
@@ -224,6 +225,7 @@ interface IGroupProps extends IProps{
 export const GroupChat = memo((props: IGroupProps) => {
 
   const [ isFirstFetch, setIsFirstFetch ] = useState(true)
+  const [ fetchLoading, setFetchLoading ] = useState(false)
 
   const internalFetchData = useCallback((fetch: any) => {
     return async (...args: any[]) => {
@@ -231,6 +233,13 @@ export const GroupChat = memo((props: IGroupProps) => {
       return data 
     }
   }, [])
+
+  const onNeedLoad = useCallback(() => {
+    if(fetchLoading) return 
+    setFetchLoading(true)
+    console.log('数据loading加载')
+    setFetchLoading(false)
+  }, [fetchLoading])
 
   const { ...nextProps } = useMemo(() => {
     const { style, fetchData, ...nextProps } = props 
@@ -273,7 +282,7 @@ export const GroupChat = memo((props: IGroupProps) => {
         id="chat-list-wrapper"
       >
         {ChatHeaderDom}
-        <ObserverDom />
+        <ObserverDom onIntersection={onNeedLoad} />
         <ChatList {...nextProps} />
       </div>
       <ChatInput style={{height: '30vh'}} />

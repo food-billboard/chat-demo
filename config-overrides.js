@@ -213,6 +213,13 @@ const proxyApi = {
     //   '^/api': '/'
     // }
   },
+  '/socket.io': {
+    target: 'http://localhost:3001', // prod
+    changeOrigin: true,
+    secure: false,
+    xfwd: false,
+    ws: true 
+  },
 }
 
 module.exports = {
