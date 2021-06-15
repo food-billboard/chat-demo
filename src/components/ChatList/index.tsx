@@ -1,10 +1,9 @@
-import React, { memo, useMemo, FC, Fragment, useEffect, useCallback, useState } from 'react'
+import React, { memo, useMemo, FC, Fragment, useEffect, useCallback, useState, forwardRef } from 'react'
 import { Avatar } from 'antd'
 import { connect } from 'react-redux'
 import Day from 'dayjs'
 import { merge } from 'lodash-es'
-import * as Scroll from 'react-scroll'
-import { Link, Element, Events, animateScroll as scroll, scrollSpy, scroller } from 'react-scroll'
+import scrollIntoView from 'scroll-into-view-if-needed'
 import UserDetail from '../UserDetail'
 import ChatHeader from '../UserHeader'
 import ImageView from './components/ViewImage'
@@ -13,6 +12,8 @@ import ObserverDom from './components/Intersection'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
+import { useImperativeHandle } from 'react'
+import { useRef } from 'react'
 
 export interface IChatData {
   user: {
@@ -134,14 +135,26 @@ const ChatData: FC<{
 
 })
 
-const ChatList = memo((props: IProps) => {
+export interface IChatListRef {
+  fetchData: (params?: any, toBottom?: boolean) => Promise<any>
+}
+
+const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
 
   const [ currPage, setCurrPage ] = useState<number>(0)
   const [ value, setValue ] = useState<IChatData[]>([])
+  const [ bottomNode, setBottomNode ] = useState<Element>()
+  const [ loading, setLoading ] = useState<boolean>(false)
 
   const { userInfo, fetchData, style={} } = useMemo(() => {
     return props 
   }, [props])
+
+  useImperativeHandle(ref, () => {
+    return {
+      fetchData: internalFetchData
+    }
+  }, [])
 
   const globalStyle = useMemo(() => {
     return merge({}, { height: '300vh' }, style)
@@ -159,43 +172,43 @@ const ChatList = memo((props: IProps) => {
     })
   }, [value, userInfo])
 
-  const internalFetchData = useCallback(async(params: Partial<{ currPage: number, pageSize: number, end: number }>={}) => {
+  const scrollToBottom = useCallback(() => {
+    let node: any = bottomNode
+    if(!node) node = getNode()
+    if(node) scrollIntoView(node, {
+      scrollMode: 'if-needed',
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: 'smooth'
+    })
+  }, [bottomNode])
+
+  const internalFetchData = useCallback(async(params: Partial<{ currPage: number, pageSize: number, end: number }>={}, toBottom: boolean=false) => {
+    if(loading) return 
+    setLoading(true)
     const value = await fetchData(params)
     setValue(value)
-  }, [])
-
-  const scrollToTop = useCallback(() => {
-    scroll.scrollToTop()
-  }, [])
-
-  const scrollToBottom = useCallback(() => {
-    scroll.scrollToBottom()
-  }, [])
-
-  useEffect(() => {
-    internalFetchData()
-  }, [])
-
-  useEffect(() => {
-    Events.scrollEvent.register('begin', function(to, element) {
-      console.log('begin', arguments)
-    })
-
-    Events.scrollEvent.register('end', function(to, element) {
-      console.log('end', arguments)
-    })
-
-    scrollSpy.update()
-
-    return () => {
-      Events.scrollEvent.remove('begin')
-      Events.scrollEvent.remove('end')
+    if(toBottom) {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      scrollToBottom()
     }
+    setLoading(false)
+  }, [scrollToBottom, loading])
+
+  const getNode = useCallback(() => {
+    const node = document.querySelector("#chat-item-bottom")
+    if(node) setBottomNode(node)
+    return node 
+  }, [])
+
+  useEffect(() => {
+    internalFetchData({}, true)
   }, [])
   
   return (
     <div
       style={globalStyle}
+      id="chat-list-container"
     >
       {
         realValue.map(item => {
@@ -204,16 +217,11 @@ const ChatList = memo((props: IProps) => {
           )
         })
       }
-      <div 
-        style={{marginTop: '200vh'}}
-        onClick={() => {
-          Scroll.animateScroll.scrollMore(10)
-        }}
-      >11111</div>
+      <div id="chat-item-bottom"></div>
     </div>
   )
 
-})
+}))
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatList)
 
@@ -223,25 +231,21 @@ interface IGroupProps extends IProps{
 
 export const GroupChat = memo((props: IGroupProps) => {
 
-  const [ isFirstFetch, setIsFirstFetch ] = useState(true)
-
-  const internalFetchData = useCallback((fetch: any) => {
-    return async (...args: any[]) => {
-      const data = await fetch(...args)
-      return data 
-    }
-  }, [])
-
   const { ...nextProps } = useMemo(() => {
-    const { style, fetchData, ...nextProps } = props 
+    const { style, ...nextProps } = props 
     return merge({}, nextProps, { 
       style: merge({}, style, 
         {
         paddingBottom: '30vh'
       }),
-      fetchData: internalFetchData(fetchData)
     }) 
-  }, [props, internalFetchData])
+  }, [props])
+
+  const listRef = useRef<IChatListRef>(null)
+
+  const onFetchData = useCallback(async () => {
+    await listRef.current?.fetchData()
+  }, [])
 
   const onBack = useCallback(() => {
     console.log('返回哈哈哈哈')
@@ -273,8 +277,8 @@ export const GroupChat = memo((props: IGroupProps) => {
         id="chat-list-wrapper"
       >
         {ChatHeaderDom}
-        <ObserverDom />
-        <ChatList {...nextProps} />
+        <ObserverDom onObserve={onFetchData} />
+        <ChatList ref={listRef} {...nextProps}  />
       </div>
       <ChatInput style={{height: '30vh'}} />
     </div>

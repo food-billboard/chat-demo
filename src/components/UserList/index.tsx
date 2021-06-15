@@ -107,7 +107,7 @@ export default memo((props: IWrapperProps) => {
       trigger="click"
       {...popover}
     >
-      <Button style={merge({}, { position: 'absolute', zIndex: 2, left: 12 }, style)} icon={<UserOutlined />}></Button>
+      <Button shape="circle" style={merge({}, { position: 'absolute', zIndex: 2, right: 12, top: '20vh' }, style)} icon={<UserOutlined />}></Button>
     </Popover>
   )
 

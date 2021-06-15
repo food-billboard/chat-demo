@@ -2,20 +2,20 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import {  } from 'antd'
 
 interface IProps {
-
+  onObserve?: () => void 
 }
 
 export default memo((props: IProps) => {
 
   const [ observer, setObserver ] = useState<IntersectionObserver>()
 
-  const {  } = useMemo(() => {
+  const { onObserve } = useMemo(() => {
     return props
   }, [props])
 
   const initObserver = useCallback(() => {
     const io = new IntersectionObserver(entries => {
-      console.log(entries)
+      onObserve?.()
     }, {
       root: document.querySelector('#chat-list-wrapper')
     })
