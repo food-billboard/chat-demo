@@ -1,7 +1,8 @@
 import React, { memo, useCallback } from 'react'
 import {  } from 'antd'
 import { GroupChat } from '@/components/ChatList'
-import RoomList from '@/components/UserList'
+import RoomList from '@/components/RoomList'
+import {  } from '@/services'
 import styles from './index.less'
 
 export default memo(() => {
@@ -22,7 +23,7 @@ export default memo(() => {
         style={{
           position: 'absolute'
         }}
-        fetchData={fetchRoomList}
+        // fetchData={fetchRoomList}
       />
       <GroupChat 
         fetchData={fetchData}

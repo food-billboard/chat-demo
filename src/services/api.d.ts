@@ -109,3 +109,143 @@ declare namespace Upload {
   }
 
 }
+
+declare namespace API_CHAT {
+
+  export interface IGetMemberListParams {
+    _id: string 
+    currPage?: number 
+    pageSize?: number 
+  }
+
+  export type TUserData = {
+    username: string 
+    _id: string 
+    avatar: string 
+  }
+
+  export type TUserStatus = "ONLINE" | "OFFLINE"
+
+  export interface IGetMemberListData {
+    user: TUserData
+    _id: string 
+    status: TUserStatus
+    sid: string 
+    createdAt: string 
+    updatedAt: string 
+  }
+
+  export type TRoomType = "SYSTEM" | "USER"
+
+  export interface IGetRoomListParams {
+    _id?: string 
+    type?: TRoomType 
+    origin?: 0 | 1
+    create_user?: string 
+    content?: string 
+    members?: string 
+    currPage?: number 
+    pageSize?: number 
+  }
+
+  export type TCreateUser = TUserData & {
+    description: string 
+    member: string 
+  }
+
+  export type TRoomInfo = {
+    name: string 
+    description: string 
+    avatar: string 
+  }
+
+  export interface IGetRoomListData {
+    _id: string 
+    create_user: TCreateUser
+    info: TRoomInfo
+    members: number 
+    is_delete: boolean 
+    createdAt: string 
+    updatedAt: string 
+    online_members: number 
+  }
+
+  export interface IPostRoomParams {
+    _id: string 
+  }
+
+  export interface IPutRoomParams {
+    _id?: string 
+    all?: 0 | 1 
+  }
+
+  export interface IDeleteRoomParams {
+    _id: string 
+  }
+
+  export interface IPostJoinRoomParams {
+    _id: string 
+  }
+
+  export interface IDeleteJoinRoomParams {
+    _id: string 
+  }
+
+  export interface IGetMessageListParams {
+    _id?: string 
+    currPage?: number 
+    pageSize?: number
+  }
+
+  export interface IGetMessageListData {
+    user: TUserData
+    _id: string 
+    status: TUserStatus
+    sid: string 
+    createdAt: string 
+    updatedAt: string 
+  }
+
+  export interface IPutMessageParams {
+    _id: string 
+    type?: 0 | 1
+  }
+
+  export interface IDeleteMessageParams {
+    _id: string 
+    type?: 0 | 1
+  }
+
+  export type TMessageMediaType = "IMAGE" | "AUDIO" | "TEXT" | "VIDEO"
+
+  export interface IPostMessageParams {
+    _id: string 
+    type: TMessageMediaType
+    content: string 
+    point_to?: string 
+  }
+
+  export interface IGetMessageDetailParams {
+    _id: string 
+    currPage?: number 
+    pageSize?: number 
+    start?: string 
+  }
+
+  export interface IGetMessageDetailData {
+    _id: string 
+    user_info: TUserData
+    media_type: TMessageMediaType
+    point_to: string 
+    createdAt: string 
+    updatedAt: string 
+    content: Partial<{
+      video: string 
+      image: string 
+      text: string 
+      audio: string 
+      poster: string
+    }>
+  }
+
+}

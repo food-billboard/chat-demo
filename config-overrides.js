@@ -204,8 +204,8 @@ const addMiniCssExtractPlugin = () => {
 
 const proxyApi = {
   '/api': {
-    target: 'http://47.111.229.250', // prod
-    // target: "http://localhost:4000",
+    // target: 'http://47.111.229.250', // prod
+    target: "http://localhost:4000",
     changeOrigin: true,
     secure: false,
     xfwd: false,

@@ -25,7 +25,6 @@ const parseValue = (value: string) => {
 export const connect = () => {
   const socket = Client('ws://localhost:3001')
   socket.on('connect', () => {
-    console.log(22222)
     connectStoreUserData(socket)
   })
 }

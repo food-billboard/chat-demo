@@ -146,6 +146,8 @@ const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
   const [ bottomNode, setBottomNode ] = useState<Element>()
   const [ loading, setLoading ] = useState<boolean>(false)
 
+  const containerRef = useRef<any>()
+
   const { userInfo, fetchData, style={} } = useMemo(() => {
     return props 
   }, [props])

@@ -19,6 +19,13 @@ declare namespace STORE_USER {
     member: string 
   }
 
+  export interface ISocketData {
+    roomList: API_CHAT.IGetRoomListData[]
+    messageList: API_CHAT.IGetMessageListData[]
+    messageDetailList: API_CHAT.IGetMessageDetailData[]
+    socket: any 
+  }
+
   export interface IBaseState<T=any> {
     error: any
     loading: boolean 

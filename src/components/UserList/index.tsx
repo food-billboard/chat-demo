@@ -37,7 +37,7 @@ const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
 
   useEffect(() => {
     internalFetchData()
-  }, [])
+  }, [internalFetchData])
 
   return (
     <List
@@ -97,7 +97,7 @@ export default memo((props: IWrapperProps) => {
     return (
       <UserList {...nextProps} />
     )
-  }, [])
+  }, [nextProps])
 
   return (
     <Popover

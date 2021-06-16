@@ -69,6 +69,7 @@ export default memo(() => {
       />
       <Col span={24}
         className={styles["friends-chat-list"]}
+        style={{padding: 0}}
       >
         <div
           style={{height: '100%'}}
