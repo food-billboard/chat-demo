@@ -5,6 +5,8 @@ import { GroupChat } from '@/components/ChatList'
 import { getBlackUser, unBlack2User, deleteRelation } from '@/services'
 import styles from './index.less'
 
+import { Button as CusBottom } from 'ComponentStory'
+
 export default memo(() => {
 
   const fetchData = useCallback(async () => {
@@ -56,13 +58,14 @@ export default memo(() => {
       <Button onClick={cancelBlack.bind(this, item)} type="link" key="list-edit">取消</Button>, 
       <Button onClick={deleteUser.bind(this, item)} danger type="link" key="list-delete">删除</Button>
     ]
-  }, [])
+  }, [cancelBlack, deleteUser])
 
   return (
     <Row 
       gutter={24}
       style={{width: '100%', position: 'relative', margin: 0}}
     >
+      <CusBottom>1112233</CusBottom>
       <UserList 
         fetchData={fetchData} 
         actions={actions}

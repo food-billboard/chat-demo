@@ -169,7 +169,7 @@ const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
       const { _id } = user
       return {
         ...item,
-        isMine: member == _id
+        isMine: member === _id
       } 
     })
   }, [value, userInfo])
@@ -246,6 +246,7 @@ export const GroupChat = memo((props: IGroupProps) => {
   const listRef = useRef<IChatListRef>(null)
 
   const onFetchData = useCallback(async () => {
+    console.log('fetchData')
     await listRef.current?.fetchData()
   }, [])
 

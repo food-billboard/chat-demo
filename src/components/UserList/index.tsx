@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { CSSProperties, forwardRef, memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { List, Avatar, Skeleton, Image, Tooltip, Button, Popover, PopoverProps } from 'antd'
 import { unstable_batchedUpdates } from 'react-dom'
 import { merge } from 'lodash-es'
@@ -11,18 +11,19 @@ interface IProps {
   fetchData:() => Promise<API_USER.IGetUserListData[]>
   actions?: (data: API_USER.IGetUserListData) => React.ReactNode[]
   userAction?: (data: API_USER.IGetUserListData) => any
+  style?: CSSProperties
 }
 
 interface IUserListRef {
 
 }
 
-const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
+export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
 
   const [ loading, setLoading ] = useState<boolean>(true)
   const [ list, setList ] = useState<API_USER.IGetUserListData[]>([])
 
-  const { fetchData, actions, userAction } = useMemo(() => {
+  const { fetchData, actions, userAction, style={} } = useMemo(() => {
     return props 
   }, [props])
 
@@ -42,6 +43,7 @@ const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
   return (
     <List
       className={styles["demo-loadmore-list"]}
+      style={style}
       loading={loading}
       itemLayout="horizontal"
       // loadMore={loadMore}

@@ -1,19 +1,20 @@
 import { memo, useCallback, useMemo } from 'react'
 import { Row, Col, Button, Modal, message, Result } from 'antd'
-import UserList from '@/components/UserList'
+import { UserList } from '@/components/UserList'
 import { getBlackUser, unBlack2User, deleteRelation } from '@/services'
 
 export default memo(() => {
 
   const fetchData = useCallback(async () => {
-    return [
-      {
-        username: "伙食棒棒", 
-        avatar: "https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=2035980560,2598993403&fm=58", 
-        _id: '1',
-        description: "我是天天才才hhhhhh" 
-      }
-    ]
+    return new Array(20).fill({
+      username: "伙食棒棒", 
+      avatar: "https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=2035980560,2598993403&fm=58", 
+      _id: '1',
+      description: "我是天天才才hhhhhh" 
+    }).map(item => ({
+      ...item,
+      _id: Math.random() + Date.now().toString()
+    }))
     return await getBlackUser()
   }, [])
 
@@ -31,6 +32,8 @@ export default memo(() => {
       Modal.confirm({
         title: '提示',
         content: '是否删除该黑名单好友',
+        okText: '确定',
+        cancelText: "取消",
         onOk: (close) => {
           close()
           resolve(true)
@@ -53,10 +56,10 @@ export default memo(() => {
 
   const actions = useCallback((item) => {
     return [
-      <Button onClick={cancelBlack.bind(this, item)} type="link" ghost key="list-edit">取消</Button>, 
+      <Button onClick={cancelBlack.bind(this, item)} type="link" ghost key="list-edit">取消拉黑</Button>, 
       <Button onClick={deleteUser.bind(this, item)} danger type="link" key="list-delete">删除</Button>
     ]
-  }, [])
+  }, [cancelBlack, deleteUser])
 
   const ResultPage = useMemo(() => {
     return (
@@ -73,15 +76,18 @@ export default memo(() => {
   return (
     <Row 
       gutter={24}
-      style={{width: '100%', padding: 10, boxSizing: 'border-box', margin: 0}}
+      style={{width: '100%', padding: 10, boxSizing: 'border-box', margin: 0, height: '100%'}}
     >
-      <Col span={6}>
+      <Col span={16}
+        style={{height: '100%', overflow: 'auto'}}
+      >
         <UserList 
           fetchData={fetchData} 
           actions={actions}
+          style={{height: '100%', maxHeight: 'unset'}}
         />
       </Col>
-      <Col span={18} style={{padding: 0}}>
+      <Col span={8} style={{padding: 0}}>
         {ResultPage}
       </Col>
     </Row>
