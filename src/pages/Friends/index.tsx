@@ -5,8 +5,6 @@ import { GroupChat } from '@/components/ChatList'
 import { getBlackUser, unBlack2User, deleteRelation } from '@/services'
 import styles from './index.less'
 
-import { Button as CusBottom } from 'ComponentStory'
-
 export default memo(() => {
 
   const fetchData = useCallback(async () => {
@@ -65,7 +63,6 @@ export default memo(() => {
       gutter={24}
       style={{width: '100%', position: 'relative', margin: 0}}
     >
-      <CusBottom>1112233</CusBottom>
       <UserList 
         fetchData={fetchData} 
         actions={actions}

@@ -3,6 +3,8 @@ import { Carousel, Popover, PopoverProps, Button, Input, Space, Image, Typograph
 import { CarouselRef } from 'antd/es/carousel'
 import { BankOutlined, FireOutlined, UserOutlined, LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons'
 import { merge, noop } from 'lodash-es'
+import { connect } from 'react-redux'
+import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
 
@@ -36,7 +38,9 @@ const RoomItem = memo((props: IRoomItemProps) => {
           preview={false}
           wrapperStyle={{
             display: 'flex',
-            alignItems: 'center'
+            alignItems: 'center',
+            borderRadius: 5,
+            overflow: 'hidden'
           }}
         />
         <div
@@ -75,49 +79,26 @@ const RoomItem = memo((props: IRoomItemProps) => {
 
 interface IProps {
   style?: React.CSSProperties
+  value?: API_CHAT.IGetRoomListData[]
 }
 
 interface IRoomListRef {
   searchValue: (value: string) => void 
 }
 
-const RoomList = memo(forwardRef<IRoomListRef, IProps>((props, ref) => {
+const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IRoomListRef, IProps>((props, ref) => {
 
   const PAGE_MAX_SIZE = 4
 
-  const [ value, setValue ] = useState<API_CHAT.IGetRoomListData[]>([])
-
   const carouselRef = useRef<CarouselRef>(null)
 
-  const { style={} } = useMemo(() => {
+  const { style={}, value=[] } = useMemo(() => {
     return props 
   }, [props])
 
-  const fetchData = useCallback(async () => {
-    setValue(new Array(10).fill({
-      _id: '1',  
-      create_user: {
-        _id: '111',
-        username: '10'.repeat(10),
-        avatar: "https://dss1.bdstatic.com/6OF1bjeh1BF3odCf/it/u=3878056340,2402291520&fm=218&app=92&f=PNG?w=121&h=75&s=6AA58B0ADE94B08AD3450CDB010050B3",
-        description: "100".repeat(10), 
-        member: "111111" 
-      },
-      info: {
-        name: 'room0'.repeat(10),
-        description: 'room0'.repeat(10),
-        avatar: "https://dss1.bdstatic.com/6OF1bjeh1BF3odCf/it/u=3878056340,2402291520&fm=218&app=92&f=PNG?w=121&h=75&s=6AA58B0ADE94B08AD3450CDB010050B3",
-      },
-      members: 100, 
-      is_delete: false, 
-      createdAt: new Date().toString(), 
-      updatedAt: new Date().toString(), 
-      online_members: 100000 
-    }).map((item, index) => ({ ...item, _id: index + Math.random() })))
-  }, [])
-
   const list = useMemo(() => {
-    return value.reduce((acc, cur, index) => {
+    const realValue = (value || [])
+    return realValue.reduce((acc, cur, index) => {
       const len = acc.length 
       const currentIndex = len === 0 ? 0 : len - 1
       if(!acc[currentIndex]) acc[currentIndex] = []
@@ -153,10 +134,6 @@ const RoomList = memo(forwardRef<IRoomListRef, IProps>((props, ref) => {
     })
   }, [list])
 
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
-
   const searchValue = useCallback((value: string) => {
     const index = list.findIndex(item => {
       return item.some(data => {
@@ -187,7 +164,7 @@ const RoomList = memo(forwardRef<IRoomListRef, IProps>((props, ref) => {
     </div>
   )
 
-}))
+})))
 
 interface IWrapperProps extends IProps {
   popover?: Partial<PopoverProps>

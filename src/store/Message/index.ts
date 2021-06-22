@@ -1,4 +1,4 @@
-import { merge, pick, omit } from 'lodash-es'
+import { merge } from 'lodash-es'
 import {
   SUCCESS,
   BEGIN,
@@ -7,7 +7,7 @@ import {
 import { generateReducer } from '../utils'
 
 const DEFAULT_VALUE = {
-  socket: null 
+  messageList: [],
 }
 
 const initialState = {
@@ -23,15 +23,5 @@ export default generateReducer({
     BEGIN,
     FAIL
   },
-  callback: {
-    success: (value: any, state: any) => {
-      return {
-        ...(omit(state, ["value"])),
-        value: {
-          ...pick(state, ["value"]),
-          ...value 
-        }
-      }
-    }
-  }
+  
 })

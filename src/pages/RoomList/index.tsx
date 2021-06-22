@@ -1,19 +1,13 @@
 import React, { memo, useCallback } from 'react'
 import { Row, Col } from 'antd'
+import { connect } from 'react-redux'
 import { GroupChat } from '@/components/ChatList'
 import RoomList from '@/components/RoomList'
+import { mapStateToProps, mapDispatchToProps } from './connect'
 import {  } from '@/services'
 import styles from './index.less'
 
-export default memo(() => {
-
-  const fetchData = useCallback(async () => {
-    return []
-  }, [])
-
-  const fetchRoomList = useCallback(async () => {
-    return []
-  }, [])
+export default connect(mapStateToProps, mapDispatchToProps)(memo(() => {
 
   return (
     <Row 
@@ -70,4 +64,4 @@ export default memo(() => {
     </Row>
   )
 
-})
+}))

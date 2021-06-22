@@ -7,7 +7,7 @@ import {
 import { generateReducer } from '../utils'
 
 const DEFAULT_VALUE = {
-  socket: null 
+  messageDetailList: [],
 }
 
 const initialState = {

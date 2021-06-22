@@ -2,6 +2,13 @@ declare namespace STORE_GLOBAL {
 
   export interface IState {
     getUserInfo: STORE_USER.IBaseState<STORE_USER.IUserInfo>
+    Forgot: STORE_USER.IBaseState<any>
+    Login: STORE_USER.IBaseState<any>
+    Message: STORE_USER.IBaseState<STORE_USER.IMessageData>
+    MessageDetail: STORE_USER.IBaseState<STORE_USER.IMessageDetailData>
+    Register: STORE_USER.IBaseState<any>
+    Room: STORE_USER.IBaseState<STORE_USER.IRoomData>
+    Socket: STORE_USER.IBaseState<STORE_USER.ISocketData>
   }
 
 }
@@ -20,9 +27,6 @@ declare namespace STORE_USER {
   }
 
   export interface ISocketData {
-    roomList: API_CHAT.IGetRoomListData[]
-    messageList: API_CHAT.IGetMessageListData[]
-    messageDetailList: API_CHAT.IGetMessageDetailData[]
     socket: any 
   }
 
@@ -30,6 +34,18 @@ declare namespace STORE_USER {
     error: any
     loading: boolean 
     value: T
+  }
+
+  export interface IRoomData {
+    roomList: API_CHAT.IGetRoomListData[]
+  }
+
+  export interface IMessageData {
+    messageList: API_CHAT.IGetMessageListData[]
+  }
+
+  export interface IMessageDetailData {
+    messageDetailList: API_CHAT.IGetMessageDetailData[]
   }
 
 }

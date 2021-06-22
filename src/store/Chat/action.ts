@@ -1,23 +1,70 @@
-import { forgot } from '@/services'
 import { generateAction } from '../utils'
-import { history } from '@/utils'
-import { connect as internalConnect,  } from '@/utils/socket'
+import { connect as internalConnect, parseValue, connectStoreUserData } from '@/utils/socket'
+import { setStorage } from '@/utils/socket/utils'
+import { messageListSave, messageList } from '../Message/action'
+import { messageListDetailSave, messageListDetail } from '../MessageDetail/action'
+import { roomList, roomListSave } from '../Room/action'
 
 export const { success, fail, begin, SUCCESS, FAIL, BEGIN } = generateAction<any>('SOCKET')
 
-export function connect(params: API_USER.IForgetParams) {
+export function connect() {
   return (dispatch: any) => {
     dispatch(begin());
-    return forgot(params)
+    return internalConnect()
     .then(json => {
-      dispatch(success(json))
-      history.replace('/login')
+      connect2User(json)
+      eventBinding(dispatch, json)
       return json
     })
     .catch(error => dispatch(fail(error)))
   }
 }
 
-function eventBinding(socket: any) {
+async function connect2User(socket: any) {
+  return connectStoreUserData(socket)
+}
+
+function eventBinding(dispatch: any, socket: any) {
+
+  //connect2user
+  socket.on('connect_user', (data: string) => {
+    const value: any = parseValue(data)
+    const { success: isSuccess, res: { data: resData } } = value 
+    if(isSuccess) {
+      setStorage({
+        temp_user_id: resData.temp_user_id
+      })
+      dispatch(success({ socket }))
+      dispatch(messageList(socket))
+      dispatch(roomList(socket))
+    }
+  })
+
+  //messagelist
+  socket.on('get', (data: string) => {
+    const value: any = parseValue(data)
+    const { success, res: { data: resData } } = value 
+    if(success) {
+      dispatch(messageListSave(resData))
+    }
+  })
+
+  //message detail
+  socket.on('message', (data: string) => {
+    const value: any = parseValue(data)
+    const { success, res: { data: resData } } = value 
+    if(success) {
+      dispatch(messageListDetailSave(resData))
+    }
+  })
+
+  //room list 
+  socket.on('room', (data: string) => {
+    const value: any = parseValue(data)
+    const { success, res: { data: resData } } = value 
+    if(success) {
+      dispatch(roomListSave(resData))
+    }
+  })
 
 }

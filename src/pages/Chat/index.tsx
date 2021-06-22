@@ -1,5 +1,5 @@
 import React, { Fragment, memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { Row, Col, Menu } from 'antd'
+import { Menu } from 'antd'
 import { 
   PieChartOutlined, 
   DesktopOutlined, 
@@ -11,12 +11,12 @@ import {
 import { debounce } from 'lodash-es'
 import classnames from 'classnames'
 import { Switch, Route, withRouter, Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { mapStateToProps, mapDispatchToProps } from './connect'
 import Black from '../BlackUser'
 import Friends from '../Friends'
 import Room from '../RoomList'
 import Recent from '../RecuntUser'
-import ChatHeader from '@/components/UserHeader'
-import List from '@/components/ChatList'
 import { history } from '@/utils'
 import styles from './index.less'
 
@@ -29,7 +29,7 @@ const CHAT_ROUTE_MAP = {
   black: '/main/black'
 }
 
-export default withRouter(memo(() => {
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((props: any) => {
 
   const [ collapsed, setCollapsed ] = useState<boolean>(false)
   const [ selectedKeys, setSelectedKeys ] = useState<string[]>(['room'])
@@ -96,6 +96,10 @@ export default withRouter(memo(() => {
     }
   }, [])
 
+  useEffect(() => {
+    props.connect?.()
+  }, [])
+
   return (
     <div
       className={styles["chat-content"]}
@@ -139,4 +143,4 @@ export default withRouter(memo(() => {
     </div>
   )
 
-}))
+})))

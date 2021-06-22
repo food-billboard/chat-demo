@@ -7,7 +7,7 @@ import {
 import { generateReducer } from '../utils'
 
 const DEFAULT_VALUE = {
-  socket: null 
+  roomList: [],
 }
 
 const initialState = {

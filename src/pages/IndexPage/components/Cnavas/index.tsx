@@ -23,7 +23,7 @@ class Bubble {
 
   x: number = 0
   y: number = 0
-  w: number = 2
+  w: number = 1
   h: number = 10
   color: string = '#3ff'
   speed: number = 0

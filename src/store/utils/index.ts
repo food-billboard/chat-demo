@@ -92,7 +92,7 @@ export function generateReducer<SuccessType=any, ErrorType=any>({
       case actionType.SUCCESS:
         // 全部完成：设置 loading 为 "false"。
         // 同样，把从服务端获取的数据赋给 items。
-        if(callback?.success) return callback.success(action.payload.value)
+        if(callback?.success) return callback.success(action.payload.value, state)
         return {
           ...state,
           loading: false,
