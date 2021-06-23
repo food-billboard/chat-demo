@@ -3,7 +3,6 @@ import { Menu } from 'antd'
 import { 
   PieChartOutlined, 
   DesktopOutlined, 
-  ContainerOutlined, 
   PaperClipOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined
@@ -16,7 +15,6 @@ import { mapStateToProps, mapDispatchToProps } from './connect'
 import Black from '../BlackUser'
 import Friends from '../Friends'
 import Room from '../RoomList'
-import Recent from '../RecuntUser'
 import { history } from '@/utils'
 import styles from './index.less'
 
@@ -25,7 +23,6 @@ const { Item } = Menu
 const CHAT_ROUTE_MAP = {
   room: '/main/room',
   user: '/main/friends',
-  recent: '/main/recent',
   black: '/main/black'
 }
 
@@ -42,9 +39,6 @@ export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((pro
         </Item>
         <Item key="user" icon={<DesktopOutlined />}>
           好友
-        </Item>
-        <Item key="recent" icon={<ContainerOutlined />}>
-          最近联系人
         </Item>
         <Item key="black" icon={<PaperClipOutlined />}>
           黑名单
@@ -135,7 +129,6 @@ export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((pro
         <Switch>
           <Route component={Black} path="/main/black" />
           <Route component={Friends} path="/main/friends" />
-          <Route component={Recent} path="/main/recent" />
           <Route component={Room} path="/main/room" />
           <Redirect from="/main" to="/main/friends" />
         </Switch>

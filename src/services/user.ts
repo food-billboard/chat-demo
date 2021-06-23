@@ -55,14 +55,16 @@ export const unBlack2User = (params: API_USER.IUnBlackUserParams) => {
 }
 
 export const getBlackUser = (params: API_USER.IGetBlackUserParams={}) => {
-  return request<API_USER.IGetBlackUserRes[]>('/api/customer/manage/black', {
+  return request<{
+    black: API_USER.IGetBlackUserRes[]
+  }>('/api/customer/manage/black', {
     params,
     method: 'GET'
   })
 }
 
-export const getRelation = (params: API_USER.IGetFriendsParams) => {
-  return request<API_USER.IGetFriendsRes[]>('/api/customer/manage/friends', {
+export const getRelation = (params: API_USER.IGetFriendsParams={}) => {
+  return request<{ friends: API_USER.IGetFriendsRes[] }>('/api/customer/manage/friends', {
     params,
     method: 'GET'
   })

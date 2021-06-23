@@ -1,8 +1,8 @@
-import React, { memo, useCallback, useState, useEffect, useMemo, forwardRef, useRef, useImperativeHandle, Fragment } from "react"
+import React, { memo, useCallback, useMemo, forwardRef, useRef, useImperativeHandle } from "react"
 import { Carousel, Popover, PopoverProps, Button, Input, Space, Image, Typography } from 'antd'
 import { CarouselRef } from 'antd/es/carousel'
 import { BankOutlined, FireOutlined, UserOutlined, LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons'
-import { merge, noop } from 'lodash-es'
+import { merge, noop, omit } from 'lodash-es'
 import { connect } from 'react-redux'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
@@ -11,7 +11,7 @@ import styles from './index.less'
 const { Title, Paragraph } = Typography
 
 interface IRoomItemProps extends API_CHAT.IGetRoomListData {
-  prefix: boolean
+  prefix?: boolean
   onClick?: (item: API_CHAT.IGetRoomListData) => void 
 }
 
@@ -23,7 +23,7 @@ const RoomItem = memo((props: IRoomItemProps) => {
     return (
       <div
         className={styles["room-icon-list-item-wrapper-content-container"]}
-        onClick={onClick}
+        onClick={onClick.bind(this, props)}
       >
         <div 
           className={styles["room-icon-list-item-wrapper-content-bg"]}
@@ -46,11 +46,12 @@ const RoomItem = memo((props: IRoomItemProps) => {
         <div
           style={{
             width: '58%',
-            marginLeft: '2%'
+            marginLeft: '2%',
           }}
+          className={styles["white-text"]}
         >
-          <Title ellipsis level={4}>{name}</Title>
-          <Paragraph ellipsis={true}>
+          <Title style={{color: 'white'}} ellipsis level={4}>{name}</Title>
+          <Paragraph className={styles["white-text"]} ellipsis={true}>
             {description}
           </Paragraph>
           <Space>
@@ -77,7 +78,7 @@ const RoomItem = memo((props: IRoomItemProps) => {
   ) 
 })
 
-interface IProps {
+interface IProps extends Pick<IRoomItemProps, 'onClick'> {
   style?: React.CSSProperties
   value?: API_CHAT.IGetRoomListData[]
 }
@@ -92,7 +93,7 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
 
   const carouselRef = useRef<CarouselRef>(null)
 
-  const { style={}, value=[] } = useMemo(() => {
+  const { style={}, value=[], onClick } = useMemo(() => {
     return props 
   }, [props])
 
@@ -114,9 +115,11 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
   const domList = useMemo(() => {
     return list.map(item => {
       const newItem: any[] = [...item]
-      if(newItem.length < PAGE_MAX_SIZE) newItem.push(...new Array(PAGE_MAX_SIZE - newItem.length).fill({
-        _id: Date.now() + Math.random().toString(),
-        prefix: true 
+      if(newItem.length < PAGE_MAX_SIZE) newItem.push(...new Array(PAGE_MAX_SIZE - newItem.length).fill(0).map(() => {
+        return {
+          _id: Date.now() + Math.random().toString(),
+          prefix: true 
+        }
       }) as any[])
       return (
         <div className={styles["room-icon-list-item-wrapper"]} key={item[0]._id}>
@@ -124,7 +127,7 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
             {
               newItem.map(item => {
                 return (
-                  <RoomItem key={item._id} {...item} />
+                  <RoomItem onClick={onClick} key={item._id} {...item} />
                 )
               })
             }
@@ -132,7 +135,7 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
         </div>
       )
     })
-  }, [list])
+  }, [list, onClick])
 
   const searchValue = useCallback((value: string) => {
     const index = list.findIndex(item => {
@@ -166,9 +169,10 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
 
 })))
 
-interface IWrapperProps extends IProps {
+interface IWrapperProps extends Omit<IProps, "style"> {
   popover?: Partial<PopoverProps>
   style?: React.CSSProperties
+  listStyle?: React.CSSProperties
 }
 
 export default memo((props: IWrapperProps) => {
@@ -178,12 +182,6 @@ export default memo((props: IWrapperProps) => {
   }, [props])
 
   const roomListRef = useRef<IRoomListRef>(null)
-
-  const RoomListContent = useMemo(() => {
-    return (
-      <RoomList ref={roomListRef} {...nextProps} />
-    )
-  }, [nextProps])
 
   const searchRoom = useCallback((value: string) => {
     roomListRef.current?.searchValue(value)
@@ -209,7 +207,9 @@ export default memo((props: IWrapperProps) => {
       overlayClassName={styles["room-list-popover"]}
       placement="rightBottom"
       title={Title}
-      content={RoomListContent}
+      content={
+        <RoomList ref={roomListRef} {...omit(nextProps, ['listStyle'])} style={nextProps.listStyle || {}} />
+      }
       trigger="click"
       {...popover}
     >

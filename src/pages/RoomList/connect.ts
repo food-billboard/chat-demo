@@ -1,9 +1,11 @@
-import { connect } from '../../store'
+import { messageListDetail } from '../../store'
 
-export const mapStateToProps = (_: STORE_GLOBAL.IState) => {
-  return {}
+export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
+  return {
+    socket: state.Socket.value.socket
+  }
 }
 
 export const mapDispatchToProps = (dispatch: any) =>  ({
-  connect: () => dispatch(connect())
+  messageListDetail: (socket: any) => dispatch(messageListDetail(socket))
 })

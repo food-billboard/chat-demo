@@ -3,11 +3,12 @@ import { List, Avatar, Skeleton, Image, Tooltip, Button, Popover, PopoverProps }
 import { unstable_batchedUpdates } from 'react-dom'
 import { merge } from 'lodash-es'
 import { UserOutlined } from '@ant-design/icons'
+import { ListProps } from 'antd/es/list'
 import UserDetail from './components/UserDetail'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
 
-interface IProps {
+export interface IProps extends ListProps<API_USER.IGetUserListData> {
   fetchData:() => Promise<API_USER.IGetUserListData[]>
   actions?: (data: API_USER.IGetUserListData) => React.ReactNode[]
   userAction?: (data: API_USER.IGetUserListData) => any
@@ -23,7 +24,7 @@ export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
   const [ loading, setLoading ] = useState<boolean>(true)
   const [ list, setList ] = useState<API_USER.IGetUserListData[]>([])
 
-  const { fetchData, actions, userAction, style={} } = useMemo(() => {
+  const { fetchData, actions, userAction, style={}, ...nextProps } = useMemo(() => {
     return props 
   }, [props])
 
@@ -46,8 +47,8 @@ export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
       style={style}
       loading={loading}
       itemLayout="horizontal"
-      // loadMore={loadMore}
       dataSource={list}
+      locale={{emptyText: '暂无好友'}}
       renderItem={item => {
         const { avatar, username, description, _id } = item 
         const actionsNode = actions?.(item) || []
@@ -79,38 +80,8 @@ export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
           </List.Item>
         )
       }}
+      {...nextProps}
     />
   )
 
 }))
-
-interface IWrapperProps extends IProps {
-  popover?: Partial<PopoverProps>
-  style?: React.CSSProperties
-}
-
-export default memo((props: IWrapperProps) => {
-
-  const { popover, style={}, ...nextProps } = useMemo(() => {
-    return props
-  }, [props])
-
-  const UserListContent = useMemo(() => {
-    return (
-      <UserList {...nextProps} />
-    )
-  }, [nextProps])
-
-  return (
-    <Popover
-      placement="rightBottom"
-      title="好友列表"
-      content={UserListContent}
-      trigger="click"
-      {...popover}
-    >
-      <Button shape="circle" style={merge({}, { position: 'absolute', zIndex: 2, right: 12, top: '20vh' }, style)} icon={<UserOutlined />}></Button>
-    </Popover>
-  )
-
-})

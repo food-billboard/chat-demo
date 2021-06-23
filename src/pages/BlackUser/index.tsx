@@ -6,16 +6,8 @@ import { getBlackUser, unBlack2User, deleteRelation } from '@/services'
 export default memo(() => {
 
   const fetchData = useCallback(async () => {
-    return new Array(20).fill({
-      username: "伙食棒棒", 
-      avatar: "https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=2035980560,2598993403&fm=58", 
-      _id: '1',
-      description: "我是天天才才hhhhhh" 
-    }).map(item => ({
-      ...item,
-      _id: Math.random() + Date.now().toString()
-    }))
-    return await getBlackUser()
+    const data = await getBlackUser()
+    return data.black as API_USER.IGetFriendsRes[]
   }, [])
 
   const cancelBlack = useCallback(async (item: API_USER.IGetUserListData) => {
@@ -57,7 +49,7 @@ export default memo(() => {
   const actions = useCallback((item) => {
     return [
       <Button onClick={cancelBlack.bind(this, item)} type="link" ghost key="list-edit">取消拉黑</Button>, 
-      <Button onClick={deleteUser.bind(this, item)} danger type="link" key="list-delete">删除</Button>
+      <Button onClick={deleteUser.bind(this, item)} danger type="link" key="list-delete">删除好友</Button>
     ]
   }, [cancelBlack, deleteUser])
 
@@ -85,6 +77,7 @@ export default memo(() => {
           fetchData={fetchData} 
           actions={actions}
           style={{height: '100%', maxHeight: 'unset'}}
+          locale={{emptyText: '暂无黑名单用户'}}
         />
       </Col>
       <Col span={8} style={{padding: 0}}>

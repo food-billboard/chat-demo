@@ -1,21 +1,11 @@
-import { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback } from 'react'
 import { Row, Col, Button, Modal, message } from 'antd'
-import UserList from '@/components/UserList'
+import UserList from './components/UserList'
 import { GroupChat } from '@/components/ChatList'
-import { getBlackUser, unBlack2User, deleteRelation } from '@/services'
+import { unBlack2User, deleteRelation } from '@/services'
 import styles from './index.less'
 
 export default memo(() => {
-
-  const fetchData = useCallback(async () => {
-    return new Array(10).fill({
-      username: "伙食棒棒", 
-      avatar: "https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=2035980560,2598993403&fm=58", 
-      _id: '1',
-      description: "我是天天才才hhhhhh" 
-    })
-    return await getBlackUser()
-  }, [])
 
   const cancelBlack = useCallback(async (item: API_USER.IGetUserListData) => {
     await unBlack2User({
@@ -64,7 +54,6 @@ export default memo(() => {
       style={{width: '100%', position: 'relative', margin: 0}}
     >
       <UserList 
-        fetchData={fetchData} 
         actions={actions}
       />
       <Col span={24}
