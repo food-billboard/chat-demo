@@ -7,7 +7,10 @@ import {
 import { generateReducer } from '../utils'
 
 const DEFAULT_VALUE = {
-  messageDetailList: [],
+  messageDetailList: {
+    message: [],
+    room: {}
+  },
 }
 
 const initialState = {

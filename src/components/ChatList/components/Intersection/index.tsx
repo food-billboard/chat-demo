@@ -32,7 +32,7 @@ export default memo((props: IProps) => {
   }, [])
 
   return (
-    <div id="intersection-observer">loading...</div>
+    <div id="intersection-observer"></div>
   )
 
 })

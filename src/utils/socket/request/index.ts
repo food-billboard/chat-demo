@@ -41,57 +41,81 @@ export const connectStoreUserData = async (socket: any) => {
 }
 
 //消息列表
-export const getMessage = async (socket: any) => {
+export const getMessage = async (socket: any, params: API_CHAT.IGetMessageListParams={}) => {
   socket.emit('get', {
-    token: getToken()
+    token: getToken(),
+    ...params
   })
 }
 
 //消息详情
-export const getMessageDetail = async (socket: any) => {
+export const getMessageDetail = async (socket: any, params: API_CHAT.IGetMessageDetailParams) => {
   socket.emit('message', {
-    token: getToken()
+    token: getToken(),
+    ...params
   })
 }
 
 //房间列表
-export const getRoomList = async (socket: any) => {
+export const getRoomList = async (socket: any, params: API_CHAT.IGetRoomListParams={}) => {
   socket.emit('room', {
-    token: getToken()
+    token: getToken(),
+    ...params
   })
 }
 
 //进入房间
-export const joinRoom = () => {
-
+export const joinRoom = (socket: any, params: API_CHAT.IPostJoinRoomParams) => {
+  socket.emit('join', {
+    token: getToken(),
+    ...params
+  })
 }
 
 //发送消息
-export const postMessage = () => {
-
+export const postMessage = (socket: any, params: API_CHAT.IPostMessageParams) => {
+  socket.emit('post', {
+    token: getToken(),
+    ...params
+  })
 }
 
 //读消息
-export const readMessage = () => {
-
+export const readMessage = (socket: any, params: API_CHAT.IPutMessageParams) => {
+  socket.emit('put', {
+    token: getToken(),
+    ...params
+  })
 }
 
 //删除消息
-export const deleteMessage = () => {
-
+export const deleteMessage = (socket: any, params: API_CHAT.IDeleteMessageParams) => {
+  socket.emit('delete', {
+    token: getToken(),
+    ...params
+  })
 }
 
 //退出房间
-export const quitRoom = () => {
-
+export const quitRoom = (socket: any, params: API_CHAT.IDeleteJoinRoomParams) => {
+  socket.emit('quit_room', {
+    token: getToken(),
+    ...params
+  })
 }
 
 //删除房间
-export const deleteRoom = () => {
-
+export const deleteRoom = (socket: any, params: API_CHAT.IDeleteRoomParams) => {
+  socket.emit('remove_room', {
+    token: getToken(),
+    ...params
+  })
 }
 
 //离开房间(下线)
-export const putRoom = () => {
-  
+export const putRoom = (socket: any, params: API_CHAT.IDeleteRoomParams) => {
+  socket.emit('leave', {
+    token: getToken(),
+    ...params
+  })
 }

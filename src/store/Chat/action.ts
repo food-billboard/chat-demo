@@ -2,7 +2,7 @@ import { generateAction } from '../utils'
 import { connect as internalConnect, parseValue, connectStoreUserData } from '@/utils/socket'
 import { setStorage } from '@/utils/socket/utils'
 import { messageListSave, messageList } from '../Message/action'
-import { messageListDetailSave, messageListDetail } from '../MessageDetail/action'
+import { messageListDetailSave } from '../MessageDetail/action'
 import { roomList, roomListSave } from '../Room/action'
 
 export const { success, fail, begin, SUCCESS, FAIL, BEGIN } = generateAction<any>('SOCKET')

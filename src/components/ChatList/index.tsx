@@ -1,9 +1,10 @@
-import React, { memo, useMemo, FC, Fragment, useEffect, useCallback, useState, forwardRef } from 'react'
+import React, { memo, useMemo, FC, useCallback, useState, forwardRef } from 'react'
 import { Avatar } from 'antd'
 import { connect } from 'react-redux'
 import Day from 'dayjs'
 import { merge } from 'lodash-es'
 import scrollIntoView from 'scroll-into-view-if-needed'
+import { PageHeaderProps } from 'antd/es/page-header'
 import UserDetail from '../UserDetail'
 import ChatHeader from '../UserHeader'
 import ImageView from './components/ViewImage'
@@ -15,46 +16,35 @@ import styles from './index.less'
 import { useImperativeHandle } from 'react'
 import { useRef } from 'react'
 
-export interface IChatData {
-  user: {
-    avatar: string 
-    _id: string 
-    username: string 
-    description?: string 
-  },
-  message: {
-    value: string 
-    type: 'IMAGE' | 'AUDIO' | 'TEXT' | 'VIDEO'
-    poster?: string 
-    createdAt: string 
-  } 
-  isMine?: boolean 
-}
+type TMessageValue = API_CHAT.IGetMessageDetailData & { isMine?: boolean }
 
 export interface IProps {
-  // value: IChatData[]
+  value: TMessageValue[]
   style?: React.CSSProperties
+  loading?: boolean 
   userInfo?: STORE_USER.IUserInfo
   fetchData: (params: Partial<{
     currPage: number 
     pageSize: number 
-  }>) => Promise<IChatData[]>
+  }>) => Promise<void>
 }
 
 const ChatData: FC<{
-  value: IChatData
+  value: TMessageValue
 }> = memo((props) => {
 
   const { 
     value: {
       isMine,
-      user: {
+      user_info: {
         avatar,
         _id,
         username,
         description
       },
-      message
+      media_type,
+      content,
+      createdAt
     } 
   } = useMemo(() => {
     return props 
@@ -80,11 +70,7 @@ const ChatData: FC<{
   }, [avatar, username, isMine, description, _id])
 
   const PopoverMessage = useMemo(() => {
-    const {
-      value,
-      type,
-      poster
-    } = message
+    const { poster, image, text } = content 
     const margin = isMine ? { marginRight: 20 } : { marginLeft: 20 }
     return (
       <div
@@ -96,30 +82,30 @@ const ChatData: FC<{
         }}
       >
         {
-          type === 'AUDIO' && '语音消息'
+          media_type === 'AUDIO' && '语音消息'
         }
         {
-          (type === 'IMAGE' || type === 'VIDEO') && (
+          (media_type === 'IMAGE' || media_type === 'VIDEO') && (
             <ImageView
               type={'VIDEO'}
-              src={type === 'IMAGE' ? value : (poster || IMAGE_FALLBACK)}
+              src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
             />
           )
         }
         {
-          type === 'TEXT' && value
+          media_type === 'TEXT' && text!
         }
       </div>
     )
-  }, [message, isMine])
+  }, [media_type, content, isMine])
 
   return (
     <div
       className={styles["chat-item-container"]}
     >
       { 
-        !!message.createdAt && (
-          <div className={styles["chat-item-date"]}>{Day(message.createdAt).format('YYYY-MM-DD HH:mm:ss')}</div>
+        !!createdAt && (
+          <div className={styles["chat-item-date"]}>{Day(createdAt).format('YYYY-MM-DD HH:mm:ss')}</div>
         ) 
       }
       <div
@@ -142,13 +128,9 @@ export interface IChatListRef {
 const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
 
   const [ currPage, setCurrPage ] = useState<number>(0)
-  const [ value, setValue ] = useState<IChatData[]>([])
   const [ bottomNode, setBottomNode ] = useState<Element>()
-  const [ loading, setLoading ] = useState<boolean>(false)
 
-  const containerRef = useRef<any>()
-
-  const { userInfo, fetchData, style={} } = useMemo(() => {
+  const { userInfo, fetchData, style={}, value, loading } = useMemo(() => {
     return props 
   }, [props])
 
@@ -159,20 +141,26 @@ const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
   }, [])
 
   const globalStyle = useMemo(() => {
-    return merge({}, { height: '300vh' }, style)
+    return merge({}, style)
   }, [style])
 
   const realValue = useMemo(() => {
     const { member } = userInfo || {}
-    return value.map(item => {
-      const { user } = item
-      const { _id } = user
+    return (value || []).map(item => {
+      const { user_info } = item
+      const { _id } = user_info
       return {
         ...item,
         isMine: member === _id
       } 
     })
   }, [value, userInfo])
+
+  const getNode = useCallback(() => {
+    const node = document.querySelector("#chat-item-bottom")
+    if(node) setBottomNode(node)
+    return node 
+  }, [])
 
   const scrollToBottom = useCallback(() => {
     let node: any = bottomNode
@@ -183,29 +171,17 @@ const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
       inline: 'nearest',
       behavior: 'smooth'
     })
-  }, [bottomNode])
+  }, [bottomNode, getNode])
 
-  const internalFetchData = useCallback(async(params: Partial<{ currPage: number, pageSize: number, end: number }>={}, toBottom: boolean=false) => {
+  const internalFetchData = useCallback(async(params: Partial<{ currPage: number, pageSize: number, start: number }>={}, toBottom: boolean=false) => {
     if(loading) return 
-    setLoading(true)
-    const value = await fetchData(params)
-    setValue(value)
+    await fetchData(merge({ currPage, pageSize: 10 }, params))
+    setCurrPage(prev => prev + 1)
     if(toBottom) {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       scrollToBottom()
     }
-    setLoading(false)
-  }, [scrollToBottom, loading])
-
-  const getNode = useCallback(() => {
-    const node = document.querySelector("#chat-item-bottom")
-    if(node) setBottomNode(node)
-    return node 
-  }, [])
-
-  useEffect(() => {
-    internalFetchData({}, true)
-  }, [])
+  }, [scrollToBottom, loading, fetchData, currPage])
   
   return (
     <div
@@ -215,7 +191,7 @@ const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
       {
         realValue.map(item => {
           return (
-            <ChatData key={item.message.createdAt} value={item} />
+            <ChatData key={item.createdAt} value={item} />
           )
         })
       }
@@ -228,12 +204,12 @@ const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
 export default connect(mapStateToProps, mapDispatchToProps)(ChatList)
 
 interface IGroupProps extends IProps{
-
+  header: Partial<PageHeaderProps>
 }
 
 export const GroupChat = memo((props: IGroupProps) => {
 
-  const { ...nextProps } = useMemo(() => {
+  const { header, ...nextProps } = useMemo(() => {
     const { style, ...nextProps } = props 
     return merge({}, nextProps, { 
       style: merge({}, style, 
@@ -246,13 +222,12 @@ export const GroupChat = memo((props: IGroupProps) => {
   const listRef = useRef<IChatListRef>(null)
 
   const onFetchData = useCallback(async () => {
-    console.log('fetchData')
     await listRef.current?.fetchData()
   }, [])
 
   const onBack = useCallback(() => {
-    console.log('返回哈哈哈哈')
-  }, [])
+    console.log('返回哈哈哈哈', header)
+  }, [header])
 
   const ChatHeaderDom = useMemo(() => {
     return (
@@ -263,12 +238,13 @@ export const GroupChat = memo((props: IGroupProps) => {
           backgroundColor: 'rgb(236, 239, 243)',
           zIndex: 1
         }} 
-        title={"用户民"}
+        title={"用户名"}
         subTitle={""}
+        {...header}
         onBack={onBack}
       />
     )
-  }, [onBack])
+  }, [onBack, header])
 
   return (
     <div style={{height: '100%', overflow: 'auto'}}>

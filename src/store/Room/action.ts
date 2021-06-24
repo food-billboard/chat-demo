@@ -3,10 +3,10 @@ import { getRoomList } from '@/utils/socket'
 
 export const { success, fail, begin, SUCCESS, FAIL, BEGIN } = generateAction<any>('ROOM')
 
-export function roomList(socket: any) {
+export function roomList(socket: any, params: API_CHAT.IGetRoomListParams={}) {
   return async (dispatch: any) => {
     dispatch(begin())
-    return getRoomList(socket)
+    return getRoomList(socket, params)
     .catch(error => dispatch(fail(error)))
   }
 }

@@ -13,6 +13,7 @@ interface IProps {
   chatMessageCount?: number 
   groupChatMessageCount?: number 
   systemChatMessageCount?: number 
+  value?: API_CHAT.IGetMessageListData[]
 }
 
 interface IListProps {
@@ -67,10 +68,15 @@ const List = memo((props: IListProps) => {
 const Message = memo((props: IProps) => {
 
   const [ activeKey, setActiveKey ] = useState<'chat' | 'group_chat' | 'system'>('chat')
-  const [ messageList, setMessageList ] = useState<any[]>([])
 
-  const { chatMessageCount, groupChatMessageCount, systemChatMessageCount } = useMemo(() => {
-    return props 
+  const { chatMessageCount, groupChatMessageCount, systemChatMessageCount, value } = useMemo(() => {
+    const { value, } = props 
+    return {
+      value: value || [],
+      chatMessageCount: 0,
+      groupChatMessageCount: 0,
+      systemChatMessageCount: 0
+    }
   }, [props])
 
   const chatTitle = useMemo(() => {
@@ -133,7 +139,7 @@ const Message = memo((props: IProps) => {
       {
         activeKey === 'chat' && (
           <List 
-            list={messageList} 
+            list={value} 
             footer={footer}
           />
         )
@@ -141,7 +147,7 @@ const Message = memo((props: IProps) => {
       {
         activeKey === 'group_chat' && (
           <List 
-            list={messageList} 
+            list={value} 
             footer={footer}
           />
         )
@@ -149,7 +155,7 @@ const Message = memo((props: IProps) => {
       {
         activeKey === 'system' && (
           <List 
-            list={messageList} 
+            list={value} 
             footer={footer}
           />
         )

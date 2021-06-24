@@ -3,10 +3,10 @@ import { getMessageDetail } from '@/utils/socket'
 
 export const { success, fail, begin, SUCCESS, FAIL, BEGIN } = generateAction<any>('MESSAGE_DETAIL')
 
-export function messageListDetail(socket: any) {
+export function messageListDetail(socket: any, params: API_CHAT.IGetMessageDetailParams) {
   return async (dispatch: any) => {
     dispatch(begin())
-    return getMessageDetail(socket)
+    return getMessageDetail(socket, params)
     .catch(error => dispatch(fail(error)))
   }
 }

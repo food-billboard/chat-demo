@@ -232,9 +232,14 @@ declare namespace API_CHAT {
     start?: string 
   }
 
+  export interface IgetMessageDetailRes {
+    room: Pick<IGetRoomListData, '_id' | 'info'>,
+    message: IGetMessageDetailData[]
+  }
+
   export interface IGetMessageDetailData {
     _id: string 
-    user_info: TUserData
+    user_info: TUserData & { description: string }
     media_type: TMessageMediaType
     point_to: string 
     createdAt: string 

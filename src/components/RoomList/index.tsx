@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
+import { useState } from "react"
 
 const { Title, Paragraph } = Typography
 
@@ -51,7 +52,7 @@ const RoomItem = memo((props: IRoomItemProps) => {
           className={styles["white-text"]}
         >
           <Title style={{color: 'white'}} ellipsis level={4}>{name}</Title>
-          <Paragraph className={styles["white-text"]} ellipsis={true}>
+          <Paragraph style={{color: 'white'}} ellipsis={true}>
             {description}
           </Paragraph>
           <Space>
@@ -173,11 +174,14 @@ interface IWrapperProps extends Omit<IProps, "style"> {
   popover?: Partial<PopoverProps>
   style?: React.CSSProperties
   listStyle?: React.CSSProperties
+  clickClose?: boolean 
 }
 
 export default memo((props: IWrapperProps) => {
 
-  const { popover, style={}, ...nextProps } = useMemo(() => {
+  const [ visible, setVisible ] = useState<boolean>(false)
+
+  const { popover, style={}, clickClose, onClick, ...nextProps } = useMemo(() => {
     return props
   }, [props])
 
@@ -202,15 +206,26 @@ export default memo((props: IWrapperProps) => {
     )
   }, [searchRoom])
 
+  const onSelectClick = useCallback((item: API_CHAT.IGetRoomListData) => {
+    if(!!clickClose) setVisible(false)
+    onClick?.(item)
+  }, [onClick, clickClose])
+
+  const onVisibleChange = useCallback((visible) => {
+    setVisible(visible)
+  }, [])
+
   return (
     <Popover
       overlayClassName={styles["room-list-popover"]}
       placement="rightBottom"
       title={Title}
       content={
-        <RoomList ref={roomListRef} {...omit(nextProps, ['listStyle'])} style={nextProps.listStyle || {}} />
+        <RoomList ref={roomListRef} {...omit(nextProps, ['listStyle'])} style={nextProps.listStyle || {}} onClick={onSelectClick} />
       }
       trigger="click"
+      visible={visible}
+      onVisibleChange={onVisibleChange}
       {...popover}
     >
       <Button shape="circle" style={merge({}, { position: 'absolute', zIndex: 2, right: 12, top: '20vh' }, style)} icon={<BankOutlined />}></Button>
