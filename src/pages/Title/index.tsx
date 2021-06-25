@@ -10,11 +10,15 @@ import styles from './index.less'
 
 const Title = memo((props: any) => {
 
-  const { isLogin, userInfo={}, logout: fetchLogout } = useMemo(() => {
-    const { userInfo } = props
+  const { isLogin, userInfo={}, logout: fetchLogout, messageCount } = useMemo(() => {
+    const { userInfo, value } = props
     return {
       ...props,
-      isLogin: !!userInfo && !!userInfo._id
+      isLogin: !!userInfo && !!userInfo._id,
+      messageCount: (Array.isArray(value) ? value : []).reduce((acc, cur) => {
+        acc += (cur.un_read_message_count || 0)
+        return acc 
+      }, 0)
     } 
   }, [props])
 
@@ -69,7 +73,7 @@ const Title = memo((props: any) => {
                   >
                     <Badge
                       offset={[0, 5]}
-                      count={10}
+                      count={messageCount}
                       size={"small"}
                     >
                       <Button type="link" icon={<BellOutlined />} />

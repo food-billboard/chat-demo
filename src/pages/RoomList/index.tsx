@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { merge } from 'lodash'
 import { GroupChat } from '@/components/ChatList'
 import RoomList from '@/components/RoomList'
+import { putRoom, joinRoom } from '@/utils/socket/request'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import styles from './index.less'
 
@@ -17,19 +18,23 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
 
   const onSelectRoom = useCallback((item: API_CHAT.IGetRoomListData) => {
     if(!!curRoom) {
-      console.log('退出当前房间')
+      console.log('离开当前房间')
+      quitRoom()
     }
+    joinRoom(socket, { _id: item._id })
     console.log('进入指定房间')
     setCurRoom(item)
-  }, [curRoom])
+  }, [curRoom, socket])
 
   const fetchRoomList = useCallback(async (params: Omit<API_CHAT.IGetMessageDetailParams, "_id">={ currPage: 0, pageSize: 10 }) => {
     await messageListDetail(socket, merge({}, params, { _id: curRoom?._id }))
   }, [messageListDetail, socket, curRoom])
 
   const quitRoom = useCallback(() => {
-    console.log('我退出了房间', curRoom)
-  }, [curRoom])
+    console.log('我离开了房间', curRoom)
+    if(curRoom) putRoom(socket, { _id: curRoom._id })
+    setCurRoom(undefined)
+  }, [curRoom, socket])
 
   useEffect(() => {
     if(curRoom) {

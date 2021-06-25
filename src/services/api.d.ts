@@ -137,6 +137,8 @@ declare namespace API_CHAT {
 
   export type TRoomType = "SYSTEM" | "USER"
 
+  export type TChatType = "CHAT" | "GROUP_CHAT" | "SYSTEM"
+
   export interface IGetRoomListParams {
     _id?: string 
     type?: TRoomType 
@@ -198,12 +200,21 @@ declare namespace API_CHAT {
   }
 
   export interface IGetMessageListData {
-    user: TUserData
-    _id: string 
-    status: TUserStatus
-    sid: string 
     createdAt: string 
     updatedAt: string 
+    _id: string 
+    type: TChatType
+    create_user: TCreateUser
+    info: TRoomInfo
+    message_info: {
+      _id: string 
+      image: string 
+      poster: string 
+      video: string 
+      text: string,
+      media_type: TMessageMediaType
+    }
+    un_read_message_count: number 
   }
 
   export interface IPutMessageParams {

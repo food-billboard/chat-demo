@@ -1,6 +1,7 @@
 export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
   return {
-    value: state.Message.value?.messageList || []
+    value: state.Message.value?.messageList || [],
+    socket: state.Socket.value?.socket
   }
 }
 

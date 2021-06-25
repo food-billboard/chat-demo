@@ -225,8 +225,9 @@ export const GroupChat = memo((props: IGroupProps) => {
     await listRef.current?.fetchData()
   }, [])
 
-  const onBack = useCallback(() => {
+  const onBack = useCallback((e) => {
     console.log('返回哈哈哈哈', header)
+    header.onBack?.(e)
   }, [header])
 
   const ChatHeaderDom = useMemo(() => {

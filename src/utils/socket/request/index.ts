@@ -4,7 +4,7 @@ import { getStorage } from '../utils'
 
 export const getToken = () => {
   // return JSCookie.get()
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwNWYxZDIwYjhjMzY1MzI3NjI4M2RhMCIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyMzMxNjU5NSwiZXhwIjoxNjIzNDAyOTk1fQ.xuQ-J_3-WcWqV51R4LatAnDRJOJwcoF4FZXMIq1Kk7s'
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNDU5MDEwNSwiZXhwIjoxNjI0Njc2NTA1fQ.UeJ-qaw5i2lTdcnGWvRMa8bJArGrZeO2Kwd7Y9Vrpg0'
 }
 
 export const parseValue = (value: string) => {

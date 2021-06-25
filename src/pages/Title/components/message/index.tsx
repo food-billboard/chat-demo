@@ -1,8 +1,9 @@
-import React, { Fragment, memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { Tabs, Empty, List as AntList, Avatar, ConfigProvider, Button } from 'antd'
+import React, { Fragment, memo, useCallback, useMemo, useState } from 'react'
+import { Tabs, List as AntList, Avatar, Badge, Button } from 'antd'
 import { connect } from 'react-redux'
-import zhCN from 'antd/es/locale/zh_CN'
+import Day from 'dayjs'
 import { history } from '@/utils'
+import { readMessage as requestReadMessage } from '@/utils/socket/request'
 import { mapDispatchToProps, mapStateToProps } from './connect'
 
 const { TabPane } = Tabs
@@ -14,48 +15,56 @@ interface IProps {
   groupChatMessageCount?: number 
   systemChatMessageCount?: number 
   value?: API_CHAT.IGetMessageListData[]
+  [key: string]: any 
+}
+
+type TListData = {
+  avatar: string 
+  username: string 
+  message: string 
+  media_type: API_CHAT.TMessageMediaType
+  _id: string 
+  createdAt: string 
+  un_read_message_count: number 
+  [key: string]: any 
 }
 
 interface IListProps {
-  list: any[]
+  list: TListData[]
   footer?: React.ReactNode
+  onClick?: (item: TListData) => Promise<any> 
 }
 
 const List = memo((props: IListProps) => {
   
-  const { list, footer } = useMemo(() => {
+  const { list, footer, onClick } = useMemo(() => {
     return props 
   }, [props])
 
-  const goChat = useCallback(() => {
-    history.push('/main')
-  }, [])
-
-  if(list.length) return (
-    <ConfigProvider
-      locale={zhCN}
-    >
-      <Empty 
-        description="暂无新消息"
-      />
-    </ConfigProvider>
-  )
+  const goChat = useCallback((item) => {
+    onClick?.(item)
+  }, [onClick])
 
   return (
     <AntList
       footer={footer}
       dataSource={list}
+      locale={{emptyText: '暂无新消息'}}
       renderItem={item => {
-        const { avatar, username, message="" } = item 
+        const { avatar, username, message="", createdAt, un_read_message_count } = item 
         return (
           <ListItem
-            // onClick={goChat}
+            onClick={goChat.bind(this, item)}
           >
             <Meta
               avatar={<Avatar src={avatar}>{username}</Avatar>}
-              title={<a>{item.title}</a>}
+              title={<a>{username}</a>}
               description={message}
             />
+            <div style={{textAlign: 'center'}}>
+              {Day(createdAt).format('MM-DD HH:mm:ss')}<br />
+              <Badge count={un_read_message_count} />
+            </div>
           </ListItem>
         )
       }}
@@ -65,19 +74,83 @@ const List = memo((props: IListProps) => {
 
 })
 
+const MessageContent = {
+  IMAGE: "[图片]",
+  VIDEO: "[视频]",
+  AUDIO: "[音频]",
+}
+
 const Message = memo((props: IProps) => {
 
   const [ activeKey, setActiveKey ] = useState<'chat' | 'group_chat' | 'system'>('chat')
 
-  const { chatMessageCount, groupChatMessageCount, systemChatMessageCount, value } = useMemo(() => {
-    const { value, } = props 
+  const { chatMessage, groupChatMessage, systemChatMessage, socket } = useMemo(() => {
+    const { value, socket } = props 
+    const { chatMessage, groupChatMessage, systemChatMessage } = (Array.isArray(value) ? value : []).reduce((acc, cur) => {
+      const { info, createdAt, _id, type, message_info: { media_type, text }, create_user, un_read_message_count } = cur 
+      let defaultData = {
+        avatar: info.avatar, 
+        username: info.name, 
+        message: MessageContent[media_type as keyof typeof MessageContent] || text || '',
+        media_type,
+        _id,
+        createdAt,
+        un_read_message_count,
+      }
+      switch(type) {
+        case 'CHAT':
+          acc.chatMessage.push({
+            avatar: create_user.avatar, 
+            username: create_user.username, 
+            message: MessageContent[media_type as keyof typeof MessageContent] || text || '',
+            media_type,
+            _id,
+            createdAt,
+            un_read_message_count
+          })
+          break 
+        case 'GROUP_CHAT':
+          acc.groupChatMessage.push(defaultData)
+          break
+        case 'SYSTEM':
+          acc.systemChatMessage.push(defaultData)
+      }
+      return acc 
+    }, {
+      chatMessage: [],
+      groupChatMessage: [],
+      systemChatMessage: []
+    } as {
+      [key: string]: IListProps["list"]
+    })
     return {
-      value: value || [],
-      chatMessageCount: 0,
-      groupChatMessageCount: 0,
-      systemChatMessageCount: 0
-    }
+      socket,
+      chatMessage,
+      groupChatMessage,
+      systemChatMessage
+    } 
   }, [props])
+
+  const chatMessageCount = useMemo(() => {
+    return chatMessage.reduce((acc, cur) => {
+      acc += cur.un_read_message_count
+      return acc 
+    }, 0)
+  }, [ chatMessage ])
+
+  const groupChatMessageCount = useMemo(() => {
+    return groupChatMessage.reduce((acc, cur) => {
+      acc += cur.un_read_message_count
+      return acc 
+    }, 0)
+  }, [groupChatMessage])
+
+  const systemChatMessageCount = useMemo(() => {
+    return systemChatMessage.reduce((acc, cur) => {
+      acc += cur.un_read_message_count
+      return acc 
+    }, 0)
+  }, [systemChatMessage])
 
   const chatTitle = useMemo(() => {
     return `未读消息(${chatMessageCount || 0})`
@@ -95,9 +168,16 @@ const Message = memo((props: IProps) => {
     setActiveKey(activeKey)
   }, [])
 
-  const readMessage = useCallback(() => {
-    console.log('读消息')
-  }, [])
+  const readMessage = useCallback(async () => {
+    console.log('读消息', socket, props.value)
+    if(!props.value || !socket) return 
+    requestReadMessage(socket, {
+      _id: props.value?.map(item => {
+        return item._id
+      }).join(','),
+      type: 1
+    })
+  }, [socket, props.value])
 
   const getDetail = useCallback(() => {
     history.push('/main')
@@ -112,15 +192,11 @@ const Message = memo((props: IProps) => {
         <Button style={{flex: 1}} onClick={getDetail}>查看更多</Button>
       </div>
     )
-  }, [activeKey])
+  }, [getDetail, readMessage])
 
-  const fetchData = useCallback(() => {
-    console.log('获取数据详情')
+  const goRoom = useCallback(async (item: TListData) => {
+
   }, [])
-
-  useEffect(() => {
-    fetchData()
-  }, [activeKey])
  
   return (
     <Fragment>
@@ -139,24 +215,27 @@ const Message = memo((props: IProps) => {
       {
         activeKey === 'chat' && (
           <List 
-            list={value} 
+            list={chatMessage} 
             footer={footer}
+            onClick={goRoom}
           />
         )
       }
       {
         activeKey === 'group_chat' && (
           <List 
-            list={value} 
+            list={groupChatMessage} 
             footer={footer}
+            onClick={goRoom}
           />
         )
       }
       {
         activeKey === 'system' && (
           <List 
-            list={value} 
+            list={systemChatMessage} 
             footer={footer}
+            onClick={goRoom}
           />
         )
       }
