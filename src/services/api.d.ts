@@ -185,6 +185,12 @@ declare namespace API_CHAT {
     _id: string 
   }
 
+  export interface ICreateRoomParams {
+    _id?: string 
+    type: string 
+    members: string 
+  }
+
   export interface IPostJoinRoomParams {
     _id: string 
   }

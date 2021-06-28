@@ -1,13 +1,40 @@
-import React, { memo, useCallback, useMemo, forwardRef, useRef, useImperativeHandle } from "react"
-import { Carousel, Popover, PopoverProps, Button, Input, Space, Image, Typography } from 'antd'
+import React, { 
+  memo, 
+  useCallback, 
+  useMemo, 
+  forwardRef, 
+  useRef, 
+  useImperativeHandle, 
+  Fragment,
+  useState
+} from "react"
+import { 
+  Carousel, 
+  Popover, 
+  PopoverProps, 
+  Button, 
+  Input, 
+  Space, 
+  Image, 
+  Typography,
+  Tooltip, 
+} from 'antd'
 import { CarouselRef } from 'antd/es/carousel'
-import { BankOutlined, FireOutlined, UserOutlined, LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons'
+import { 
+  BankOutlined, 
+  FireOutlined, 
+  UserOutlined, 
+  LeftCircleOutlined, 
+  RightCircleOutlined, 
+  SettingOutlined
+} from '@ant-design/icons'
 import { merge, noop, omit } from 'lodash-es'
 import { connect } from 'react-redux'
+import RoomCreateModal, { IRoomCreateModalRef } from './components/RoomCreateModal'
 import { mapStateToProps, mapDispatchToProps } from './connect'
+import { createRoom } from '@/utils/socket/request'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
-import { useState } from "react"
 
 const { Title, Paragraph } = Typography
 
@@ -186,10 +213,16 @@ export default memo((props: IWrapperProps) => {
   }, [props])
 
   const roomListRef = useRef<IRoomListRef>(null)
+  const roomCreteModalRef = useRef<IRoomCreateModalRef>(null)
 
   const searchRoom = useCallback((value: string) => {
     roomListRef.current?.searchValue(value)
   }, [roomListRef])
+
+  const createChatRoom = useCallback(() => {
+    setVisible(false)
+    roomCreteModalRef.current?.open()
+  }, [roomCreteModalRef])
 
   const Title = useMemo(() => {
     return (
@@ -202,9 +235,14 @@ export default memo((props: IWrapperProps) => {
           enterButton
           size="small"
         />
+        <Tooltip
+          title="创建聊天室"
+        >
+          <SettingOutlined onClick={createChatRoom} />
+        </Tooltip>
       </Space>
     )
-  }, [searchRoom])
+  }, [searchRoom, createChatRoom])
 
   const onSelectClick = useCallback((item: API_CHAT.IGetRoomListData) => {
     if(!!clickClose) setVisible(false)
@@ -215,21 +253,36 @@ export default memo((props: IWrapperProps) => {
     setVisible(visible)
   }, [])
 
+  const createRoom = useCallback((value: any) => {
+    const { type, members } = value 
+    createRoom({
+      type,
+      members: Array.isArray(members) ? members.join(',') : members
+    })
+    console.log(value, '创建房间')
+  }, [])
+
   return (
-    <Popover
-      overlayClassName={styles["room-list-popover"]}
-      placement="rightBottom"
-      title={Title}
-      content={
-        <RoomList ref={roomListRef} {...omit(nextProps, ['listStyle'])} style={nextProps.listStyle || {}} onClick={onSelectClick} />
-      }
-      trigger="click"
-      visible={visible}
-      onVisibleChange={onVisibleChange}
-      {...popover}
-    >
-      <Button shape="circle" style={merge({}, { position: 'absolute', zIndex: 2, right: 12, top: '20vh' }, style)} icon={<BankOutlined />}></Button>
-    </Popover>
+    <Fragment>
+      <Popover
+        overlayClassName={styles["room-list-popover"]}
+        placement="rightBottom"
+        title={Title}
+        content={
+          <RoomList ref={roomListRef} {...omit(nextProps, ['listStyle'])} style={nextProps.listStyle || {}} onClick={onSelectClick} />
+        }
+        trigger="click"
+        visible={visible}
+        onVisibleChange={onVisibleChange}
+        {...popover}
+      >
+        <Button shape="circle" style={merge({}, { position: 'absolute', zIndex: 2, right: 12, top: '20vh' }, style)} icon={<BankOutlined />}></Button>
+      </Popover>
+      <RoomCreateModal
+        ref={roomCreteModalRef}
+        onOk={createRoom}
+      />
+    </Fragment>
   )
 
 })

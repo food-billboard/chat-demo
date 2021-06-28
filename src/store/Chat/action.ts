@@ -44,7 +44,6 @@ function eventBinding(dispatch: any, socket: any) {
   socket.on('get', (data: string) => {
     const value: any = parseValue(data)
     const { success, res: { data: resData } } = value 
-    console.log(resData, 2222)
     if(success) {
       dispatch(messageListSave(resData))
     }
@@ -72,6 +71,18 @@ function eventBinding(dispatch: any, socket: any) {
   socket.on('put', () => {
     console.log('读取消息完成')
     dispatch(messageList(socket))
+  })
+
+  //delete message 
+  socket.on('delete', () => {
+    console.log('删除消息完成')
+    dispatch(messageList(socket))
+  })
+
+  //room create 
+  socket.on('create_room', () => {
+    console.log('创建房间完成')
+    dispatch(roomList(socket))
   })
 
 }

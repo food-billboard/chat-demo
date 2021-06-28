@@ -4,7 +4,7 @@ import { getStorage } from '../utils'
 
 export const getToken = () => {
   // return JSCookie.get()
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNDU5MDEwNSwiZXhwIjoxNjI0Njc2NTA1fQ.UeJ-qaw5i2lTdcnGWvRMa8bJArGrZeO2Kwd7Y9Vrpg0'
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNDg0Mjk5NSwiZXhwIjoxNjI0OTI5Mzk1fQ.BR-V8_Knu21PWEI6BwLLNFPsyfIV29bOQ2n5pVOL72k'
 }
 
 export const parseValue = (value: string) => {
@@ -115,6 +115,13 @@ export const deleteRoom = (socket: any, params: API_CHAT.IDeleteRoomParams) => {
 //离开房间(下线)
 export const putRoom = (socket: any, params: API_CHAT.IDeleteRoomParams) => {
   socket.emit('leave', {
+    token: getToken(),
+    ...params
+  })
+}
+
+export const createRoom = (socket: any, params: API_CHAT.ICreateRoomParams) => {
+  socket.emit('create_room', {
     token: getToken(),
     ...params
   })
