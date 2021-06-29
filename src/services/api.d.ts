@@ -127,7 +127,7 @@ declare namespace API_CHAT {
   export type TUserStatus = "ONLINE" | "OFFLINE"
 
   export interface IGetMemberListData {
-    user: TUserData
+    user: TUserData & { friend_id: string }
     _id: string 
     status: TUserStatus
     sid: string 

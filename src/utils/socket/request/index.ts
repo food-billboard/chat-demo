@@ -120,6 +120,7 @@ export const putRoom = (socket: any, params: API_CHAT.IDeleteRoomParams) => {
   })
 }
 
+//创建房间
 export const createRoom = (socket: any, params: API_CHAT.ICreateRoomParams) => {
   socket.emit('create_room', {
     token: getToken(),

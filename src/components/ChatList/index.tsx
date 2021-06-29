@@ -1,4 +1,4 @@
-import React, { memo, useMemo, FC, useCallback, useState, forwardRef } from 'react'
+import React, { memo, useMemo, FC, useCallback, useState, forwardRef, useImperativeHandle, useRef } from 'react'
 import { Avatar } from 'antd'
 import { connect } from 'react-redux'
 import Day from 'dayjs'
@@ -13,8 +13,6 @@ import ObserverDom from './components/Intersection'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
-import { useImperativeHandle } from 'react'
-import { useRef } from 'react'
 
 type TMessageValue = API_CHAT.IGetMessageDetailData & { isMine?: boolean }
 
