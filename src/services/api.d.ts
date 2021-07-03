@@ -270,4 +270,24 @@ declare namespace API_CHAT {
     }>
   }
 
+  export interface IAgreeFriendParams {
+    _id: string 
+  }
+
+  export interface IDisagreeFriendParams {
+    _id: string 
+  }
+
+  export interface IGetInviteFriendListParams {
+    currPage?: number 
+    pageSize?: number 
+  }
+
+  export interface IGetInviteFriendListRes {
+    _id:	string
+    avatar: string 
+    username: string 
+    description: string 
+  }
+
 }

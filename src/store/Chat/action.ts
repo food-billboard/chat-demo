@@ -4,6 +4,7 @@ import { setStorage } from '@/utils/socket/utils'
 import { messageListSave, messageList } from '../Message/action'
 import { messageListDetailSave } from '../MessageDetail/action'
 import { roomList, roomListSave } from '../Room/action'
+import { inviteFriendList, inviteFriendListSave } from '../InviteList/action'
 
 export const { success, fail, begin, SUCCESS, FAIL, BEGIN } = generateAction<any>('SOCKET')
 
@@ -37,6 +38,7 @@ function eventBinding(dispatch: any, socket: any) {
       dispatch(success({ socket }))
       dispatch(messageList(socket))
       dispatch(roomList(socket))
+      dispatch(inviteFriendList(socket))
     }
   })
 
@@ -83,6 +85,12 @@ function eventBinding(dispatch: any, socket: any) {
   socket.on('create_room', () => {
     console.log('创建房间完成')
     dispatch(roomList(socket))
+  })
+
+  //invite list 
+  socket.on('invite_friend_list', () => {
+    console.log('好友申请列表')
+    dispatch(inviteFriendListSave(socket))
   })
 
 }

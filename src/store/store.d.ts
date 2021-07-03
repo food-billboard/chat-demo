@@ -9,6 +9,7 @@ declare namespace STORE_GLOBAL {
     Register: STORE_USER.IBaseState<any>
     Room: STORE_USER.IBaseState<STORE_USER.IRoomData>
     Socket: STORE_USER.IBaseState<STORE_USER.ISocketData>
+    InviteList: STORE_USER.IBaseState<STORE_USER.IInviteFriendList>
   }
 
 }
@@ -46,6 +47,10 @@ declare namespace STORE_USER {
 
   export interface IMessageDetailData {
     messageDetailList: API_CHAT.IgetMessageDetailRes
+  }
+
+  export interface IInviteFriendList {
+    inviteFriendList: API_CHAT.IGetInviteFriendListRes[]
   }
 
 }

@@ -224,7 +224,6 @@ export const GroupChat = memo((props: IGroupProps) => {
   }, [])
 
   const onBack = useCallback((e) => {
-    console.log('返回哈哈哈哈', header)
     header.onBack?.(e)
   }, [header])
 

@@ -127,3 +127,35 @@ export const createRoom = (socket: any, params: API_CHAT.ICreateRoomParams) => {
     ...params
   })
 }
+
+//申请添加好友
+export const inviteFriend = (socket: any, params: API_USER.IPostFriendsParams) => {
+  socket.emit('invite_friend', {
+    token: getToken(),
+    ...params
+  })
+}
+
+//拒绝添加好友
+export const disagreeFriend = (socket: any, params: API_CHAT.IDisagreeFriendParams) => {
+  socket.emit('disagree_friend', {
+    token: getToken(),
+    ...params
+  })
+}
+
+//同意添加好友
+export const agreeFriend = (socket: any, params: API_CHAT.IAgreeFriendParams) => {
+  socket.emit('agree_friend', {
+    token: getToken(),
+    ...params
+  })
+}
+
+//申请列表
+export const inviteList = async (socket: any, params: API_CHAT.IGetInviteFriendListParams) => {
+  socket.emit('invite_friend_list', {
+    token: getToken(),
+    ...params
+  })
+}

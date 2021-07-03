@@ -19,16 +19,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
     return props 
   }, [props])
 
-  const onSelectRoom = useCallback((item: API_CHAT.IGetRoomListData) => {
-    if(!!curRoom) {
-      console.log('离开当前房间')
-      quitRoom()
-    }
-    joinRoom(socket, { _id: item._id })
-    console.log('进入指定房间')
-    setCurRoom(item)
-  }, [curRoom, socket])
-
   const fetchRoomList = useCallback(async (params: Omit<API_CHAT.IGetMessageDetailParams, "_id">={ currPage: 0, pageSize: 10 }) => {
     await messageListDetail(socket, merge({}, params, { _id: curRoom?._id }))
   }, [messageListDetail, socket, curRoom])
@@ -38,6 +28,15 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
     if(curRoom) putRoom(socket, { _id: curRoom._id })
     setCurRoom(undefined)
   }, [curRoom, socket])
+
+  const onSelectRoom = useCallback((item: API_CHAT.IGetRoomListData) => {
+    if(!!curRoom) {
+      quitRoom()
+    }
+    joinRoom(socket, { _id: item._id })
+
+    setCurRoom(item)
+  }, [curRoom, socket, quitRoom])
 
   const fetchRoomUserList = useCallback(async () => {
     if(!curRoom) return []

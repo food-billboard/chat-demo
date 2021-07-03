@@ -9,6 +9,7 @@ import Socket from './Chat'
 import Message from './Message'
 import MessageDetail from './MessageDetail'
 import Room from './Room'
+import InviteFriend from "./InviteList"
 
 export { fetchUserInfoData, fetchLogout } from './UserInfo/action'
 export { fetchLogin, redirectPage } from './Login/action'
@@ -18,6 +19,7 @@ export { connect } from './Chat/action'
 export { messageList, messageListSave } from './Message/action'
 export { messageListDetail, messageListDetailSave } from './MessageDetail/action'
 export { roomList, roomListSave } from './Room/action'
+export { inviteFriendListSave, inviteFriendList } from './InviteList/action'
 
 const reducers = combineReducers({
   getUserInfo,
@@ -27,7 +29,8 @@ const reducers = combineReducers({
   Socket,
   Message,
   MessageDetail,
-  Room
+  Room,
+  InviteFriend
 })
 
 export default createStore(reducers, applyMiddleware(
