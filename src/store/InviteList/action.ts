@@ -13,6 +13,7 @@ export function inviteFriendList(socket: any, params: API_CHAT.IGetInviteFriendL
 
 export function inviteFriendListSave(value: any) {
   return async (dispatch: any) => {
-    return dispatch(success({ roomList: value }))
+
+    return dispatch(success({ inviteFriendList: value }))
   }
 }

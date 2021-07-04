@@ -2,6 +2,7 @@ import React, { Fragment, memo, useCallback, useMemo, useState } from 'react'
 import { Tabs, List as AntList, Avatar, Badge, Button } from 'antd'
 import { connect } from 'react-redux'
 import Day from 'dayjs'
+import { merge } from 'lodash'
 import { history } from '@/utils'
 import { readMessage as requestReadMessage } from '@/utils/socket/request'
 import { mapDispatchToProps, mapStateToProps } from './connect'
@@ -15,6 +16,7 @@ interface IProps {
   groupChatMessageCount?: number 
   systemChatMessageCount?: number 
   value?: API_CHAT.IGetMessageListData[]
+  inviteList?: API_CHAT.IGetInviteFriendListRes[]
   [key: string]: any 
 }
 
@@ -82,10 +84,10 @@ const MessageContent = {
 
 const Message = memo((props: IProps) => {
 
-  const [ activeKey, setActiveKey ] = useState<'chat' | 'group_chat' | 'system'>('chat')
+  const [ activeKey, setActiveKey ] = useState<'chat' | 'group_chat' | 'system' | 'invite'>('chat')
 
-  const { chatMessage, groupChatMessage, systemChatMessage, socket } = useMemo(() => {
-    const { value, socket } = props 
+  const { chatMessage, groupChatMessage, systemChatMessage, socket, inviteList } = useMemo(() => {
+    const { value, socket, inviteList } = props 
     const { chatMessage, groupChatMessage, systemChatMessage } = (Array.isArray(value) ? value : []).reduce((acc, cur) => {
       const { info, createdAt, _id, type, message_info: { media_type, text }, create_user, un_read_message_count } = cur 
       let defaultData = {
@@ -127,7 +129,15 @@ const Message = memo((props: IProps) => {
       socket,
       chatMessage,
       groupChatMessage,
-      systemChatMessage
+      systemChatMessage,
+      inviteList: inviteList?.map(item => {
+        const {  } = item 
+        return merge({}, item, {
+          message: '',
+          media_type: 'TEXT' as API_CHAT.TMessageMediaType,
+          un_read_message_count: 1
+        }) 
+      }) || []
     } 
   }, [props])
 
@@ -152,6 +162,10 @@ const Message = memo((props: IProps) => {
     }, 0)
   }, [systemChatMessage])
 
+  const inviteListCount = useMemo(() => {
+    return inviteList?.length || 0
+  }, [inviteList])
+
   const chatTitle = useMemo(() => {
     return `未读消息(${chatMessageCount || 0})`
   }, [chatMessageCount])
@@ -163,6 +177,10 @@ const Message = memo((props: IProps) => {
   const systemChatTitle = useMemo(() => {
     return `未读系统消息(${systemChatMessageCount || 0})`
   }, [systemChatMessageCount])
+
+  const inviteTitle = useMemo(() => {
+    return `好友申请(${inviteListCount})`
+  }, [inviteListCount])
 
   const onTabChange = useCallback((activeKey) => {
     setActiveKey(activeKey)
@@ -194,6 +212,17 @@ const Message = memo((props: IProps) => {
     )
   }, [getDetail, readMessage])
 
+  const inviteFooter = useMemo(() => {
+    return (
+      <div
+        style={{display: 'flex'}}
+      >
+        {/* <Button style={{flex: 1, marginRight: 16}} onClick={readMessage}>全部拒绝</Button>
+        <Button style={{flex: 1}} onClick={getDetail}>全部同意</Button> */}
+      </div>
+    )
+  }, [])
+
   const goRoom = useCallback(async (item: TListData) => {
 
   }, [])
@@ -211,6 +240,7 @@ const Message = memo((props: IProps) => {
         <TabPane tab={chatTitle} key="chat" />
         <TabPane tab={groupChatTitle} key="group_chat" />
         <TabPane tab={systemChatTitle} key="system" />
+        <TabPane tab={inviteTitle} key="invite" />
       </Tabs>
       {
         activeKey === 'chat' && (
@@ -236,6 +266,14 @@ const Message = memo((props: IProps) => {
             list={systemChatMessage} 
             footer={footer}
             onClick={goRoom}
+          />
+        )
+      }
+      {
+        activeKey === 'invite' && (
+          <List
+            footer={inviteFooter}
+            list={inviteList}
           />
         )
       }

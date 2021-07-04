@@ -288,6 +288,7 @@ declare namespace API_CHAT {
     avatar: string 
     username: string 
     description: string 
+    createdAt: string 
   }
 
 }

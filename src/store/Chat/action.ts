@@ -88,9 +88,13 @@ function eventBinding(dispatch: any, socket: any) {
   })
 
   //invite list 
-  socket.on('invite_friend_list', () => {
+  socket.on('invite_friend_list', (data: string) => {
     console.log('好友申请列表')
-    dispatch(inviteFriendListSave(socket))
+    const value: any = parseValue(data)
+    const { success, res: { data: resData } } = value 
+    if(success) {
+      dispatch(inviteFriendListSave(resData?.friends || []))
+    }
   })
 
 }

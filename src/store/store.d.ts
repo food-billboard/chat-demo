@@ -9,7 +9,7 @@ declare namespace STORE_GLOBAL {
     Register: STORE_USER.IBaseState<any>
     Room: STORE_USER.IBaseState<STORE_USER.IRoomData>
     Socket: STORE_USER.IBaseState<STORE_USER.ISocketData>
-    InviteList: STORE_USER.IBaseState<STORE_USER.IInviteFriendList>
+    InviteFriend: STORE_USER.IBaseState<STORE_USER.IInviteFriendList>
   }
 
 }

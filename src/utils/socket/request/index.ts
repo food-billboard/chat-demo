@@ -4,7 +4,8 @@ import { getStorage } from '../utils'
 
 export const getToken = () => {
   // return JSCookie.get()
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNDg0Mjk5NSwiZXhwIjoxNjI0OTI5Mzk1fQ.BR-V8_Knu21PWEI6BwLLNFPsyfIV29bOQ2n5pVOL72k'
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYzQ5NmI2MmUyMDZkMTgwMzg1ODA0NyIsIm1vYmlsZSI6MTM1MDE4MjM0NzksIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNTM3NjEwNSwiZXhwIjoxNjI1NDYyNTA1fQ.Rr3l3CsvJMObZfnT0lbGFLvJzmPorMu8rCw0toXGYUQ'
+  // return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2MxNzZmMGY4NzJjN2EzZDU5NWNjMiIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNTM3NDIyNiwiZXhwIjoxNjI1NDYwNjI2fQ.NH-gRXODEijMpKY7pS82JD6sLamQI7Ht_pwyG38eOuI'
 }
 
 export const parseValue = (value: string) => {
