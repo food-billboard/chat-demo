@@ -54,7 +54,7 @@ export default memo((props: IAvatarListProps) => {
                 style={{ backgroundColor: '#f56a00' }}
                 alt={username}
                 size="small"
-                srcSet={IMAGE_FALLBACK}
+                // srcSet={IMAGE_FALLBACK}
                 src={avatar}
                 draggable
                 {...nextProps}

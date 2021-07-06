@@ -4,8 +4,24 @@ import { getStorage } from '../utils'
 
 export const getToken = () => {
   // return JSCookie.get()
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYzQ5NmI2MmUyMDZkMTgwMzg1ODA0NyIsIm1vYmlsZSI6MTM1MDE4MjM0NzksIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNTM3NjEwNSwiZXhwIjoxNjI1NDYyNTA1fQ.Rr3l3CsvJMObZfnT0lbGFLvJzmPorMu8rCw0toXGYUQ'
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTg5MTI2NzJjMTEyMDlkZDVjNjdlYSIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMSIsImlhdCI6MTYyNTUzNzMwNywiZXhwIjoxNjI1NjIzNzA3fQ.9uwAyecERANHSp5KPI48_JfypteoN7K258eIaFoUrb0'
   // return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2MxNzZmMGY4NzJjN2EzZDU5NWNjMiIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNTM3NDIyNiwiZXhwIjoxNjI1NDYwNjI2fQ.NH-gRXODEijMpKY7pS82JD6sLamQI7Ht_pwyG38eOuI'
+}
+
+const promisify = (emit: any, on: any) => {
+  return new Promise((resolve, reject) => {
+    on((data: string) => {
+      console.log('socket响应')
+      const value: any = parseValue(data)
+      const { success, res: { data: resData, errMsg } } = value 
+      if(success) {
+        resolve(resData)
+      }else {
+        reject(errMsg)
+      }
+    })
+    emit()
+  })
 }
 
 export const parseValue = (value: string) => {
@@ -138,19 +154,19 @@ export const inviteFriend = (socket: any, params: API_USER.IPostFriendsParams) =
 }
 
 //拒绝添加好友
-export const disagreeFriend = (socket: any, params: API_CHAT.IDisagreeFriendParams) => {
-  socket.emit('disagree_friend', {
+export const disagreeFriend = async (socket: any, params: API_CHAT.IDisagreeFriendParams) => {
+  return promisify(socket.emit.bind(socket, 'disagree_friend', {
     token: getToken(),
     ...params
-  })
+  }), socket.on.bind(socket, 'disagree_friend'))
 }
 
 //同意添加好友
-export const agreeFriend = (socket: any, params: API_CHAT.IAgreeFriendParams) => {
-  socket.emit('agree_friend', {
+export const agreeFriend = async (socket: any, params: API_CHAT.IAgreeFriendParams) => {
+  return promisify(socket.emit.bind(socket, 'agree_friend', {
     token: getToken(),
     ...params
-  })
+  }), socket.on.bind(socket, 'agree_friend'))
 }
 
 //申请列表

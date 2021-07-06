@@ -8,6 +8,7 @@ import { putRoom, joinRoom } from '@/utils/socket/request'
 import AvatarList, { TAvatarData } from '@/components/AvatarList'
 import { getRoomMembers, postRelation } from '@/services'
 import { mapStateToProps, mapDispatchToProps } from './connect'
+import { withTry } from '@/utils'
 import styles from './index.less'
 
 export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) => {
@@ -57,7 +58,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
 
   const addFriends = useCallback(async (item: TAvatarData) => {
     setPostUserLoading(true)
-    await postRelation({
+    await withTry(postRelation)({
       _id: item._id
     })
     setPostUserLoading(false)

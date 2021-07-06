@@ -64,6 +64,7 @@ function eventBinding(dispatch: any, socket: any) {
   socket.on('room', (data: string) => {
     const value: any = parseValue(data)
     const { success, res: { data: resData } } = value 
+    console.log(value, 333)
     if(success) {
       dispatch(roomListSave(resData))
     }
@@ -92,6 +93,7 @@ function eventBinding(dispatch: any, socket: any) {
     console.log('好友申请列表')
     const value: any = parseValue(data)
     const { success, res: { data: resData } } = value 
+    console.log(value, 2222)
     if(success) {
       dispatch(inviteFriendListSave(resData?.friends || []))
     }

@@ -13,10 +13,7 @@ import Footer from './pages/Footer'
 import Forget from './pages/Forget'
 import store from './store'
 import { history } from './utils'
-import { connect } from '@/utils/socket'
 import './App.css'
-
-// connect()
 
 const App = () => {
 

@@ -1,10 +1,10 @@
 import React, { Fragment, memo, useCallback, useMemo, useState } from 'react'
-import { Tabs, List as AntList, Avatar, Badge, Button } from 'antd'
+import { Tabs, List as AntList, Avatar, Badge, Button, Space, message } from 'antd'
 import { connect } from 'react-redux'
 import Day from 'dayjs'
 import { merge } from 'lodash'
-import { history } from '@/utils'
-import { readMessage as requestReadMessage } from '@/utils/socket/request'
+import { history, withTry } from '@/utils'
+import { disagreeFriend as disagreeFriendMethod, readMessage as requestReadMessage, agreeFriend as agreeFriendMethod } from '@/utils/socket/request'
 import { mapDispatchToProps, mapStateToProps } from './connect'
 
 const { TabPane } = Tabs
@@ -35,11 +35,12 @@ interface IListProps {
   list: TListData[]
   footer?: React.ReactNode
   onClick?: (item: TListData) => Promise<any> 
+  badge?: (item: TListData) => React.ReactNode
 }
 
 const List = memo((props: IListProps) => {
   
-  const { list, footer, onClick } = useMemo(() => {
+  const { list, footer, onClick, badge } = useMemo(() => {
     return props 
   }, [props])
 
@@ -65,7 +66,9 @@ const List = memo((props: IListProps) => {
             />
             <div style={{textAlign: 'center'}}>
               {Day(createdAt).format('MM-DD HH:mm:ss')}<br />
-              <Badge count={un_read_message_count} />
+              {
+                badge?.(item) || <Badge count={un_read_message_count} />
+              }
             </div>
           </ListItem>
         )
@@ -86,8 +89,8 @@ const Message = memo((props: IProps) => {
 
   const [ activeKey, setActiveKey ] = useState<'chat' | 'group_chat' | 'system' | 'invite'>('chat')
 
-  const { chatMessage, groupChatMessage, systemChatMessage, socket, inviteList } = useMemo(() => {
-    const { value, socket, inviteList } = props 
+  const { chatMessage, groupChatMessage, systemChatMessage, socket, inviteList, inviteFriendList } = useMemo(() => {
+    const { value, socket, inviteList, inviteFriendList } = props 
     const { chatMessage, groupChatMessage, systemChatMessage } = (Array.isArray(value) ? value : []).reduce((acc, cur) => {
       const { info, createdAt, _id, type, message_info: { media_type, text }, create_user, un_read_message_count } = cur 
       let defaultData = {
@@ -131,13 +134,13 @@ const Message = memo((props: IProps) => {
       groupChatMessage,
       systemChatMessage,
       inviteList: inviteList?.map(item => {
-        const {  } = item 
         return merge({}, item, {
           message: '',
           media_type: 'TEXT' as API_CHAT.TMessageMediaType,
           un_read_message_count: 1
         }) 
-      }) || []
+      }) || [],
+      inviteFriendList
     } 
   }, [props])
 
@@ -223,6 +226,35 @@ const Message = memo((props: IProps) => {
     )
   }, [])
 
+  const disagreeFriend = useCallback(async (item: TListData) => {
+    const { friend_id } = item
+    const [err, ] = await withTry(disagreeFriendMethod)(socket, { _id: friend_id })
+    if(err) {
+      message.info('网络错误')
+    }else {
+      await inviteFriendList(socket)
+    }
+  }, [socket, inviteFriendList])
+
+  const agreeFriend = useCallback(async (item: TListData) => {
+    const { friend_id } = item
+    const [err, ] = await withTry(agreeFriendMethod)(socket, { _id: friend_id })
+    if(err) {
+      message.info('网络错误')
+    }else {
+      await inviteFriendList(socket)
+    }
+  }, [socket, inviteFriendList])
+
+  const inviteBadge = useCallback((item: TListData) => {
+    return (
+      <Space size={5}>
+        <Button type="link" danger onClick={disagreeFriend.bind(this, item)}>拒绝</Button>
+        <Button type="link" onClick={agreeFriend.bind(this, item)}>同意</Button>
+      </Space>
+    )
+  }, [disagreeFriend, agreeFriend])
+
   const goRoom = useCallback(async (item: TListData) => {
 
   }, [])
@@ -274,6 +306,7 @@ const Message = memo((props: IProps) => {
           <List
             footer={inviteFooter}
             list={inviteList}
+            badge={inviteBadge}
           />
         )
       }
