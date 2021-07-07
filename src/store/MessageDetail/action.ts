@@ -13,7 +13,6 @@ export function messageListDetail(socket: any, params: API_CHAT.IGetMessageDetai
 
 export function messageListDetailSave(value: any) {
   return async (dispatch: any) => {
-    console.log(value, 234455)
     return dispatch(success({ messageDetailList: value }))
   }
 }

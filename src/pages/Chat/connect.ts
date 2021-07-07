@@ -1,9 +1,13 @@
-import { connect } from '../../store'
+import { connect, exchangeRoom } from '../../store'
 
-export const mapStateToProps = (_: STORE_GLOBAL.IState) => {
-  return {}
+export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
+  return {
+    currRoom: state.Socket.value?.room,
+    socket: state.Socket.value.socket,
+  }
 }
 
 export const mapDispatchToProps = (dispatch: any) =>  ({
-  connect: () => dispatch(connect())
+  connect: () => dispatch(connect()),
+  exchangeRoom: (socket: any, room: API_CHAT.IGetRoomListData, isJoin: boolean) => dispatch(exchangeRoom(socket, room, isJoin)),
 })

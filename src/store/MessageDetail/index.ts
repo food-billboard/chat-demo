@@ -31,7 +31,7 @@ export default generateReducer({
       return {
         ...(omit(state, ["value"])),
         value: {
-          ...pick(state, ["value"]),
+          ...state.value,
           ...value 
         }
       }

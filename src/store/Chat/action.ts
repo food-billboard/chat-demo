@@ -1,5 +1,5 @@
 import { generateAction } from '../utils'
-import { connect as internalConnect, parseValue, connectStoreUserData } from '@/utils/socket'
+import { connect as internalConnect, parseValue, connectStoreUserData, putRoom, joinRoom } from '@/utils/socket'
 import { setStorage } from '@/utils/socket/utils'
 import { messageListSave, messageList } from '../Message/action'
 import { messageListDetailSave } from '../MessageDetail/action'
@@ -18,6 +18,27 @@ export function connect() {
       return json
     })
     .catch(error => dispatch(fail(error)))
+  }
+}
+
+export function exchangeRoom(socket: any, room: API_CHAT.IGetRoomListData, isJoin: boolean) {
+  return async (dispatch: any) => {  
+    if(!room) return 
+    dispatch(begin())
+    const method = isJoin ? joinRoom : putRoom
+    return method(socket, {
+      _id: room._id
+    })
+    .then(_ => {
+      const json = {
+        room: isJoin ? room : null 
+      }
+      dispatch(success(json))
+      return json
+    })
+    .catch(error => {
+      return dispatch(fail(error))
+    })
   }
 }
 
@@ -64,7 +85,6 @@ function eventBinding(dispatch: any, socket: any) {
   socket.on('room', (data: string) => {
     const value: any = parseValue(data)
     const { success, res: { data: resData } } = value 
-    console.log(value, 333)
     if(success) {
       dispatch(roomListSave(resData))
     }
@@ -93,7 +113,6 @@ function eventBinding(dispatch: any, socket: any) {
     console.log('好友申请列表')
     const value: any = parseValue(data)
     const { success, res: { data: resData } } = value 
-    console.log(value, 2222)
     if(success) {
       dispatch(inviteFriendListSave(resData?.friends || []))
     }

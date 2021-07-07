@@ -77,7 +77,7 @@ export default memo(() => {
 
   const actions = useCallback((item) => {
     return [
-      <Button onClick={cancelBlack.bind(this, item)} type="link" key="list-edit">取消</Button>, 
+      <Button onClick={cancelBlack.bind(this, item)} type="link" key="list-edit">拉黑</Button>, 
       <Button onClick={deleteUser.bind(this, item)} danger type="link" key="list-delete">删除</Button>
     ]
   }, [cancelBlack, deleteUser])

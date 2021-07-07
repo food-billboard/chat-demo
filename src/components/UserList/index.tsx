@@ -65,13 +65,14 @@ export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
                   } >{username}</Avatar>
                 }
                 title={
-                  <Tooltip
-                    title={
-                      <UserDetail />
-                    }
-                  >
-                    <a className={styles["user-list-username"]} onClick={userAction?.bind(this, item)}>{username}</a>
-                  </Tooltip>
+                  <a className={styles["user-list-username"]} onClick={userAction?.bind(this, item)}>{username}</a>
+                  // <Tooltip
+                  //   title={
+                  //     <UserDetail />
+                  //   }
+                  // >
+                  //   <a className={styles["user-list-username"]} onClick={userAction?.bind(this, item)}>{username}</a>
+                  // </Tooltip>
                 }
                 description={description}
               />

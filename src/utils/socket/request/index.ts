@@ -4,7 +4,7 @@ import { getStorage } from '../utils'
 
 export const getToken = () => {
   // return JSCookie.get()
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTg5MTI2NzJjMTEyMDlkZDVjNjdlYSIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMSIsImlhdCI6MTYyNTUzNzMwNywiZXhwIjoxNjI1NjIzNzA3fQ.9uwAyecERANHSp5KPI48_JfypteoN7K258eIaFoUrb0'
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMCIsImlhdCI6MTYyNTYyMDU0MCwiZXhwIjoxNjI1NzA2OTQwfQ.XwD3ZvzxtzXMXr5VAKFI0AsSKN_oN9BUurRMLItRDZc'
   // return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2MxNzZmMGY4NzJjN2EzZDU5NWNjMiIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNTM3NDIyNiwiZXhwIjoxNjI1NDYwNjI2fQ.NH-gRXODEijMpKY7pS82JD6sLamQI7Ht_pwyG38eOuI'
 }
 
@@ -82,11 +82,11 @@ export const getRoomList = async (socket: any, params: API_CHAT.IGetRoomListPara
 }
 
 //进入房间
-export const joinRoom = (socket: any, params: API_CHAT.IPostJoinRoomParams) => {
-  socket.emit('join', {
+export const joinRoom = async (socket: any, params: API_CHAT.IPostJoinRoomParams) => {
+  return promisify(socket.emit.bind(socket, 'join', {
     token: getToken(),
     ...params
-  })
+  }), socket.on.bind(socket, 'join'))
 }
 
 //发送消息
@@ -114,7 +114,7 @@ export const deleteMessage = (socket: any, params: API_CHAT.IDeleteMessageParams
 }
 
 //退出房间
-export const quitRoom = (socket: any, params: API_CHAT.IDeleteJoinRoomParams) => {
+export const quitRoom = async (socket: any, params: API_CHAT.IDeleteJoinRoomParams) => {
   socket.emit('quit_room', {
     token: getToken(),
     ...params
@@ -131,10 +131,10 @@ export const deleteRoom = (socket: any, params: API_CHAT.IDeleteRoomParams) => {
 
 //离开房间(下线)
 export const putRoom = (socket: any, params: API_CHAT.IDeleteRoomParams) => {
-  socket.emit('leave', {
+  return promisify(socket.emit.bind(socket, 'leave', {
     token: getToken(),
     ...params
-  })
+  }), socket.on.bind(socket, 'leave'))
 }
 
 //创建房间

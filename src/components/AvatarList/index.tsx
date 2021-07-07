@@ -68,6 +68,7 @@ export default memo((props: IAvatarListProps) => {
           return (
             <Tooltip
               title={username}
+              key={_id}
             >
               {avatarDom}
             </Tooltip>

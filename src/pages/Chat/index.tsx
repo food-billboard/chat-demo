@@ -52,12 +52,12 @@ export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((pro
     return MenuFoldOutlined
   }, [collapsed])
 
-  const onMenuChange = useCallback(({ item, key }) => {
-    console.log(item, key, '路由跳转')
+  const onMenuChange = useCallback(async ({ item, key }) => {
+    await props.exchangeRoom(props.socket, props.currRoom, false)
     setSelectedKeys([key])
     const route = CHAT_ROUTE_MAP[key as keyof typeof CHAT_ROUTE_MAP]
     if(route) history.push(route)
-  }, [])
+  }, [props])
 
   const resize = useCallback((e?) => {
     const width = document.documentElement.clientWidth

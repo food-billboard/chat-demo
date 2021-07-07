@@ -29,6 +29,7 @@ declare namespace STORE_USER {
 
   export interface ISocketData {
     socket: any 
+    room: API_CHAT.IGetRoomListData 
   }
 
   export interface IBaseState<T=any> {
