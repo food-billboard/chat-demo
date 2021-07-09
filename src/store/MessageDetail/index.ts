@@ -30,6 +30,7 @@ export default generateReducer({
     success: (value: any, state: any) => {
       return {
         ...(omit(state, ["value"])),
+        loading: false,
         value: {
           ...state.value,
           ...value 

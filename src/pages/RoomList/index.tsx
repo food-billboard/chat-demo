@@ -23,7 +23,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
   }, [messageListDetail, socket, currRoom])
 
   const quitRoom = useCallback(async () => {
-    console.log('我离开了房间', currRoom)
     await exchangeRoom(socket, currRoom, false)
   }, [currRoom, socket, exchangeRoom])
 

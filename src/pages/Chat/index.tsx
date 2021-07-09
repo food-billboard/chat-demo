@@ -30,6 +30,10 @@ export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((pro
 
   const [ collapsed, setCollapsed ] = useState<boolean>(false)
   const [ selectedKeys, setSelectedKeys ] = useState<string[]>(['room'])
+
+  const { location } = useMemo(() => {
+    return props 
+  }, [props])
   
   const MenuList = useMemo(() => {
     return (
@@ -69,8 +73,7 @@ export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((pro
   }, [])
 
   useEffect(() => {
-    const url = new URL(window.location.href)
-    const { pathname } = url
+    const { pathname } = location || {}
     Object.entries(CHAT_ROUTE_MAP).some(item => {
       const [ key, value ] = item
       if(pathname.includes(value)) {
@@ -79,7 +82,7 @@ export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((pro
       }
       return false 
     })
-  }, [])
+  }, [location])
 
   useEffect(() => {
     const debounceResize = debounce(resize, 500)

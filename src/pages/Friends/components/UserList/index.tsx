@@ -1,22 +1,29 @@
-import React, { memo, useMemo, useCallback, useState } from 'react'
-import { Button, Popover, PopoverProps, Tabs } from 'antd'
+import React, { memo, useMemo, useCallback, useState, useEffect } from 'react'
+import { Button, message, Popover, PopoverProps, Tabs } from 'antd'
 import { merge } from 'lodash-es'
+import { connect } from 'react-redux'
 import { UserOutlined } from '@ant-design/icons'
 import { UserList, IProps } from '@/components/UserList'
 import { getRelation } from '@/services'
+import { createRoom } from '@/utils/socket'
+import { history, withTry } from '@/utils'
+import { mapStateToProps, mapDispatchToProps } from './connect'
 
 const { TabPane } = Tabs
 
 interface IWrapperProps extends Omit<IProps, 'fetchData'> {
   popover?: Partial<PopoverProps>
   style?: React.CSSProperties
+  [key: string]: any 
 }
 
-export default memo((props: IWrapperProps) => {
+const UserListWrapper = memo((props: IWrapperProps) => {
 
   const [ activeKey, setActiveKey ] = useState<'friends' | 'recent'>('friends')
+  const [ loading, setLoading ] = useState<boolean | null>(null)
+  const [ currRoomId, setCurrRoomId ] = useState<string>('')
 
-  const { popover, style={}, ...nextProps } = useMemo(() => {
+  const { popover, style={}, userInfo, socket, currRoom, roomList, getRoomList, fetchRoomLoading, exchangeRoom, ...nextProps } = useMemo(() => {
     return props
   }, [props])
 
@@ -28,19 +35,40 @@ export default memo((props: IWrapperProps) => {
     return data.friends
   }, [])
   
-
   const fetchRecentList = useCallback(async () => {
     return []
   }, [])
 
+  const startChat = useCallback(async (data: API_USER.IGetFriendsRes) => {
+    const { member } = data 
+    const [err, value] = await withTry(createRoom)(socket, {
+      type: "CHAT",
+      members: member
+    })
+    if(err) {
+      message.info('发起聊天失败')
+    }else {
+      setLoading(true)
+      setCurrRoomId(value)
+      await getRoomList(socket)
+    }
+  }, [socket, getRoomList])
+
+  const go2Room = useCallback(async () => {
+    const roomData = roomList.find((item: any) => item._id === currRoomId)
+    if(roomData) await exchangeRoom(socket, roomData, true)
+    history.push('/main/room')
+    setLoading(null)
+  }, [exchangeRoom, socket, roomList, currRoomId])
+
   const UserListContent = useMemo(() => {
     if(activeKey === 'friends') {
-      return <UserList {...nextProps} fetchData={fetchFriends} />
+      return <UserList {...nextProps} fetchData={fetchFriends} userAction={startChat} />
     }
     return (
-      <UserList {...nextProps} fetchData={fetchRecentList} locale={{emptyText: '暂无最近联系人'}} />
+      <UserList {...nextProps} fetchData={fetchRecentList} locale={{emptyText: '暂无最近联系人'}} userAction={startChat} />
     )
-  }, [nextProps, fetchFriends, fetchRecentList, activeKey])
+  }, [nextProps, fetchFriends, fetchRecentList, activeKey, startChat])
 
   const onTabChange = useCallback((activekey) => {
     setActiveKey(activekey)
@@ -55,6 +83,12 @@ export default memo((props: IWrapperProps) => {
     )
   }, [onTabChange, activeKey])
 
+  useEffect(() => {
+    if(!fetchRoomLoading && loading) {
+      go2Room()
+    }
+  }, [fetchRoomLoading, loading, go2Room])
+
   return (
     <Popover
       placement="rightBottom"
@@ -68,3 +102,5 @@ export default memo((props: IWrapperProps) => {
   )
 
 })
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserListWrapper)

@@ -15,7 +15,8 @@ const DEFAULT_VALUE: STORE_USER.IUserInfo = {
   username: "", 
   createdAt: Day().format('YYY-MM-DD'),
   updatedAt: Day().format('YYY-MM-DD'), 
-  member: ''
+  member: '',
+  friend_id: ''
 }
 
 const initialState: STORE_USER.IBaseState<STORE_USER.IUserInfo> = {

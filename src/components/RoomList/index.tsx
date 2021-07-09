@@ -6,7 +6,8 @@ import React, {
   useRef, 
   useImperativeHandle, 
   Fragment,
-  useState
+  useState,
+  useEffect
 } from "react"
 import { 
   Carousel, 
@@ -33,14 +34,15 @@ import { connect } from 'react-redux'
 import RoomCreateModal, { IRoomCreateModalRef } from './components/RoomCreateModal'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { createRoom } from '@/utils/socket/request'
-import { IMAGE_FALLBACK } from '@/utils'
+import { getRoomMembers } from '@/services'
+import { IMAGE_FALLBACK, withTry } from '@/utils'
 import styles from './index.less'
 
 const { Title, Paragraph } = Typography
 
-interface IRoomItemProps extends API_CHAT.IGetRoomListData {
+interface IRoomItemProps extends realRoomList {
   prefix?: boolean
-  onClick?: (item: API_CHAT.IGetRoomListData) => void 
+  onClick?: (item: realRoomList) => void 
 }
 
 const RoomItem = memo((props: IRoomItemProps) => {
@@ -109,6 +111,11 @@ const RoomItem = memo((props: IRoomItemProps) => {
 interface IProps extends Pick<IRoomItemProps, 'onClick'> {
   style?: React.CSSProperties
   value?: API_CHAT.IGetRoomListData[]
+  userInfo?: API_USER.IGetUserInfoResData
+}
+
+type realRoomList = API_CHAT.IGetRoomListData & {
+  member_list: API_CHAT.IGetMemberListData[]
 }
 
 interface IRoomListRef {
@@ -120,25 +127,46 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
   const PAGE_MAX_SIZE = 4
 
   const carouselRef = useRef<CarouselRef>(null)
+  const [ realList, setRealList ] = useState<realRoomList[]>([])
 
-  const { style={}, value=[], onClick } = useMemo(() => {
+  const { style={}, value=[], onClick, userInfo } = useMemo(() => {
     return props 
   }, [props])
 
   const list = useMemo(() => {
-    const realValue = (value || [])
+    const realValue = (realList || [])
     return realValue.reduce((acc, cur, index) => {
       const len = acc.length 
       const currentIndex = len === 0 ? 0 : len - 1
       if(!acc[currentIndex]) acc[currentIndex] = []
       if(acc[currentIndex].length < PAGE_MAX_SIZE) {
         acc[currentIndex].push(cur)
-      }else if(index < value.length) {
+      }else if(index < realList.length) {
         acc[len] = [cur]
       }
       return acc 
-    }, [] as API_CHAT.IGetRoomListData[][])
-  }, [value])
+    }, [] as realRoomList[][])
+  }, [realList])
+
+  const fetchRealList = useCallback(async () => {
+    let newList:realRoomList[]  = []
+    for(let i = 0; i < value.length; i ++) {
+      const item = value[i]
+      const { type, _id } = item 
+      const target = realList.find(item => item._id === _id)
+      if(type !== 'CHAT' || !!target) {
+        newList.push(target || merge({}, item, { member_list: [] }))
+      }else {
+        const [, value] = await withTry(getRoomMembers)({ _id })
+        const friend_id = userInfo?.friend_id
+        const target = value?.find((item: any) => item.user?.friend_id !== friend_id) || {}
+        if(value) {
+          newList.push(merge({}, item, { member_list: [], info: { avatar: target.user?.avatar, name: target.user?.username } }))
+        }
+      }
+    }
+    setRealList(newList)
+  }, [value, realList, userInfo])
 
   const domList = useMemo(() => {
     return list.map(item => {
@@ -177,6 +205,10 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
   useImperativeHandle(ref, () => ({
     searchValue
   }), [searchValue])
+
+  useEffect(() => {
+    fetchRealList()
+  }, [value])
 
   return (
     <div 
@@ -244,7 +276,7 @@ export default memo((props: IWrapperProps) => {
     )
   }, [searchRoom, createChatRoom])
 
-  const onSelectClick = useCallback((item: API_CHAT.IGetRoomListData) => {
+  const onSelectClick = useCallback((item: realRoomList) => {
     if(!!clickClose) setVisible(false)
     onClick?.(item)
   }, [onClick, clickClose])

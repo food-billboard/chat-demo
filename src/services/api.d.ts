@@ -46,13 +46,16 @@ declare namespace API_USER {
     avatar: string 
     _id: string 
     description: string 
+    friend_id: string 
   }
 
   export interface IGetBlackUserRes extends IGetUserListData {}
 
   export interface IGetFriendsParams extends IGetBlackUserParams {}
 
-  export interface IGetFriendsRes extends IGetUserListData {}
+  export interface IGetFriendsRes extends IGetUserListData {
+    member: string 
+  }
 
   export interface IPostFriendsParams extends IBlackUserParams {}
 
@@ -170,6 +173,7 @@ declare namespace API_CHAT {
     createdAt: string 
     updatedAt: string 
     online_members: number 
+    type: TChatType
   }
 
   export interface IPostRoomParams {
@@ -187,7 +191,7 @@ declare namespace API_CHAT {
 
   export interface ICreateRoomParams {
     _id?: string 
-    type: string 
+    type: "CHAT" | "GROUP_CHAT" 
     members: string 
   }
 

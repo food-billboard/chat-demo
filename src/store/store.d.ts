@@ -25,6 +25,7 @@ declare namespace STORE_USER {
     createdAt: string 
     updatedAt: string 
     member: string 
+    friend_id
   }
 
   export interface ISocketData {

@@ -1,6 +1,9 @@
 import React, { memo, useCallback, useMemo, useState } from 'react'
 import { Input } from 'antd'
 import { merge } from 'lodash-es'
+import { Picker } from 'emoji-mart'
+import 'emoji-mart/css/emoji-mart.css'
+import styles from './index.less'
 
 const {  } = Input
 
@@ -30,6 +33,9 @@ export default memo((props: IProps) => {
     <div
       style={globalStyle}
     >
+      <div className={styles["input-toolbar"]}>
+        
+      </div>
       <Input.TextArea style={{height: '100%'}} value={value} onChange={onChange} />
     </div>
   )

@@ -4,7 +4,7 @@ import { getStorage } from '../utils'
 
 export const getToken = () => {
   // return JSCookie.get()
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMCIsImlhdCI6MTYyNTYyMDU0MCwiZXhwIjoxNjI1NzA2OTQwfQ.XwD3ZvzxtzXMXr5VAKFI0AsSKN_oN9BUurRMLItRDZc'
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMCIsImlhdCI6MTYyNTgwMDQ0NiwiZXhwIjoxNjI1ODg2ODQ2fQ.BOgpzHQPoyJnLqN79nX6XgToe2xqmxSJiPbl5VQQVdk'
   // return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2MxNzZmMGY4NzJjN2EzZDU5NWNjMiIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYyNTM3NDIyNiwiZXhwIjoxNjI1NDYwNjI2fQ.NH-gRXODEijMpKY7pS82JD6sLamQI7Ht_pwyG38eOuI'
 }
 
@@ -139,10 +139,10 @@ export const putRoom = (socket: any, params: API_CHAT.IDeleteRoomParams) => {
 
 //创建房间
 export const createRoom = (socket: any, params: API_CHAT.ICreateRoomParams) => {
-  socket.emit('create_room', {
+  return promisify(socket.emit.bind(socket, 'create_room', {
     token: getToken(),
     ...params
-  })
+  }), socket.on.bind(socket, 'create_room'))
 }
 
 //申请添加好友
