@@ -11,8 +11,8 @@ export function messageListDetail(socket: any, params: API_CHAT.IGetMessageDetai
   }
 }
 
-export function messageListDetailSave(value: any) {
+export function messageListDetailSave(value: any, insert: { insertBefore?: boolean, insertAfter?: boolean }={}) {
   return async (dispatch: any) => {
-    return dispatch(success({ messageDetailList: value }))
+    return dispatch(success({ messageDetailList: value, insert }))
   }
 }

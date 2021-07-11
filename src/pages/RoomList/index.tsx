@@ -2,7 +2,7 @@ import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
 import { Row, Col, Tooltip, Button } from 'antd'
 import { connect } from 'react-redux'
 import { merge } from 'lodash'
-import { GroupChat } from '@/components/ChatList'
+import GroupChat from '@/components/ChatList'
 import RoomList from '@/components/RoomList'
 import AvatarList, { TAvatarData } from '@/components/AvatarList'
 import { getRoomMembers, postRelation } from '@/services'
@@ -14,11 +14,11 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
 
   const [ postUserLoading, setPostUserLoading ] = useState<boolean>(false)
 
-  const { socket, messageListDetail, value, loading, userInfo, exchangeRoom, currRoom } = useMemo(() => {
+  const { socket, messageListDetail, value, userInfo, exchangeRoom, currRoom } = useMemo(() => {
     return props 
   }, [props])
 
-  const fetchRoomList = useCallback(async (params: Omit<API_CHAT.IGetMessageDetailParams, "_id">={ currPage: 0, pageSize: 10 }) => {
+  const fetchRoomMessageList = useCallback(async (params: Omit<API_CHAT.IGetMessageDetailParams, "_id">={ currPage: 0, pageSize: 10 }) => {
     await messageListDetail(socket, merge({}, params, { _id: currRoom?._id }))
   }, [messageListDetail, socket, currRoom])
 
@@ -36,7 +36,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
     const data = await getRoomMembers({
       _id: currRoom?._id,
       currPage: 0,
-      pageSize: 9999      
+      pageSize: 100      
     })
     return data?.map(item => {
       const { user } = item 
@@ -72,7 +72,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
 
   useEffect(() => {
     if(currRoom) {
-      fetchRoomList()
+      fetchRoomMessageList()
     }
   }, [currRoom])
 
@@ -98,8 +98,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
           {
             !!currRoom && (
               <GroupChat  
-                loading={loading}
-                fetchData={fetchRoomList}
+                fetchData={fetchRoomMessageList}
                 value={value}
                 header={{
                   title: currRoom.info?.name || '某房间',

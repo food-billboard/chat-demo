@@ -7,6 +7,7 @@ import { UserList, IProps } from '@/components/UserList'
 import { getRelation } from '@/services'
 import { createRoom } from '@/utils/socket'
 import { history, withTry } from '@/utils'
+import { formatRoomInfo } from '../../../RoomList/utils'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 
 const { TabPane } = Tabs
@@ -56,10 +57,11 @@ const UserListWrapper = memo((props: IWrapperProps) => {
 
   const go2Room = useCallback(async () => {
     const roomData = roomList.find((item: any) => item._id === currRoomId)
-    if(roomData) await exchangeRoom(socket, roomData, true)
+    const data = await formatRoomInfo(roomData, userInfo!)
+    if(data) await exchangeRoom(socket, data, true)
     history.push('/main/room')
     setLoading(null)
-  }, [exchangeRoom, socket, roomList, currRoomId])
+  }, [exchangeRoom, socket, roomList, currRoomId, userInfo])
 
   const UserListContent = useMemo(() => {
     if(activeKey === 'friends') {
@@ -70,8 +72,8 @@ const UserListWrapper = memo((props: IWrapperProps) => {
     )
   }, [nextProps, fetchFriends, fetchRecentList, activeKey, startChat])
 
-  const onTabChange = useCallback((activekey) => {
-    setActiveKey(activekey)
+  const onTabChange = useCallback((activeKey) => {
+    setActiveKey(activeKey)
   }, [])
 
   const PopOverTitle = useMemo(() => {

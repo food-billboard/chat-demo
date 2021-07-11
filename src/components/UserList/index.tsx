@@ -1,17 +1,14 @@
 import React, { CSSProperties, forwardRef, memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { List, Avatar, Skeleton, Image, Tooltip, Button, Popover, PopoverProps } from 'antd'
+import { List, Avatar, Skeleton, Image } from 'antd'
 import { unstable_batchedUpdates } from 'react-dom'
-import { merge } from 'lodash-es'
-import { UserOutlined } from '@ant-design/icons'
 import { ListProps } from 'antd/es/list'
-import UserDetail from './components/UserDetail'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
 
-export interface IProps extends ListProps<API_USER.IGetUserListData> {
-  fetchData:() => Promise<API_USER.IGetUserListData[]>
-  actions?: (data: API_USER.IGetUserListData) => React.ReactNode[]
-  userAction?: (data: API_USER.IGetUserListData) => any
+export interface IProps extends ListProps<API_USER.IGetFriendsRes> {
+  fetchData:() => Promise<API_USER.IGetFriendsRes[]>
+  actions?: (data: API_USER.IGetFriendsRes) => React.ReactNode[]
+  userAction?: (data: API_USER.IGetFriendsRes) => any
   style?: CSSProperties
 }
 
@@ -22,7 +19,7 @@ interface IUserListRef {
 export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
 
   const [ loading, setLoading ] = useState<boolean>(true)
-  const [ list, setList ] = useState<API_USER.IGetUserListData[]>([])
+  const [ list, setList ] = useState<API_USER.IGetFriendsRes[]>([])
 
   const { fetchData, actions, userAction, style={}, ...nextProps } = useMemo(() => {
     return props 

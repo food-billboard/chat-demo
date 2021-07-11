@@ -22,13 +22,14 @@ export function generateActionType(prefix?: string): {
   } 
 }
 
-export function generateAction<S=any, E=any>(prefix?: string, callback?: DEFINE_CALLBACK_TYPE) {
+export function generateAction<S=any, E=any, B=any>(prefix?: string, callback?: DEFINE_CALLBACK_TYPE) {
   const { BEGIN, SUCCESS, FAIL } = generateActionType(prefix)
-  const beginFn = () => {
+  const beginFn = (init?: B) => {
     const returnData = {
-      type: BEGIN
+      type: BEGIN,
+      payload: { value: init }
     }
-    if(callback?.begin) return callback?.begin({ type: BEGIN })
+    if(callback?.begin) return callback?.begin(returnData)
     return returnData
   }
   const successFn = (res: S) => {
@@ -82,12 +83,13 @@ export function generateReducer<SuccessType=any, ErrorType=any>({
       case actionType.BEGIN:
         // 把 state 标记为 "loading" 这样我们就可以显示 spinner 或者其他内容
         // 同样，重置所有错误信息。我们从新开始。
-        if(callback?.begin) return callback.begin()
-        return {
+        let returnData = {
           ...state,
           loading: true,
           error: null
         }
+        if(callback?.begin) return callback.begin(returnData, state)
+        return returnData
   
       case actionType.SUCCESS:
         // 全部完成：设置 loading 为 "false"。
@@ -107,13 +109,14 @@ export function generateReducer<SuccessType=any, ErrorType=any>({
         // 当然这取决于你和应用情况：
         // 或许你想保留 items 数据！
         // 无论如何适合你的场景就好。
-        if(callback?.error) return callback?.error(action.payload.error)
-        return {
+        let returnErrData = {
           ...state,
           loading: false,
           error: action.payload.error,
           value: merge({}, initialState.value)
         }
+        if(callback?.error) return callback?.error(returnErrData, state)
+        return returnErrData
   
       default:
         // reducer 需要有 default case。

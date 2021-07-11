@@ -1,4 +1,4 @@
-import { merge, pick, omit } from 'lodash-es'
+import { merge, omit } from 'lodash-es'
 import {
   SUCCESS,
   BEGIN,
@@ -9,7 +9,10 @@ import { generateReducer } from '../utils'
 const DEFAULT_VALUE = {
   messageDetailList: {
     message: [],
-    room: {}
+    insert: {
+      insertBefore: false,
+      insertAfter: false 
+    }
   },
 }
 
@@ -28,12 +31,30 @@ export default generateReducer({
   },
   callback: {
     success: (value: any, state: any) => {
+      const { insert: { insertBefore, insertAfter }, messageDetailList } = value
+      let messageList: any = {}
+      const { messageDetailList: originMessageDetailList } = state.value
+      if(insertBefore) {
+        messageList = {
+          room: originMessageDetailList.room,
+          message: [...messageDetailList?.message || [], ...originMessageDetailList?.message || []]
+        }
+      }else if(insertAfter) {
+        messageList = {
+          room: originMessageDetailList.room,
+          message: [...originMessageDetailList?.message || [], ...messageDetailList?.message || []]
+        }
+      }else {
+        messageList = {
+          ...messageDetailList
+        }
+      }
       return {
         ...(omit(state, ["value"])),
         loading: false,
         value: {
           ...state.value,
-          ...value 
+          messageDetailList: messageList 
         }
       }
     }

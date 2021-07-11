@@ -33,16 +33,15 @@ import { merge, noop, omit } from 'lodash-es'
 import { connect } from 'react-redux'
 import RoomCreateModal, { IRoomCreateModalRef } from './components/RoomCreateModal'
 import { mapStateToProps, mapDispatchToProps } from './connect'
-import { createRoom } from '@/utils/socket/request'
-import { getRoomMembers } from '@/services'
-import { IMAGE_FALLBACK, withTry } from '@/utils'
+import { IMAGE_FALLBACK } from '@/utils'
+import { formatRoomInfo } from '@/pages/RoomList/utils'
 import styles from './index.less'
 
 const { Title, Paragraph } = Typography
 
-interface IRoomItemProps extends realRoomList {
+interface IRoomItemProps extends API_CHAT.IGetRoomListData {
   prefix?: boolean
-  onClick?: (item: realRoomList) => void 
+  onClick?: (item: API_CHAT.IGetRoomListData) => void 
 }
 
 const RoomItem = memo((props: IRoomItemProps) => {
@@ -114,10 +113,6 @@ interface IProps extends Pick<IRoomItemProps, 'onClick'> {
   userInfo?: API_USER.IGetUserInfoResData
 }
 
-type realRoomList = API_CHAT.IGetRoomListData & {
-  member_list: API_CHAT.IGetMemberListData[]
-}
-
 interface IRoomListRef {
   searchValue: (value: string) => void 
 }
@@ -127,7 +122,7 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
   const PAGE_MAX_SIZE = 4
 
   const carouselRef = useRef<CarouselRef>(null)
-  const [ realList, setRealList ] = useState<realRoomList[]>([])
+  const [ realList, setRealList ] = useState<API_CHAT.IGetRoomListData[]>([])
 
   const { style={}, value=[], onClick, userInfo } = useMemo(() => {
     return props 
@@ -145,24 +140,18 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
         acc[len] = [cur]
       }
       return acc 
-    }, [] as realRoomList[][])
+    }, [] as API_CHAT.IGetRoomListData[][])
   }, [realList])
 
   const fetchRealList = useCallback(async () => {
-    let newList:realRoomList[]  = []
+    let newList:API_CHAT.IGetRoomListData[]  = []
     for(let i = 0; i < value.length; i ++) {
       const item = value[i]
       const { type, _id } = item 
       const target = realList.find(item => item._id === _id)
-      if(type !== 'CHAT' || !!target) {
-        newList.push(target || merge({}, item, { member_list: [] }))
-      }else {
-        const [, value] = await withTry(getRoomMembers)({ _id })
-        const friend_id = userInfo?.friend_id
-        const target = value?.find((item: any) => item.user?.friend_id !== friend_id) || {}
-        if(value) {
-          newList.push(merge({}, item, { member_list: [], info: { avatar: target.user?.avatar, name: target.user?.username } }))
-        }
+      const data = await formatRoomInfo(item, userInfo!)
+      if(data) {
+        newList.push(target || data || item)
       }
     }
     setRealList(newList)
@@ -276,7 +265,7 @@ export default memo((props: IWrapperProps) => {
     )
   }, [searchRoom, createChatRoom])
 
-  const onSelectClick = useCallback((item: realRoomList) => {
+  const onSelectClick = useCallback((item: API_CHAT.IGetRoomListData) => {
     if(!!clickClose) setVisible(false)
     onClick?.(item)
   }, [onClick, clickClose])
@@ -291,7 +280,6 @@ export default memo((props: IWrapperProps) => {
       type,
       members: Array.isArray(members) ? members.join(',') : members
     })
-    console.log(value, '创建房间')
   }, [])
 
   return (

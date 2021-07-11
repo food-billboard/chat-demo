@@ -48,7 +48,7 @@ declare namespace STORE_USER {
   }
 
   export interface IMessageDetailData {
-    messageDetailList: API_CHAT.IgetMessageDetailRes
+    messageDetailList: API_CHAT.IGetMessageDetailRes
   }
 
   export interface IInviteFriendList {

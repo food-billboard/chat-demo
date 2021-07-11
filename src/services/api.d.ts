@@ -251,16 +251,17 @@ declare namespace API_CHAT {
     currPage?: number 
     pageSize?: number 
     start?: string 
+    messageId?: string 
   }
 
-  export interface IgetMessageDetailRes {
+  export interface IGetMessageDetailRes {
     room: Pick<IGetRoomListData, '_id' | 'info'>,
     message: IGetMessageDetailData[]
   }
 
   export interface IGetMessageDetailData {
     _id: string 
-    user_info: TUserData & { description: string }
+    user_info: TUserData & { description: string, member: string, friend_id: string  }
     media_type: TMessageMediaType
     point_to: string 
     createdAt: string 
