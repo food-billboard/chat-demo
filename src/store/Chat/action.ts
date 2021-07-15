@@ -1,5 +1,5 @@
 import { generateAction } from '../utils'
-import { connect as internalConnect, parseValue, connectStoreUserData, putRoom, joinRoom } from '@/utils/socket'
+import { connect as internalConnect, parseValue, connectStoreUserData, putRoom, joinRoom, readMessage } from '@/utils/socket'
 import { setStorage } from '@/utils/socket/utils'
 import { messageListSave, messageList } from '../Message/action'
 import { messageListDetailSave } from '../MessageDetail/action'
@@ -33,8 +33,14 @@ export function exchangeRoom(socket: any, room: API_CHAT.IGetRoomListData, isJoi
       const json = {
         room: isJoin ? room : null 
       }
-      dispatch(success(json))
-      return json
+      return (isJoin ? readMessage(socket, {
+        type: 1,
+        _id: room._id
+      }) : Promise.resolve())
+      .then(_ => {
+        return dispatch(success(json))
+      })
+      .then(_ => json)
     })
     .catch(error => {
       return dispatch(fail(error))
@@ -115,6 +121,20 @@ function eventBinding(dispatch: any, socket: any) {
     const { success, res: { data: resData } } = value 
     if(success) {
       dispatch(inviteFriendListSave(resData?.friends || []))
+    }
+  })
+
+  //invite 
+  socket.on('invite_friend', (data: string) => {
+    const value: any = parseValue(data)
+    console.log('响应好友申请', value)
+    if(!value) {
+      dispatch(inviteFriendList(socket))
+      return 
+    }
+    const { success } = value 
+    if(success) {
+      dispatch(inviteFriendList(socket))
     }
   })
 

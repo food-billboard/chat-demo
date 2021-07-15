@@ -1,9 +1,11 @@
-import { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback, useMemo, useRef } from 'react'
 import { Row, Col, Button, Modal, message, Result } from 'antd'
-import { UserList } from '@/components/UserList'
+import { UserList, IUserListRef } from '@/components/UserList'
 import { getBlackUser, unBlack2User, deleteRelation } from '@/services'
 
 export default memo(() => {
+
+  const listRef = useRef<IUserListRef>(null)
 
   const fetchData = useCallback(async () => {
     const data = await getBlackUser()
@@ -12,7 +14,10 @@ export default memo(() => {
 
   const cancelBlack = useCallback(async (item: API_USER.IGetUserListData) => {
     await unBlack2User({
-      _id: item._id
+      _id: item.friend_id
+    })
+    .then(res => {
+      return listRef.current?.fetchData()
     })
     .catch(err => {
       message.info('操作失败，请重试')
@@ -38,13 +43,16 @@ export default memo(() => {
     })
     .then(res => {
       if(res) return deleteRelation({
-        _id: item._id
+        _id: item.friend_id
       })
+    })
+    .then(_ => {
+      return listRef.current?.fetchData()
     })
     .catch(err => {
       message.info('操作失败，请重试')
     })
-  }, [])
+  }, [listRef])
 
   const actions = useCallback((item) => {
     return [
@@ -78,6 +86,7 @@ export default memo(() => {
           actions={actions}
           style={{height: '100%', maxHeight: 'unset'}}
           locale={{emptyText: '暂无黑名单用户'}}
+          ref={listRef}
         />
       </Col>
       <Col span={8} style={{padding: 0}}>

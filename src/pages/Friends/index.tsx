@@ -1,49 +1,49 @@
-import { memo, useCallback } from 'react'
-import { Row, Col, Button, Modal, message } from 'antd'
+import { memo, useCallback, useRef } from 'react'
+import { Row, Col, Button, message, Popconfirm } from 'antd'
+import { IUserListRef } from '@/components/UserList'
 import UserList from './components/UserList'
-import { unBlack2User, deleteRelation } from '@/services'
+import { deleteRelation, black2User } from '@/services'
 import styles from './index.less'
 
 export default memo(() => {
 
+  const listRef = useRef<IUserListRef>(null)
+
   const cancelBlack = useCallback(async (item: API_USER.IGetUserListData) => {
-    await unBlack2User({
-      _id: item._id
+    await black2User({
+      _id: item.friend_id
+    })
+    .then(_ => {
+      return listRef.current?.fetchData()
     })
     .catch(err => {
       message.info('操作失败，请重试')
     })
-  }, [])
+  }, [listRef])
 
   const deleteUser = useCallback(async (item: API_USER.IGetUserListData) => {
-    await new Promise((resolve, reject) => {
-      Modal.confirm({
-        title: '提示',
-        content: '是否删除该黑名单好友',
-        onOk: (close) => {
-          close()
-          resolve(true)
-        },
-        onCancel: (close) => {
-          close()
-          resolve(false)
-        }
-      })
+    await deleteRelation({
+      _id: item.friend_id
     })
-    .then(res => {
-      if(res) return deleteRelation({
-        _id: item._id
-      })
+    .then(_ => {
+      return listRef.current?.fetchData()
     })
     .catch(err => {
       message.info('操作失败，请重试')
     })
-  }, [])
+  }, [listRef])
 
   const actions = useCallback((item) => {
     return [
       <Button onClick={cancelBlack.bind(this, item)} type="link" key="list-edit">拉黑</Button>, 
-      <Button onClick={deleteUser.bind(this, item)} danger type="link" key="list-delete">删除</Button>
+      <Popconfirm
+        title="是否删除该好友?"
+        onConfirm={deleteUser.bind(this, item)}
+        okText="确定"
+        cancelText="取消"
+      >
+        <Button danger type="link" key="list-delete">删除</Button>
+      </Popconfirm>
     ]
   }, [cancelBlack, deleteUser])
 
@@ -54,6 +54,7 @@ export default memo(() => {
     >
       <UserList 
         actions={actions}
+        wrapperRef={listRef}
       />
       <Col span={24}
         className={styles["friends-chat-list"]}

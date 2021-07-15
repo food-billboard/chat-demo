@@ -12,7 +12,6 @@ import { postMessage } from '@/utils/socket'
 import { getMessageDetail } from '@/services'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { withTry } from '@/utils'
-import { messageListDeal } from './utils'
 
 interface IGroupProps extends IProps{
   header: Partial<PageHeaderProps>
@@ -57,7 +56,6 @@ const GroupChat = memo((props: IGroupProps) => {
         messageId: res,
         _id: currentRoom!._id
       })
-      console.log(newData, 4444)
       await messageListDetailSave?.(newData, {
         insertAfter: true 
       })
@@ -97,7 +95,7 @@ const GroupChat = memo((props: IGroupProps) => {
         <ObserverDom onObserve={onFetchData} />
         <ChatList ref={listRef} loading={!!fetchLoading} {...nextProps}  />
       </div>
-      <ChatInput style={{height: '30vh'}} onPostMessage={handlePostMessage} />
+      <ChatInput style={{height: '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={handlePostMessage} />
     </div>
   )
 

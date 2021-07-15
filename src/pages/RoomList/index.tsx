@@ -6,6 +6,7 @@ import GroupChat from '@/components/ChatList'
 import RoomList from '@/components/RoomList'
 import AvatarList, { TAvatarData } from '@/components/AvatarList'
 import { getRoomMembers, postRelation } from '@/services'
+import { inviteFriend } from '@/utils/socket' 
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { withTry } from '@/utils'
 import styles from './index.less'
@@ -50,11 +51,11 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
 
   const addFriends = useCallback(async (item: TAvatarData) => {
     setPostUserLoading(true)
-    await withTry(postRelation)({
+    await withTry(inviteFriend)(socket, {
       _id: item._id
     })
     setPostUserLoading(false)
-  }, [])
+  }, [socket])
 
   const tooltip = useCallback((node: React.ReactNode, item: TAvatarData, props: any) => {
     const { _id } = item 

@@ -66,6 +66,8 @@ const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
       scrollToBottom()
     }
   }, [scrollToBottom, loading, fetchData, currPage])
+
+  console.log(realValue, 555555555)
   
   return (
     <div

@@ -2,10 +2,17 @@ import Client from 'socket.io-client'
 import JSCookie from 'js-cookie'
 import { getStorage } from '../utils'
 
+const mock = () => {
+  const { userAgent } = window.navigator
+  if(userAgent.includes('Chrome')) {
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMCIsImlhdCI6MTYyNjM0MTI1NiwiZXhwIjoxNjI2NDI3NjU2fQ.JDheBZMTTAG_E0byU1pKcxgpIxGMLjIAqBSKJVTMwCM'
+  }
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTg5MTI2NzJjMTEyMDlkZDVjNjdlYSIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMSIsImlhdCI6MTYyNjMzOTA1NSwiZXhwIjoxNjI2NDI1NDU1fQ.qaDrnJ5mfxzw2gpklIz9oQZDx-4JT6iIbghk1nja74c'
+}
+
 export const getToken = () => {
   // return JSCookie.get()
-  // return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYzQ5NmI2MmUyMDZkMTgwMzg1ODA0NyIsIm1vYmlsZSI6MTM1MDE4MjM0NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTE0MWQ2YWVlYTEyMGUxYWNjYzE2MCIsImlhdCI6MTYyNjAwMDM4NiwiZXhwIjoxNjI2MDg2Nzg2fQ.aZgjnxL98cH8A54SrKS8yVH_J4Uu7w0sc4MtwTHE3f4"
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2MxNzZmMGY4NzJjN2EzZDU5NWNjMiIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTE0MWQ2YWVlYTEyMGUxYWNjYzE1ZiIsImlhdCI6MTYyNTk2NzQ5OSwiZXhwIjoxNjI2MDUzODk5fQ.wql0z-RYNT2rKwHxeG51EInbsRDFfXbcE2wfs_ZLtSU'
+  return mock()
 }
 
 const promisify = (emit: any, on: any) => {
@@ -99,10 +106,10 @@ export const postMessage = async (socket: any, params: API_CHAT.IPostMessagePara
 
 //读消息
 export const readMessage = (socket: any, params: API_CHAT.IPutMessageParams) => {
-  socket.emit('put', {
+  return promisify(socket.emit.bind(socket, 'put', {
     token: getToken(),
     ...params
-  })
+  }), socket.on.bind(socket, 'put'))
 }
 
 //删除消息
@@ -147,10 +154,10 @@ export const createRoom = (socket: any, params: API_CHAT.ICreateRoomParams) => {
 
 //申请添加好友
 export const inviteFriend = (socket: any, params: API_USER.IPostFriendsParams) => {
-  socket.emit('invite_friend', {
+  return promisify(socket.emit.bind(socket, 'invite_friend', {
     token: getToken(),
     ...params
-  })
+  }), socket.on.bind(socket, 'invite_friend'))
 }
 
 //拒绝添加好友

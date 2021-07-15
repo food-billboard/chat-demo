@@ -1,4 +1,4 @@
-import React, { CSSProperties, forwardRef, memo, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { CSSProperties, forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { List, Avatar, Skeleton, Image } from 'antd'
 import { unstable_batchedUpdates } from 'react-dom'
 import { ListProps } from 'antd/es/list'
@@ -12,8 +12,8 @@ export interface IProps extends ListProps<API_USER.IGetFriendsRes> {
   style?: CSSProperties
 }
 
-interface IUserListRef {
-
+export interface IUserListRef {
+  fetchData: () => Promise<void>
 }
 
 export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
@@ -33,6 +33,12 @@ export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
       setLoading(false)
     })
   }, [fetchData])
+
+  useImperativeHandle(ref, () => {
+    return {
+      fetchData: internalFetchData
+    }
+  }, [])
 
   useEffect(() => {
     internalFetchData()
@@ -57,9 +63,7 @@ export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
             <Skeleton avatar title={false} loading={false} active>
               <List.Item.Meta
                 avatar={
-                  <Avatar src={
-                    <Image src={avatar} preview={false} fallback={IMAGE_FALLBACK} />
-                  } >{username}</Avatar>
+                  <Avatar src={avatar} >{username}</Avatar>
                 }
                 title={
                   <a className={styles["user-list-username"]} onClick={userAction?.bind(this, item)}>{username}</a>
