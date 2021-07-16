@@ -294,6 +294,7 @@ declare namespace API_CHAT {
     username: string 
     description: string 
     createdAt: string 
+    status: "AGREE" | "DIS_AGREE" | "TO_AGREE"
   }
 
 }

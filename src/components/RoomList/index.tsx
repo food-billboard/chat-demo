@@ -27,11 +27,13 @@ import {
   UserOutlined, 
   LeftCircleOutlined, 
   RightCircleOutlined, 
-  SettingOutlined
+  SettingOutlined,
+  DeleteOutlined
 } from '@ant-design/icons'
 import { merge, noop, omit } from 'lodash-es'
 import { connect } from 'react-redux'
 import RoomCreateModal, { IRoomCreateModalRef } from './components/RoomCreateModal'
+import DeleteOperation from './components/DeleteOperation'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
 import { formatRoomInfo } from '@/pages/RoomList/utils'
@@ -52,7 +54,6 @@ const RoomItem = memo((props: IRoomItemProps) => {
     return (
       <div
         className={styles["room-icon-list-item-wrapper-content-container"]}
-        onClick={onClick.bind(this, props)}
       >
         <div 
           className={styles["room-icon-list-item-wrapper-content-bg"]}
@@ -65,6 +66,7 @@ const RoomItem = memo((props: IRoomItemProps) => {
           src={avatar}
           width={"40%"}
           preview={false}
+          onClick={onClick.bind(this, props)}
           wrapperStyle={{
             display: 'flex',
             alignItems: 'center',
@@ -81,7 +83,7 @@ const RoomItem = memo((props: IRoomItemProps) => {
         >
           <Title style={{color: 'white'}} ellipsis level={4}>{name}</Title>
           <Paragraph style={{color: 'white'}} ellipsis={true}>
-            {description}
+            {description || '这个房间什么也没留下'} 
           </Paragraph>
           <Space>
             <Space>
@@ -94,6 +96,18 @@ const RoomItem = memo((props: IRoomItemProps) => {
             </Space>
           </Space>
         </div>
+        <DeleteOperation
+          onShow={() => omit(props, ["prefix", "onClick"])}
+        >
+          <DeleteOutlined 
+            style={{
+              position: 'absolute',
+              right: '1em',
+              top: '0.1em',
+              fontSize: '1.5em',
+            }} 
+          />
+        </DeleteOperation>
       </div>
     )
   }, [props])

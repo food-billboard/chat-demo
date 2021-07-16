@@ -43,7 +43,6 @@ const UserListWrapper = memo((props: IWrapperProps) => {
 
   const startChat = useCallback(async (data: API_USER.IGetFriendsRes) => {
     const { member } = data 
-    console.log(userInfo.member, member, 666666666)
     const [err, value] = await withTry(createRoom)(socket, {
       type: "CHAT",
       members: member
@@ -55,7 +54,7 @@ const UserListWrapper = memo((props: IWrapperProps) => {
       setCurrRoomId(value)
       await getRoomList(socket)
     }
-  }, [socket, getRoomList, userInfo])
+  }, [socket, getRoomList])
 
   const go2Room = useCallback(async () => {
     const roomData = roomList.find((item: any) => item._id === currRoomId)

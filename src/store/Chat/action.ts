@@ -128,10 +128,10 @@ function eventBinding(dispatch: any, socket: any) {
   socket.on('invite_friend', (data: string) => {
     const value: any = parseValue(data)
     console.log('响应好友申请', value)
-    if(!value) {
-      dispatch(inviteFriendList(socket))
-      return 
-    }
+    // if(!value) {
+    //   dispatch(inviteFriendList(socket))
+    //   return 
+    // }
     const { success } = value 
     if(success) {
       dispatch(inviteFriendList(socket))

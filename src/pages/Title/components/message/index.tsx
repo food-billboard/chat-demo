@@ -190,7 +190,6 @@ const Message = memo((props: IProps) => {
   }, [])
 
   const readMessage = useCallback(async () => {
-    console.log('读消息', socket, props.value)
     if(!props.value || !socket) return 
     requestReadMessage(socket, {
       _id: props.value?.map(item => {
@@ -247,6 +246,9 @@ const Message = memo((props: IProps) => {
   }, [socket, inviteFriendList])
 
   const inviteBadge = useCallback((item: TListData) => {
+    const { status } = item 
+    if(status === 'AGREE') return '同意了你的好友申请'
+    if(status === 'DIS_AGREE') return '拒绝了你的好友申请'
     return (
       <Space size={5}>
         <Button type="link" danger onClick={disagreeFriend.bind(this, item)}>拒绝</Button>
