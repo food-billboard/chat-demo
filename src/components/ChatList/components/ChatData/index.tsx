@@ -7,7 +7,7 @@ import { IMAGE_FALLBACK } from '@/utils'
 
 import styles from './index.less'
 
-type TMessageValue = API_CHAT.IGetMessageDetailData & { isMine?: boolean }
+export type TMessageValue = API_CHAT.IGetMessageDetailData & { isMine?: boolean }
 
 export interface IProps {
   value: TMessageValue[]

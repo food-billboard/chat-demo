@@ -1,19 +1,21 @@
-import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
+import React, { memo, useCallback, useState, useMemo, useEffect, useRef } from 'react'
 import { Row, Col, Tooltip, Button } from 'antd'
 import { connect } from 'react-redux'
 import { merge } from 'lodash'
-import GroupChat from '@/components/ChatList'
+import GroupChat, { IGroupChatRef } from '@/components/ChatList'
 import RoomList from '@/components/RoomList'
 import AvatarList, { TAvatarData } from '@/components/AvatarList'
-import { getRoomMembers, postRelation } from '@/services'
+import { getRoomMembers } from '@/services'
 import { inviteFriend } from '@/utils/socket' 
 import { mapStateToProps, mapDispatchToProps } from './connect'
-import { withTry } from '@/utils'
+import { withTry, sleep } from '@/utils'
 import styles from './index.less'
 
 export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) => {
 
   const [ postUserLoading, setPostUserLoading ] = useState<boolean>(false)
+
+  const chatRef = useRef<IGroupChatRef>(null)
 
   const { socket, messageListDetail, value, userInfo, exchangeRoom, currRoom } = useMemo(() => {
     return props 
@@ -74,6 +76,10 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
   useEffect(() => {
     if(currRoom) {
       fetchRoomMessageList()
+      .then(_ => sleep(1000))
+      .then(_ => {
+        chatRef?.current?.scrollToBottom?.()
+      })
     }
   }, [currRoom])
 
@@ -99,6 +105,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
           {
             !!currRoom && (
               <GroupChat  
+                ref={chatRef}
                 fetchData={fetchRoomMessageList}
                 value={value}
                 header={{

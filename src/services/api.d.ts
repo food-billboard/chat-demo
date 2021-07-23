@@ -247,7 +247,7 @@ declare namespace API_CHAT {
   }
 
   export interface IGetMessageDetailParams {
-    _id: string 
+    _id?: string 
     currPage?: number 
     pageSize?: number 
     start?: string 

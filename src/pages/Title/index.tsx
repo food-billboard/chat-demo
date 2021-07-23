@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Space, Button, Badge, Avatar, Menu, Dropdown, Tooltip } from 'antd'
 import { BellOutlined } from '@ant-design/icons'
 import { history } from '@/utils'
-import Message from './components/Message'
+import Message, { inviteListFilter } from './components/Message'
 import { mapDispatchToProps, mapStateToProps } from './connect'
 import { LOGO } from './constants'
 import styles from './index.less'
@@ -12,13 +12,14 @@ const Title = memo((props: any) => {
 
   const { isLogin, userInfo={}, logout: fetchLogout, messageCount } = useMemo(() => {
     const { userInfo, value, inviteList } = props
+    const inviteListCount = inviteListFilter(inviteList)?.length || 0
     return {
       ...props,
       isLogin: !!userInfo && !!userInfo._id,
       messageCount: (Array.isArray(value) ? value : []).reduce((acc, cur) => {
         acc += (cur.un_read_message_count || 0)
         return acc 
-      }, 0) + (inviteList?.length || 0)
+      }, 0) + inviteListCount
     } 
   }, [props])
 

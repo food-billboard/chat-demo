@@ -1,28 +1,28 @@
-import React, { memo, useMemo, useCallback, useState, forwardRef, useImperativeHandle } from 'react'
+import React, { memo, useMemo, useCallback, useState, forwardRef, useImperativeHandle, useEffect } from 'react'
 import { connect } from 'react-redux'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { merge } from 'lodash-es'
+import { sleep, withTry } from '@/utils'
+import { readMessage as readMessageRequest } from '@/utils/socket'
 import { mapStateToProps, mapDispatchToProps } from './connect'
-import ChatData, { IProps } from '../ChatData'
+import ChatData, { IProps, TMessageValue } from '../ChatData'
 
 export interface IChatListRef {
   fetchData: (params?: any, toBottom?: boolean) => Promise<any>
+  scrollToBottom: () => void 
 }
 
-const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
+const ChatList = memo(forwardRef<IChatListRef, IProps & {
+  socket?: any,
+  currRoom?: API_CHAT.IGetRoomListData
+}>((props, ref) => {
 
   const [ currPage, setCurrPage ] = useState<number>(0)
   const [ bottomNode, setBottomNode ] = useState<Element>()
 
-  const { userInfo, fetchData, style={}, value, loading } = useMemo(() => {
+  const { userInfo, fetchData, style={}, value, loading, socket, currRoom } = useMemo(() => {
     return props 
   }, [props])
-
-  useImperativeHandle(ref, () => {
-    return {
-      fetchData: internalFetchData
-    }
-  }, [])
 
   const globalStyle = useMemo(() => {
     return merge({}, style)
@@ -46,6 +46,13 @@ const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
     return node 
   }, [])
 
+  const readMessage = useCallback((_: TMessageValue[], socket: any, currRoom: API_CHAT.IGetRoomListData) => {
+    withTry(readMessageRequest)(socket, {
+      _id: currRoom?._id,
+      type: 1
+    })
+  }, [])
+
   const scrollToBottom = useCallback(() => {
     let node: any = bottomNode
     if(!node) node = getNode()
@@ -62,10 +69,21 @@ const ChatList = memo(forwardRef<IChatListRef, IProps>((props, ref) => {
     await fetchData(merge({ currPage, pageSize: 10 }, params))
     setCurrPage(prev => prev + 1)
     if(toBottom) {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await sleep(1000)
       scrollToBottom()
     }
   }, [scrollToBottom, loading, fetchData, currPage])
+
+  useImperativeHandle(ref, () => {
+    return {
+      fetchData: internalFetchData,
+      scrollToBottom
+    }
+  }, [scrollToBottom, internalFetchData])
+
+  useEffect(() => {
+    readMessage(value, socket, currRoom!)
+  }, [value, currRoom, socket])
   
   return (
     <div

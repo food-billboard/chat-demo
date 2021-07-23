@@ -1,11 +1,12 @@
-import React, { Fragment, memo, useCallback, useMemo, useState } from 'react'
+import React, { Fragment, memo, useCallback, useMemo, useState, useEffect } from 'react'
 import { Tabs, List as AntList, Avatar, Badge, Button, Space, message } from 'antd'
 import { connect } from 'react-redux'
 import Day from 'dayjs'
 import { merge } from 'lodash'
-import { history, withTry } from '@/utils'
+import { withTry } from '@/utils'
 import { disagreeFriend as disagreeFriendMethod, readMessage as requestReadMessage, agreeFriend as agreeFriendMethod } from '@/utils/socket/request'
 import { mapDispatchToProps, mapStateToProps } from './connect'
+import { formatRoomInfo } from '../../../RoomList/utils'
 
 const { TabPane } = Tabs
 const { Item: ListItem } = AntList
@@ -17,6 +18,10 @@ interface IProps {
   systemChatMessageCount?: number 
   value?: API_CHAT.IGetMessageListData[]
   inviteList?: API_CHAT.IGetInviteFriendListRes[]
+  messageList?: (socket: any) => Promise<any>
+  userInfo?: STORE_USER.IUserInfo
+  // room?: API_CHAT.IGetRoomListData[]
+  currRoom?: API_CHAT.IGetMessageDetailRes["room"]
   [key: string]: any 
 }
 
@@ -85,12 +90,17 @@ const MessageContent = {
   AUDIO: "[音频]",
 }
 
+export function inviteListFilter(list: API_CHAT.IGetInviteFriendListRes[]) {
+  return list?.filter(item => item.status === 'TO_AGREE') || []
+}
+
 const Message = memo((props: IProps) => {
 
   const [ activeKey, setActiveKey ] = useState<'chat' | 'group_chat' | 'system' | 'invite'>('chat')
+  const [ realChatMessage, setRealChatMessage ] = useState<TListData[]>([])
 
-  const { chatMessage, groupChatMessage, systemChatMessage, socket, inviteList, inviteFriendList } = useMemo(() => {
-    const { value, socket, inviteList, inviteFriendList } = props 
+  const { chatMessage, groupChatMessage, systemChatMessage, socket, inviteList, inviteFriendList, userInfo, messageList } = useMemo(() => {
+    const { value, socket, inviteList, inviteFriendList, userInfo, ...nextProps } = props 
     const { chatMessage, groupChatMessage, systemChatMessage } = (Array.isArray(value) ? value : []).reduce((acc, cur) => {
       const { info, createdAt, _id, type, message_info: { media_type, text }, create_user, un_read_message_count } = cur 
       let defaultData = {
@@ -133,6 +143,7 @@ const Message = memo((props: IProps) => {
       chatMessage,
       groupChatMessage,
       systemChatMessage,
+      userInfo,
       inviteList: inviteList?.map(item => {
         return merge({}, item, {
           message: '',
@@ -140,16 +151,17 @@ const Message = memo((props: IProps) => {
           un_read_message_count: 1
         }) 
       }) || [],
-      inviteFriendList
+      inviteFriendList,
+      ...nextProps
     } 
   }, [props])
 
   const chatMessageCount = useMemo(() => {
-    return chatMessage.reduce((acc, cur) => {
+    return realChatMessage.reduce((acc, cur) => {
       acc += cur.un_read_message_count
       return acc 
     }, 0)
-  }, [ chatMessage ])
+  }, [ realChatMessage ])
 
   const groupChatMessageCount = useMemo(() => {
     return groupChatMessage.reduce((acc, cur) => {
@@ -166,7 +178,7 @@ const Message = memo((props: IProps) => {
   }, [systemChatMessage])
 
   const inviteListCount = useMemo(() => {
-    return inviteList?.length || 0
+    return inviteListFilter(inviteList)?.length || 0
   }, [inviteList])
 
   const chatTitle = useMemo(() => {
@@ -197,22 +209,18 @@ const Message = memo((props: IProps) => {
       }).join(','),
       type: 1
     })
-  }, [socket, props.value])
-
-  const getDetail = useCallback(() => {
-    history.push('/main')
-  }, [])
+    await messageList?.(socket)
+  }, [socket, props.value, messageList])
 
   const footer = useMemo(() => {
     return (
       <div
         style={{display: 'flex'}}
       >
-        <Button style={{flex: 1, marginRight: 16}} onClick={readMessage}>全部已读</Button>
-        <Button style={{flex: 1}} onClick={getDetail}>查看更多</Button>
+        <Button style={{flex: 1}} onClick={readMessage}>全部已读</Button>
       </div>
     )
-  }, [getDetail, readMessage])
+  }, [readMessage])
 
   const inviteFooter = useMemo(() => {
     return (
@@ -247,6 +255,8 @@ const Message = memo((props: IProps) => {
 
   const inviteBadge = useCallback((item: TListData) => {
     const { status } = item 
+    if(status === 'NORMAL') return '已同意'
+    if(status === 'DIS_AGREEED') return '已拒绝'
     if(status === 'AGREE') return '同意了你的好友申请'
     if(status === 'DIS_AGREE') return '拒绝了你的好友申请'
     return (
@@ -260,13 +270,55 @@ const Message = memo((props: IProps) => {
   const goRoom = useCallback(async (item: TListData) => {
 
   }, [])
+
+  const chatRoomMessageFormat = useCallback(async (list: TListData[]) => {
+    let newList: TListData[] = []
+    for(let i = 0; i < list.length; i ++) {
+      const roomData = list[i]
+      const prevData = realChatMessage.find(item => item._id === roomData._id)
+      if(!!prevData) {
+        const { info: prevInfo={}, ...prevPrevData } = prevData
+        const { info: nextInfo={}, ...nextPrevData } = roomData
+        newList.push(merge({}, prevPrevData, nextPrevData, {
+          ...prevInfo,
+          ...nextInfo,
+          avatar: nextInfo.avatar || prevInfo.avatar
+        }))
+      }else {
+        const newData = await formatRoomInfo({
+          info: {
+            name: roomData.username,
+            avatar: roomData.avatar,
+            description: roomData.message
+          },
+          type: "CHAT",
+          _id: roomData._id
+        } as any, userInfo!)
+        if(newData) {
+          const { info: { avatar, name } } = newData
+          newList.push(merge({}, roomData, {
+            username: name,
+            avatar
+          }))
+        }else {
+          newList.push(roomData)
+        }
+      }
+    }
+    console.log(newList, 998877)
+    setRealChatMessage(newList)
+  }, [userInfo, realChatMessage])
+
+  useEffect(() => {
+    chatRoomMessageFormat(chatMessage)
+  }, [chatMessage])
  
   return (
     <Fragment>
       <Tabs
         defaultActiveKey="chat"
         onChange={onTabChange}
-        accessKey={activeKey}
+        activeKey={activeKey}
         style={{
           padding: '0 20px'
         }}
@@ -279,7 +331,7 @@ const Message = memo((props: IProps) => {
       {
         activeKey === 'chat' && (
           <List 
-            list={chatMessage} 
+            list={realChatMessage} 
             footer={footer}
             onClick={goRoom}
           />

@@ -1,5 +1,7 @@
 // import { parse } from 'qs'
 import { parse } from 'querystring'
+import Day from 'dayjs'  
+import { merge } from 'lodash'
 import {
   API_DOMAIN
 } from './constants'
@@ -65,4 +67,32 @@ export const getLocalStorage = (key: string) => {
 export function formatUrl(url: string) {
   if(typeof url !== 'string') return url
   return url.startsWith('http') ? url : (url.startsWith('/') ? `${API_DOMAIN}${url}` : `${API_DOMAIN}/${url}`)
+}
+
+export const insertMessage = (origin: API_CHAT.IGetMessageDetailData[]=[], list: API_CHAT.IGetMessageDetailData[], insertAfter: boolean=true) => {
+  let newList = list.sort((prev, next) => {
+    const { createdAt: prevCreatedAt } = prev 
+    const { createdAt: nextCreatedAt } = next
+    return Day(prevCreatedAt).valueOf() - Day(nextCreatedAt).valueOf()
+  })
+  if(!origin.length) return [
+    ...newList
+  ]
+  if(insertAfter) {
+    const [ { createdAt: lastCreatedAt } ] = origin.slice(-1)
+    const lastCreateDateValue = Day(lastCreatedAt).valueOf()
+    newList = newList.filter(item => Day(item.createdAt).valueOf() > lastCreateDateValue)
+    return [
+      ...origin,
+      ...newList
+    ]
+  }else {
+    const [ { createdAt: firstCreatedAt } ] = origin
+    const firstCreateDateValue = Day(firstCreatedAt).valueOf()
+    newList = newList.filter(item => Day(item.createdAt).valueOf() < firstCreateDateValue)
+    return [
+      ...newList, 
+      ...origin
+    ]
+  }
 }

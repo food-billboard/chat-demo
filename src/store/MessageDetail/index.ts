@@ -5,6 +5,7 @@ import {
   FAIL
 } from './action'
 import { generateReducer } from '../utils'
+import { insertMessage } from '@/utils'
 
 const DEFAULT_VALUE = {
   messageDetailList: {
@@ -34,15 +35,10 @@ export default generateReducer({
       const { insert: { insertBefore, insertAfter }, messageDetailList } = value
       let messageList: any = {}
       const { messageDetailList: originMessageDetailList } = state.value
-      if(insertBefore) {
+      if(insertBefore || insertAfter) {
         messageList = {
           room: originMessageDetailList.room,
-          message: [...messageDetailList?.message || [], ...originMessageDetailList?.message || []]
-        }
-      }else if(insertAfter) {
-        messageList = {
-          room: originMessageDetailList.room,
-          message: [...originMessageDetailList?.message || [], ...messageDetailList?.message || []]
+          message: insertMessage(originMessageDetailList?.message || [], messageDetailList?.message || [], !insertBefore)
         }
       }else {
         messageList = {

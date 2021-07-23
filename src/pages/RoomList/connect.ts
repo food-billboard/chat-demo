@@ -4,9 +4,9 @@ export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
   return {
     socket: state.Socket.value.socket,
     value: state.MessageDetail.value.messageDetailList?.message || [],
-    room: state.MessageDetail.value.messageDetailList?.room || {},
+    currRoom: state.MessageDetail.value.messageDetailList?.room || {},
     userInfo: state.getUserInfo.value,
-    currRoom: state.Socket.value?.room
+    room: state.Socket.value?.room
   }
 }
 

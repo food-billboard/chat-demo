@@ -1,7 +1,7 @@
-import React, { memo, useMemo, useCallback, useRef } from 'react'
+import React, { memo, useMemo, useCallback, useRef, forwardRef } from 'react'
 import { message } from 'antd'
 import { connect } from 'react-redux'
-import { merge } from 'lodash-es'
+import { merge, noop } from 'lodash-es'
 import { PageHeaderProps } from 'antd/es/page-header'
 import { IProps } from './components/ChatData'
 import ChatList, { IChatListRef } from './components/ChatList'
@@ -12,8 +12,9 @@ import { postMessage } from '@/utils/socket'
 import { getMessageDetail } from '@/services'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { withTry } from '@/utils'
+import { useImperativeHandle } from 'react'
 
-interface IGroupProps extends IProps{
+export interface IGroupProps extends IProps{
   header: Partial<PageHeaderProps>
   currentRoom?: API_CHAT.IGetRoomListData
   socket?: any 
@@ -21,7 +22,11 @@ interface IGroupProps extends IProps{
   messageListDetailSave?: (value: any, insert: { insertBefore?: boolean, insertAfter?: boolean }) => Promise<void>
 }
 
-const GroupChat = memo((props: IGroupProps) => {
+export interface IGroupChatRef {
+  scrollToBottom: () => void 
+}
+
+const GroupChat = memo(forwardRef<IGroupChatRef, IGroupProps>((props, ref) => {
 
   const { header, currentRoom, socket, fetchLoading, messageListDetailSave, ...nextProps } = useMemo(() => {
     const { style, ...nextProps } = props 
@@ -51,7 +56,6 @@ const GroupChat = memo((props: IGroupProps) => {
     if(err) {
       message.info('消息发送失败')
     }else {
-      console.log('数据获取')
       const newData = await getMessageDetail({
         messageId: res,
         _id: currentRoom!._id
@@ -79,6 +83,12 @@ const GroupChat = memo((props: IGroupProps) => {
     )
   }, [onBack, header])
 
+  useImperativeHandle(ref, () => {
+    return {
+      scrollToBottom: listRef.current?.scrollToBottom || noop
+    }
+  }, [listRef])
+
   return (
     <div  
       style={{height: '100%', overflow: 'auto'}}
@@ -99,6 +109,6 @@ const GroupChat = memo((props: IGroupProps) => {
     </div>
   )
 
-})
+}))
 
 export default connect(mapStateToProps, mapDispatchToProps)(GroupChat)

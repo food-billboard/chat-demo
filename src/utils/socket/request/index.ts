@@ -5,9 +5,9 @@ import { getStorage } from '../utils'
 const mock = () => {
   const { userAgent } = window.navigator
   if(userAgent.includes('Chrome')) {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMCIsImlhdCI6MTYyNjQyNzcxMiwiZXhwIjoxNjI2NTE0MTEyfQ.ErBcuVswqfJ9hQ2EUTOkFtvZWhGw0-muBcLPBheKXug'
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMCIsImlhdCI6MTYyNzAwNTk5NSwiZXhwIjoxNjI3MDkyMzk1fQ.sukgoOG4NiJTKyWhoKrFvwELEqtWvohQZnTYOLRHsHY'
   }
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTg5MTI2NzJjMTEyMDlkZDVjNjdlYSIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMSIsImlhdCI6MTYyNjQyNjE3NSwiZXhwIjoxNjI2NTEyNTc1fQ.V9ySGGxjdfah8LzWi5ivTz2I-nMOtvP3P-H9dJ8eD5o'
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTg5MTI2NzJjMTEyMDlkZDVjNjdlYSIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMSIsImlhdCI6MTYyNzAwNjAyNCwiZXhwIjoxNjI3MDkyNDI0fQ.M9VTAblL0eCm4pv5By00Yco7MZPxtJtFXHDMWqHu8ug'
 }
 
 export const getToken = () => {
@@ -18,7 +18,6 @@ export const getToken = () => {
 const promisify = (emit: any, on: any) => {
   return new Promise((resolve, reject) => {
     on((data: string) => {
-      console.log('socket响应')
       const value: any = parseValue(data)
       const { success, res: { data: resData, errMsg } } = value 
       if(success) {

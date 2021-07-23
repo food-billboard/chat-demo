@@ -1,8 +1,9 @@
 import { generateAction } from '../utils'
+import { getMessageDetail } from '@/services'
 import { connect as internalConnect, parseValue, connectStoreUserData, putRoom, joinRoom, readMessage } from '@/utils/socket'
 import { setStorage } from '@/utils/socket/utils'
 import { messageListSave, messageList } from '../Message/action'
-import { messageListDetailSave } from '../MessageDetail/action'
+import { messageListDetail, messageListDetailSave } from '../MessageDetail/action'
 import { roomList, roomListSave } from '../Room/action'
 import { inviteFriendList, inviteFriendListSave } from '../InviteList/action'
 
@@ -135,6 +136,25 @@ function eventBinding(dispatch: any, socket: any) {
     const { success } = value 
     if(success) {
       dispatch(inviteFriendList(socket))
+    }
+  })
+
+  socket.on('post', (data: string) => {
+    console.log('接收消息响应', data)
+    const value: any = parseValue(data) 
+    const { success, res: { data: id } } = value 
+    if(success) {
+      //消息列表
+      dispatch(messageList(socket))
+      //消息详情
+      getMessageDetail({
+        messageId: id 
+      })
+      .then(data => {
+        return dispatch(messageListDetailSave?.(data, {
+          insertAfter: true 
+        }))
+      })
     }
   })
 
