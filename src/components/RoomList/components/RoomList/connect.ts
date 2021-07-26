@@ -1,13 +1,13 @@
-import { roomList } from '../../store'
+import { connect } from '../../../../store'
 
 export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
   return {
     value: state.Room.value?.roomList || [],
     userInfo: state.getUserInfo.value || {},
-    socket: state.Socket.value.socket,
+    loading: state.Room.loading
   }
 }
 
 export const mapDispatchToProps = (dispatch: any) =>  ({
-  roomList: (socket: any, params: API_CHAT.IGetRoomListParams={}) => dispatch(roomList(socket, params)),
+  connect: () => dispatch(connect())
 })

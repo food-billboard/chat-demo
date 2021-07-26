@@ -13,6 +13,8 @@ declare module '*.gif';
 declare module '*.bmp';
 declare module '*.tiff';
 declare module 'omit.js';
+declare module 'chunk-file-upload';
+
 
 // google analytics interface
 interface GAFieldsObject {

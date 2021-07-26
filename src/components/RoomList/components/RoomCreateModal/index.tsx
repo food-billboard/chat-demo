@@ -26,8 +26,7 @@ const RoomCreateModal = memo(forwardRef<IRoomCreateModalRef, {
 
   const [ visible, setVisible ] = useState<boolean>(false)
   const [ selectMode, setSelectMode ] = useState<any>("multiple")
-  // const [ friendList, setFriendList ] = useState<API_USER.IGetFriendsRes[]>([])
-  const [ friendList, setFriendList ] = useState<{ username: string, _id: string }[]>([])
+  const [ friendList, setFriendList ] = useState<API_USER.IGetFriendsRes[]>([])
   const [form] = Form.useForm()
 
   const { onOk: propsOnOk } = useMemo(() => {
@@ -40,7 +39,7 @@ const RoomCreateModal = memo(forwardRef<IRoomCreateModalRef, {
       let newMembers: any  
       let mode = value.type === 'CHAT' ? undefined : "multiple"
       if(value.type === 'GROUP_CHAT') {
-        newMembers = Array.isArray(members) ? members : [members]
+        newMembers = Array.isArray(members) ? members : (members ? [members] : [])
       }else {
         newMembers = Array.isArray(members) ? members[0] : members
       }
@@ -49,49 +48,44 @@ const RoomCreateModal = memo(forwardRef<IRoomCreateModalRef, {
       })   
       setSelectMode(mode)   
     }
-    console.log(value)
+  }, [form])
+
+  const init = useCallback(() => {
+    setVisible(false)
+    form.resetFields()
   }, [form])
 
   const onOk = useCallback(async () => {
     return form.validateFields()
     .then(data => {
-      console.log(data)
-      propsOnOk(data)
-      setVisible(false)
+      return propsOnOk(data)
+    })
+    .then(_ => {
+      init()
     })
     .catch(err => {
       console.log(err)
       message.info('请正确填写信息')
     }) 
-  }, [form, propsOnOk])
+  }, [form, propsOnOk, init])
 
   const onCancel = useCallback(() => {
-    setVisible(false)
-  }, [])
+    init()
+  }, [init])
 
   const fetchData = useCallback(async () => {
     const data = await getRelation({
       currPage: 0,
       pageSize: 9999
     })
-    // setFriendList(data.friends)
-    setFriendList([
-      {
-        _id: '111',
-        username: '2222'
-      },
-      {
-        _id: '2222',
-        username: '2244422'
-      },
-    ])
+    setFriendList(data.friends)
   }, [])
 
   const friendsOptions = useMemo(() => {
     return friendList.map(item => {
-      const { _id, username } = item 
+      const { member, username } = item 
       return (
-        <Select.Option key={_id} value={_id}>
+        <Select.Option key={member} value={member}>
           {username}
         </Select.Option>
       )

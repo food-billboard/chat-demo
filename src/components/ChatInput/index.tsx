@@ -2,7 +2,8 @@ import React, { CSSProperties, memo, useCallback, useMemo, useState } from 'reac
 import { Input, Popover, Button, Space } from 'antd'
 import { merge } from 'lodash-es'
 import { Picker, EmojiData } from 'emoji-mart'
-import { MehOutlined, FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons'
+import { MehOutlined } from '@ant-design/icons'
+import Upload, { UploadProps } from './components/Upload'
 import 'emoji-mart/css/emoji-mart.css'
 import styles from './index.less'
 
@@ -52,12 +53,8 @@ export default memo((props: IProps) => {
     })
   }, [])
 
-  const handleSelectImage = useCallback(() => {
-    console.log("选择图片")
-  }, [])
-
-  const handleSelectVideo = useCallback(() => {
-    console.log("选择视频")
+  const onUpload: UploadProps["onChange"] = useCallback((value) => {
+    console.log(value, 24444)
   }, [])
 
   const ToolBar = useMemo(() => {
@@ -75,8 +72,8 @@ export default memo((props: IProps) => {
             >
               <MehOutlined style={cursor} />
             </Popover> 
-            <FileImageOutlined style={cursor} onClick={handleSelectImage} />
-            <VideoCameraOutlined style={cursor} onClick={handleSelectVideo} />
+            <Upload icon="image" onChange={onUpload} />
+            <Upload icon="video" onChange={onUpload} />
           </Space>
         </div>
         <Button type="primary" style={{borderRadius: 10}} onClick={handlePostMessage.bind(this, false)}>发送</Button>

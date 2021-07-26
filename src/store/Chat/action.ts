@@ -3,7 +3,7 @@ import { getMessageDetail } from '@/services'
 import { connect as internalConnect, parseValue, connectStoreUserData, putRoom, joinRoom, readMessage } from '@/utils/socket'
 import { setStorage } from '@/utils/socket/utils'
 import { messageListSave, messageList } from '../Message/action'
-import { messageListDetail, messageListDetailSave } from '../MessageDetail/action'
+import { messageListDetailSave } from '../MessageDetail/action'
 import { roomList, roomListSave } from '../Room/action'
 import { inviteFriendList, inviteFriendListSave } from '../InviteList/action'
 

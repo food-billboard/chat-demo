@@ -1,4 +1,4 @@
-import { inviteFriendList, messageList } from '@/store'
+import { inviteFriendList, messageList, exchangeRoom } from '@/store'
 
 export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
   return {
@@ -7,13 +7,14 @@ export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
     socket: state.Socket.value?.socket,
     userInfo: state.getUserInfo.value,
     room: state.Socket.value?.room || [],
-    currRoom: state.MessageDetail.value.messageDetailList?.room || {},
+    currRoom: state.Socket.value.room,
   }
 }
 
 export const mapDispatchToProps = (dispatch: any) => {
   return {  
     inviteFriendList: (socket: any, params: API_CHAT.IGetInviteFriendListParams={}) => dispatch(inviteFriendList(socket, params)),
-    messageList: (socket: any) => dispatch(messageList(socket))
+    messageList: (socket: any) => dispatch(messageList(socket)),
+    exchangeRoom: (socket: any, room: API_CHAT.IGetRoomListData, isJoin: boolean) => dispatch(exchangeRoom(socket, room, isJoin)),
   }
 }

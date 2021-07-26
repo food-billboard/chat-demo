@@ -21,7 +21,8 @@ interface IProps {
   messageList?: (socket: any) => Promise<any>
   userInfo?: STORE_USER.IUserInfo
   // room?: API_CHAT.IGetRoomListData[]
-  currRoom?: API_CHAT.IGetMessageDetailRes["room"]
+  currRoom?: API_CHAT.IGetRoomListData
+  exchangeRoom?: (socket: any, currentRoom: API_CHAT.IGetRoomListData, isjoin: boolean) => Promise<any>
   [key: string]: any 
 }
 
@@ -99,7 +100,7 @@ const Message = memo((props: IProps) => {
   const [ activeKey, setActiveKey ] = useState<'chat' | 'group_chat' | 'system' | 'invite'>('chat')
   const [ realChatMessage, setRealChatMessage ] = useState<TListData[]>([])
 
-  const { chatMessage, groupChatMessage, systemChatMessage, socket, inviteList, inviteFriendList, userInfo, messageList } = useMemo(() => {
+  const { chatMessage, groupChatMessage, systemChatMessage, socket, inviteList, inviteFriendList, userInfo, messageList, currRoom, exchangeRoom } = useMemo(() => {
     const { value, socket, inviteList, inviteFriendList, userInfo, ...nextProps } = props 
     const { chatMessage, groupChatMessage, systemChatMessage } = (Array.isArray(value) ? value : []).reduce((acc, cur) => {
       const { info, createdAt, _id, type, message_info: { media_type, text }, create_user, un_read_message_count } = cur 
@@ -111,6 +112,7 @@ const Message = memo((props: IProps) => {
         _id,
         createdAt,
         un_read_message_count,
+        origin: cur
       }
       switch(type) {
         case 'CHAT':
@@ -121,7 +123,8 @@ const Message = memo((props: IProps) => {
             media_type,
             _id,
             createdAt,
-            un_read_message_count
+            un_read_message_count,
+            origin: cur
           })
           break 
         case 'GROUP_CHAT':
@@ -267,9 +270,26 @@ const Message = memo((props: IProps) => {
     )
   }, [disagreeFriend, agreeFriend])
 
-  const goRoom = useCallback(async (item: TListData) => {
+  const quitRoom = useCallback(async () => {
+    if(!!currRoom) await exchangeRoom?.(socket, currRoom, false)
+  }, [socket, exchangeRoom, currRoom])
 
-  }, [])
+  const onSelectRoom = useCallback(async (item: API_CHAT.IGetRoomListData) => {
+    await quitRoom()
+    await exchangeRoom?.(socket, item, true)
+  }, [socket, exchangeRoom, quitRoom])
+
+  const goRoom = useCallback(async (item: TListData) => {
+    const { _id: targetId, avatar, username, origin } = item 
+    const { _id: currId } = currRoom || {}
+    if(targetId === currId) return 
+    onSelectRoom(merge({}, origin, {
+      info: {
+        avatar,
+        name: username
+      }
+    }))
+  }, [currRoom, onSelectRoom])
 
   const chatRoomMessageFormat = useCallback(async (list: TListData[]) => {
     let newList: TListData[] = []
@@ -305,7 +325,6 @@ const Message = memo((props: IProps) => {
         }
       }
     }
-    console.log(newList, 998877)
     setRealChatMessage(newList)
   }, [userInfo, realChatMessage])
 
