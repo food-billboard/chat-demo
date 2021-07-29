@@ -17,7 +17,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
 
   const chatRef = useRef<IGroupChatRef>(null)
 
-  const { socket, messageListDetail, value, userInfo, exchangeRoom, currRoom } = useMemo(() => {
+  const { socket, messageListDetail, userInfo, exchangeRoom, currRoom } = useMemo(() => {
     return props 
   }, [props])
 
@@ -83,6 +83,16 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
     }
   }, [currRoom])
 
+  const chatHeader = useMemo(() => {
+    return {
+      title: currRoom?.info?.name || '某房间',
+      onBack: quitRoom,
+      extra: <AvatarList fetchData={fetchRoomUserList} avatarProps={{
+        tooltip
+      }} />
+    }
+  }, [currRoom, quitRoom, fetchRoomUserList, tooltip])
+
   return (
     <Row 
       gutter={24}
@@ -107,14 +117,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
               <GroupChat  
                 ref={chatRef}
                 fetchData={fetchRoomMessageList}
-                value={value}
-                header={{
-                  title: currRoom.info?.name || '某房间',
-                  onBack: quitRoom,
-                  extra: <AvatarList fetchData={fetchRoomUserList} avatarProps={{
-                    tooltip
-                  }} />
-                }}
+                header={chatHeader}
               />
             )
           }

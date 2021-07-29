@@ -1,6 +1,10 @@
 import React, { memo, Fragment, useRef, useCallback, CSSProperties, useMemo } from 'react'
 import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons'
-import { Upload } from 'chunk-file-upload'
+import { merge, pick } from 'lodash'
+import { connect } from 'react-redux'
+import { mapStateToProps, mapDispatchToProps } from './connect'
+import { upload as Upload } from './upload'
+import PosterGetter from '@/utils/getVideoPoster'
 import styles from './index.less'
 
 const cursor: CSSProperties = {
@@ -12,20 +16,28 @@ export type FileType = {
 
 }
 
+const posterGetter = new PosterGetter()
+
 export type UploadProps = {
   icon: "video" | "image"
   onChange?: (value: FileType) => void 
+  userInfo?: STORE_USER.IUserInfo
+  socket?: any 
+  currRoom?: API_CHAT.IGetRoomListData
+  messageListDetailSave?: (value: any, insert: { insertBefore?: boolean, insertAfter?: boolean }) => Promise<void>
 }
 
 const ImageUpload = memo((props: UploadProps) => {
 
-  const { icon } = useMemo(() => {
+  const inputRef = useRef<any>(null)
+
+  const { icon, userInfo, socket, messageListDetailSave } = useMemo(() => {
     return props 
   }, [props])
 
   const handleSelectFile = useCallback(() => {
-
-  }, [])
+    inputRef.current?.click()
+  }, [inputRef])
 
   const IconNode = useMemo(() => {
     if(icon === 'image') return <FileImageOutlined style={cursor} onClick={handleSelectFile} />
@@ -33,55 +45,52 @@ const ImageUpload = memo((props: UploadProps) => {
   }, [icon, handleSelectFile])
 
   const inputFileProps = useMemo(() => {
-    console.log(icon)
-    return {}
+    let defaultConfig = {
+      type: "file",
+      multiple: false 
+    }
+    if(icon === 'image') {
+      defaultConfig = merge({}, defaultConfig, {
+        accept: "image/*"
+      })
+    }
+    if(icon === 'video') {
+      defaultConfig = merge({}, defaultConfig, {
+        accept: "video/*"
+      })
+    }
+    return defaultConfig
   }, [icon])  
 
-  const inputRef = useRef(null)
-
-  const onChange = useCallback(() => {
-    // if(this.state.control) return
-    // const file = e.target.files[0]
-    // const that = this
-    // const [name] = this.upload.add({
-    //   file: {
-    //     file,
-    //     mime: file.type
-    //   },
-    //   request: {
-    //     exitDataFn: this.exitDataFn,
-    //     uploadFn: this.uploadFn,
-    //     completeFn: (...values) => {
-    //       this.completeFn(...values)
-    //     },
-    //     callback: (err, value) => {
-    //       this.callback(err, value)
-    //       this.setState({
-    //         control: null,
-    //         name: null
-    //       })
-    //     },
-    //   },
-    //   lifecycle: {
-    //     reading({ name, task, current, total }) {
-    //       console.log('loading: ', current, 'total', total)
-    //     },
-    //     uploading({ complete, total }) {
-    //       that.setState({
-    //         progress: Math.ceil(complete / total) * 100
-    //       })
-    //     }
-    //   }
-    // })
-    // this.setState({
-    //   name,
-    //   control: file
-    // })
+  const getPoster = useCallback((file: File) => {
+    return posterGetter.start(file)
   }, [])
+
+  const onChange = useCallback(async (e) => {
+    const file = e.target.files[0]
+    const result = Upload(file, {
+      user_info: pick(userInfo || {}, [
+        "username",
+        "description",
+        "friend_id",
+        "member",
+        "_id",
+        "avatar"
+      ]) as API_CHAT.IGetMessageDetailData["user_info"]
+    })
+    if(!result) return 
+    await messageListDetailSave?.({
+      message: [result]
+    }, {
+      insertAfter: true 
+    })
+    const data = await getPoster(file)
+    console.log(data, 55555)
+  }, [userInfo, messageListDetailSave])
 
   return (
     <Fragment>
-      <input {...inputFileProps} ref={inputRef} className={styles["upload-input"]} type="file" onChange={onChange} />
+      <input {...inputFileProps} ref={inputRef} className={styles["upload-input"]} onChange={onChange} />
       {
         IconNode
       }
@@ -90,4 +99,4 @@ const ImageUpload = memo((props: UploadProps) => {
 
 })
 
-export default ImageUpload
+export default connect(mapStateToProps, mapDispatchToProps)(ImageUpload)

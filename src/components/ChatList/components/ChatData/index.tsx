@@ -1,10 +1,12 @@
-import React, { memo, useMemo, FC } from 'react'
+import React, { memo, useMemo, FC, useCallback } from 'react'
 import { Avatar } from 'antd'
 import Day from 'dayjs'
+import { connect } from 'react-redux' 
 import UserDetail from '../../../UserDetail'
 import ImageView from '../ViewImage'
+import UploadLoading from './uploadLoading'
+import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
-
 import styles from './index.less'
 
 export type TMessageValue = API_CHAT.IGetMessageDetailData & { isMine?: boolean }
@@ -22,24 +24,32 @@ export interface IProps {
 
 const ChatData: FC<{
   value: TMessageValue
+  messageListDetailSave: (value: any, insert: { insertBefore?: boolean, insertAfter?: boolean }) => any 
 }> = memo((props) => {
 
   const { 
-    value: {
-      isMine,
-      user_info: {
-        avatar,
-        _id,
-        username,
-        description
-      },
-      media_type,
-      content,
-      createdAt
-    } 
+    value,
+    messageListDetailSave
   } = useMemo(() => {
     return props 
   }, [props])
+
+  const {
+    isMine,
+    user_info: {
+      avatar,
+      _id,
+      username,
+      description
+    },
+    media_type,
+    content,
+    createdAt,
+    loading,
+    status,
+  } = useMemo(() => {
+    return value 
+  }, [value]) 
 
   const UserAvatar = useMemo(() => {
     const UserAvatar = (
@@ -60,6 +70,10 @@ const ChatData: FC<{
     )
   }, [avatar, username, isMine, description, _id])
 
+  const onDataChange = useCallback(async (value) => {
+    await messageListDetailSave(value, { insertAfter: true })
+  }, [messageListDetailSave])
+
   const PopoverMessage = useMemo(() => {
     const { poster, image, text } = content 
     const margin = isMine ? { marginRight: 20 } : { marginLeft: 20 }
@@ -77,10 +91,20 @@ const ChatData: FC<{
         }
         {
           (media_type === 'IMAGE' || media_type === 'VIDEO') && (
-            <ImageView
-              type={'VIDEO'}
-              src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
-            />
+            status ? (
+              <UploadLoading
+                value={value}
+                onChange={onDataChange}
+              />
+            )
+            :
+            (
+              <ImageView
+                disabled={!!loading}
+                type={'VIDEO'}
+                src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
+              />
+            )
           )
         }
         {
@@ -88,7 +112,7 @@ const ChatData: FC<{
         }
       </div>
     )
-  }, [media_type, content, isMine])
+  }, [media_type, content, isMine, value, onDataChange, loading, status])
 
   return (
     <div
@@ -112,4 +136,4 @@ const ChatData: FC<{
 
 })
 
-export default ChatData
+export default connect(mapStateToProps, mapDispatchToProps)(ChatData)

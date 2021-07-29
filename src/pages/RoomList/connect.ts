@@ -3,7 +3,6 @@ import { messageListDetail, exchangeRoom } from '../../store'
 export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
   return {
     socket: state.Socket.value.socket,
-    value: state.MessageDetail.value.messageDetailList?.message || [],
     currRoom: state.Socket.value.room,
     userInfo: state.getUserInfo.value,
     room: state.Socket.value?.room

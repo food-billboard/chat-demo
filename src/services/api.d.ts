@@ -63,7 +63,7 @@ declare namespace API_USER {
 
 }
 
-declare namespace Upload {
+declare namespace API_UPLOAD {
 
   export interface IDeleteParams {
     _id: string
@@ -90,25 +90,42 @@ declare namespace Upload {
     list: IGetMediaListData[]
   }
 
-  export interface IGetMediaListData {
-    _id: string 
-    src: string 
-    name: string 
-    createdAt: string 
-    updatedAt: string 
-    origin_type: API_DATA.IDataSourceType
-    white_list_count: number 
-    origin: {
-      name: string 
-      _id: string 
-    }
-    auth: TAuth
-    info: {
-      md5: string 
-      status: TStatus
-      size: number 
-      mime: string 
-    }
+  export interface IPutVideoPosterParams {
+    data: string 
+  }
+
+  export type TAuathType = "PRIVATE" | "PUBLIC"
+
+  export interface IUploadParams {
+    md5: string
+    offset: number
+    file: Blob
+  }
+
+  export interface IUploadRes {
+    "Upload-Offset": number 
+  }
+
+  export interface ICheckUploadFileParams {
+    "Tus-Resumable": "1.0.0"
+    md5: string 
+    auth: TAuathType 
+    size: number 
+    mime: string
+    name?: string 
+    chunk: number 
+  }
+
+  export interface ICheckUploadFileRes {
+    "Tus-Resumable": "1.0.0"
+    location: string 
+    "Upload-Offset": number 
+    "Upload-Length": number 
+    "Upload-Id": string 
+  }
+
+  export interface IGetMediaDataParams {
+    load: string 
   }
 
 }
@@ -261,7 +278,7 @@ declare namespace API_CHAT {
 
   export interface IGetMessageDetailData {
     _id: string 
-    user_info: TUserData & { description: string, member: string, friend_id: string  }
+    user_info: TUserData & { description: string, member: string, friend_id: string }
     media_type: TMessageMediaType
     point_to: string 
     createdAt: string 
@@ -273,6 +290,7 @@ declare namespace API_CHAT {
       audio: string 
       poster: string
     }>
+    [key: string]: any 
   }
 
   export interface IAgreeFriendParams {

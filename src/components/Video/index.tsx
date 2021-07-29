@@ -104,7 +104,7 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
     let fileId = paths[paths.length - 1]
     if(!fileId) return 'video/mp4'
     fileId = fileId.includes('.') ? fileId.split('.')[0] : fileId
-    let params: Upload.IGetMediaListParams = {
+    let params: API_UPLOAD.IGetMediaListParams = {
       type: 1
     }
     if(isObjectId(fileId)) {

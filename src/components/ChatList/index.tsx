@@ -3,7 +3,7 @@ import { message } from 'antd'
 import { connect } from 'react-redux'
 import { merge, noop } from 'lodash-es'
 import { PageHeaderProps } from 'antd/es/page-header'
-import { IProps } from './components/ChatData'
+import { IProps, TMessageValue } from './components/ChatData'
 import ChatList, { IChatListRef } from './components/ChatList'
 import ChatHeader from '../UserHeader'
 import ChatInput from '../ChatInput'
@@ -14,12 +14,13 @@ import { mapStateToProps, mapDispatchToProps } from './connect'
 import { withTry } from '@/utils'
 import { useImperativeHandle } from 'react'
 
-export interface IGroupProps extends IProps{
+export interface IGroupProps extends Omit<IProps, "value">{
   header: Partial<PageHeaderProps>
   currentRoom?: API_CHAT.IGetRoomListData
   socket?: any 
   fetchLoading?: boolean 
   messageListDetailSave?: (value: any, insert: { insertBefore?: boolean, insertAfter?: boolean }) => Promise<void>
+  value?: TMessageValue[] 
 }
 
 export interface IGroupChatRef {
@@ -28,7 +29,7 @@ export interface IGroupChatRef {
 
 const GroupChat = memo(forwardRef<IGroupChatRef, IGroupProps>((props, ref) => {
 
-  const { header, currentRoom, socket, fetchLoading, messageListDetailSave, ...nextProps } = useMemo(() => {
+  const { currentRoom, socket, fetchLoading, messageListDetailSave, value=[], ...nextProps } = useMemo(() => {
     const { style, ...nextProps } = props 
     return merge({}, nextProps, { 
       style: merge({}, style, 
@@ -37,6 +38,10 @@ const GroupChat = memo(forwardRef<IGroupChatRef, IGroupProps>((props, ref) => {
       }),
     }) 
   }, [props])
+
+  const header = useMemo(() => {
+    return props.header
+  }, [props.header])
 
   const listRef = useRef<IChatListRef>(null)
 
@@ -81,7 +86,7 @@ const GroupChat = memo(forwardRef<IGroupChatRef, IGroupProps>((props, ref) => {
         onBack={onBack}
       />
     )
-  }, [onBack, header])
+  }, [header, onBack])
 
   useImperativeHandle(ref, () => {
     return {
@@ -103,7 +108,7 @@ const GroupChat = memo(forwardRef<IGroupChatRef, IGroupProps>((props, ref) => {
       >
         {ChatHeaderDom}
         <ObserverDom onObserve={onFetchData} />
-        <ChatList ref={listRef} loading={!!fetchLoading} {...nextProps}  />
+        <ChatList ref={listRef} loading={!!fetchLoading} {...nextProps} value={value} />
       </div>
       <ChatInput style={{height: '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={handlePostMessage} />
     </div>

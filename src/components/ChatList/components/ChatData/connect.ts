@@ -5,8 +5,7 @@ export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
     userInfo: state.getUserInfo.value,
     currentRoom: state.Socket.value?.room,
     socket: state.Socket.value?.socket,
-    fetchLoading: state.MessageDetail.loading,
-    value: state.MessageDetail.value.messageDetailList?.message || [],
+    fetchLoading: state.MessageDetail.loading
   }
 }
 

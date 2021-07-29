@@ -79,7 +79,7 @@ export default memo((props: IProps) => {
         <Button type="primary" style={{borderRadius: 10}} onClick={handlePostMessage.bind(this, false)}>发送</Button>
       </div>
     )
-  }, [handlePostMessage, handleSelectEmoji])
+  }, [handlePostMessage, handleSelectEmoji, onUpload])
 
   return (
     <div

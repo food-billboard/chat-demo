@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback, useState, forwardRef, useImperativeHandle, useEffect } from 'react'
+import React, { memo, useMemo, useCallback, useState, forwardRef, useImperativeHandle, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { merge } from 'lodash-es'
@@ -16,6 +16,8 @@ const ChatList = memo(forwardRef<IChatListRef, IProps & {
   socket?: any,
   currRoom?: API_CHAT.IGetRoomListData
 }>((props, ref) => {
+
+  let prevValueLength = useRef(-1)
 
   const [ currPage, setCurrPage ] = useState<number>(0)
   const [ bottomNode, setBottomNode ] = useState<Element>()
@@ -82,7 +84,11 @@ const ChatList = memo(forwardRef<IChatListRef, IProps & {
   }, [scrollToBottom, internalFetchData])
 
   useEffect(() => {
-    readMessage(value, socket, currRoom!)
+    let currentLength = value.length
+    if(currentLength !== prevValueLength.current) readMessage(value, socket, currRoom!)
+    return () => {
+      prevValueLength.current = currentLength
+    }
   }, [value, currRoom, socket])
   
   return (

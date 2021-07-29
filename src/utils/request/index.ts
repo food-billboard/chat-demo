@@ -118,7 +118,7 @@ const axiosInstance = axios.create(DEFAULT_REQUEST_SETTING)
 //   }
 // )
 
-export const request = async <ResBody>(url: string, setting: IRequestOptions={}): Promise<ResBody> => {
+export const request = async <ResBody>(url: string, setting: IRequestOptions={}, origin: boolean=false): Promise<ResBody> => {
     // 过滤URL参数
     const { params, data, mis=true, ...options } = setting
 
@@ -153,7 +153,7 @@ export const request = async <ResBody>(url: string, setting: IRequestOptions={})
   
     // 返回真正的response body res 内容
     if( !error ){
-      return (body?.data?.res?.data || {}) as ResBody
+      return (origin ? body : body?.data?.res?.data || {}) as ResBody
     }
     error.mis = mis
     mis && misManage(error)
