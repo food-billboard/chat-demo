@@ -1,5 +1,5 @@
 import axios, { Method, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { message, notification } from 'antd'
+import { BackTopProps, message, notification } from 'antd'
 import { createBrowserHistory } from 'history'
 import { debounce } from 'lodash-es'
 import { stringify } from 'querystring'
@@ -30,6 +30,7 @@ const codeMessage = {
 
 export interface IRequestOptions extends AxiosRequestConfig {
   mis?: boolean
+  file?: boolean 
 }
 
 const DEFAULT_REQUEST_SETTING: Partial<IRequestOptions> = {
@@ -120,7 +121,7 @@ const axiosInstance = axios.create(DEFAULT_REQUEST_SETTING)
 
 export const request = async <ResBody>(url: string, setting: IRequestOptions={}, origin: boolean=false): Promise<ResBody> => {
     // 过滤URL参数
-    const { params, data, mis=true, ...options } = setting
+    const { params, data, mis=true, file=false, ...options } = setting
 
     let body: any
     let error: any
@@ -128,7 +129,7 @@ export const request = async <ResBody>(url: string, setting: IRequestOptions={},
     try{
       body = await axiosInstance(url, {
         ...options,
-        ...(data ? { data: Qs.stringify(data) } : {}),
+        ...(data ? { data: file ? data : Qs.stringify(data) } : {}),
         ...(params ? { params: formatQuery(params) } : {}),
       })
     } catch(err) {

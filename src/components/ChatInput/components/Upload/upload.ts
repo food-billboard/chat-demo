@@ -13,7 +13,7 @@ const VALID_FILE_TYPE = [
   "VIDEO"
 ]
 
-const exitDataFn = (params: {
+const exitDataFn = async (params: {
   filename: string
   md5: string
   suffix: string
@@ -32,10 +32,10 @@ const exitDataFn = (params: {
   })
 }
 
-const uploadFn = (name: any) => async (data: FormData) => {
+const uploadFn = async (data: FormData, name: Symbol) => {
   const task = INSTANCE.getTask(name)
   const size = task.file.file.size 
-  let response: any 
+  let response: any = {}
   const md5 = data.get('md5')
   const file = data.get('file')
   const index = data.get("index") as any 
@@ -60,6 +60,7 @@ const uploadFn = (name: any) => async (data: FormData) => {
 export const upload = (file: File, defaultMessageData: Partial<API_CHAT.IGetMessageDetailData>) => {
   let [ mimeType ] = file.type.toUpperCase().split('/')
   let success = false 
+  let error = false 
   if(!VALID_FILE_TYPE.includes(mimeType)) {
     message.info("文件格式不正确~")
     return 
@@ -73,7 +74,6 @@ export const upload = (file: File, defaultMessageData: Partial<API_CHAT.IGetMess
   const [ name ] = INSTANCE.add({
     file: {
       file,
-      mime: mimeType
     },
     request: {
       exitDataFn,
@@ -81,6 +81,8 @@ export const upload = (file: File, defaultMessageData: Partial<API_CHAT.IGetMess
       callback: (err: any) => {
         if(!err) {
           success = true 
+        }else {
+          error = true 
         }
       }
     }
@@ -91,7 +93,7 @@ export const upload = (file: File, defaultMessageData: Partial<API_CHAT.IGetMess
     return 
   }
 
-  // INSTANCE.deal(name)
+  INSTANCE.deal(name)
 
   return merge({}, defaultMessageData, {
     _id: `__local_prefix_id_${Date.now()}_${Math.random()}__`, 
@@ -110,8 +112,9 @@ export const upload = (file: File, defaultMessageData: Partial<API_CHAT.IGetMess
         }
       }
       const result = INSTANCE.watch(name)
-      if(!result || !result.length) return false 
+      if(!result || !result.length || error) return false
       const [ target ] = result
+      if(!target) return false 
       return {
         error: target?.error, 
         progress: target?.progress, 

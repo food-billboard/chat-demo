@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Progress as AntProgress } from 'antd'
-import { merge, omit } from 'lodash'
+import { message, Progress as AntProgress } from 'antd'
+import { merge } from 'lodash'
 import styles from './index.less'
 
 export interface ProgressProps {
@@ -22,17 +22,18 @@ export interface ProgressProps {
 const getLoading = (result: any) => {
   const { status, progress, error } = result 
   let data: any = {
-    loading: progress != 1 || !error || status != -1 || status != -2 || status != -3 || status != 4,
-    status: progress == 1 ? undefined : (
+    loading: progress != 1 || (status != -1 && status != -2 && status != -3 && status != 4),
+    status: progress == 1 ? null : (
       !!error ? 'error' : "upload"
     )
   }
   if(!data.status) {
     data = merge({}, data, {
-      loading: undefined,
-      watch: undefined,
+      loading: null,
+      watch: null,
     })
   } 
+  return data 
 }
 
 class Progress extends Component<ProgressProps> {
@@ -71,8 +72,11 @@ class Progress extends Component<ProgressProps> {
         percent: result.progress * 100
       })
     }
-    if(!newValue.status) {
+    if(!newValue.status || newValue.status === 'error') {
       this.clearInterval()
+      if(newValue.status === 'error') {
+        message.info('消息发送失败')
+      }
     }
     onChange(newValue)
   }

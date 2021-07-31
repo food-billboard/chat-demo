@@ -55,8 +55,11 @@ export const checkUploadFile = async (params: Partial<API_UPLOAD.ICheckUploadFil
     headers: merge({}, { "Tus-Resumable": "1.0.0" }, mergeMetaData(newParams))
   }, true)
   .then(data => {
-    const { headers } = data
-    return headers
+    const { headers } = data as any 
+    const offset = headers["upload-offset"] ?? headers["Upload-Offset"]
+    return {
+      data: offset
+    }
   })
 }
 
@@ -65,11 +68,15 @@ export const uploadFile = async (params: API_UPLOAD.IUploadParams) => {
   return request<{ headers: { "Upload-Offset": number }, [key: string]: any }>('/api/customer/upload/weapp', {
     method: 'POST', 
     headers: merge({}, { "Tus-Resumable": "1.0.0", "Upload-Offset": offset, "content-type": "application/offset+octet-stream" }, mergeMetaData(nextParams)),
-    data: file
+    data: file,
+    file: true 
   }, true)
   .then(data => {
-    const { headers } = data
-    return headers
+    const { headers } = data as any 
+    const nextOffset = headers["upload-offset"] ?? headers["Upload-Offset"]
+    return {
+      data: nextOffset
+    }
   })
 
 }

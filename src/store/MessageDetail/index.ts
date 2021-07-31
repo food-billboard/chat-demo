@@ -45,6 +45,9 @@ export default generateReducer({
           ...messageDetailList
         }
       }
+      // try {
+      //   console.log(messageList.message[messageList.message.length- 1], 666666)
+      // }catch(err) {}
       return {
         ...(omit(state, ["value"])),
         loading: false,
