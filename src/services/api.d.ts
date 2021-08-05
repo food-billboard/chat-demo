@@ -261,6 +261,8 @@ declare namespace API_CHAT {
     type: TMessageMediaType
     content: string 
     point_to?: string 
+    message_id?: string 
+    status: "LOADING" | "ERROR" | "DONE"
   }
 
   export interface IGetMessageDetailParams {

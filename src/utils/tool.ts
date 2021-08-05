@@ -1,7 +1,7 @@
 // import { parse } from 'qs'
 import { parse } from 'querystring'
 import Day from 'dayjs'  
-import { merge } from 'lodash'
+import { merge, omit } from 'lodash-es'
 import {
   API_DOMAIN
 } from './constants'
@@ -69,6 +69,16 @@ export function formatUrl(url: string) {
   return url.startsWith('http') ? url : (url.startsWith('/') ? `${API_DOMAIN}${url}` : `${API_DOMAIN}/${url}`)
 }
 
+function contentMerge(origin: API_CHAT.IGetMessageDetailData["content"], target: API_CHAT.IGetMessageDetailData["content"]): API_CHAT.IGetMessageDetailData["content"] {
+  return {
+    text: target.text || origin.text,
+    image: target.image || origin.image,
+    video: target.video || origin.video,
+    audio: target.audio || origin.audio,
+    poster: target.poster || origin.poster,
+  }
+}
+
 export const insertMessage = (origin: API_CHAT.IGetMessageDetailData[]=[], list: API_CHAT.IGetMessageDetailData[], insertAfter: boolean=true) => {
   let newList = list.sort((prev, next) => {
     const { createdAt: prevCreatedAt } = prev 
@@ -78,21 +88,75 @@ export const insertMessage = (origin: API_CHAT.IGetMessageDetailData[]=[], list:
   if(!origin.length) return [
     ...newList
   ]
+  let newOriginList = [
+    ...origin
+  ]
   if(insertAfter) {
-    const [ { createdAt: lastCreatedAt } ] = origin.slice(-1)
+    const [ { createdAt: lastCreatedAt, _id: lastId } ] = origin.slice(-1)
     const lastCreateDateValue = Day(lastCreatedAt).valueOf()
-    newList = newList.filter(item => Day(item.createdAt).valueOf() > lastCreateDateValue)
+    let toAddListIndex = newList.findIndex(item => {
+      return Day(item.createdAt).valueOf() > lastCreateDateValue && lastId !== item._id
+    })
+    let commonList: any[] = []
+    let toAddList: any[] = []
+    if(!!~toAddListIndex) {
+      commonList = newList.slice(0, toAddListIndex)
+      toAddList = newList.slice(toAddListIndex)
+    }else {
+      commonList = newList.slice()
+    }
+    commonList.forEach(item => {
+      const { createdAt, _id: newId } = item
+      const createdAtValue = Day(createdAt).valueOf()
+      for(let i = origin.length - 1; i >= 0; i --) {
+        const originTarget = origin[i]
+        const { _id, createdAt } = originTarget
+        const prevCreateAtValue = Day(createdAt).valueOf()
+        if(prevCreateAtValue + 1000 < createdAtValue) break 
+        if(_id === newId) {
+          newOriginList[i] = merge({}, omit(originTarget, ["content"]), omit(item, ["content"]), {
+            content: contentMerge(originTarget.content, item.content)
+          }) as API_CHAT.IGetMessageDetailData
+        }
+      }
+    })
     return [
-      ...origin,
-      ...newList
+      ...newOriginList,
+      ...toAddList
     ]
   }else {
-    const [ { createdAt: firstCreatedAt } ] = origin
+    const [ { createdAt: firstCreatedAt, _id: firstId } ] = origin
     const firstCreateDateValue = Day(firstCreatedAt).valueOf()
-    newList = newList.filter(item => Day(item.createdAt).valueOf() < firstCreateDateValue)
+    const tempNewList = [...newList]
+    const toAddListIndex = tempNewList.reverse().findIndex(item => {
+      return Day(item.createdAt).valueOf() < firstCreateDateValue && firstId !== item._id
+    })
+    let commonList: any[] = []
+    let toAddList: any[] = []
+    if(!!~toAddListIndex) {
+      commonList = newList.slice(0, toAddListIndex)
+      toAddList = newList.slice(toAddListIndex)
+    }else {
+      commonList = newList.slice()
+    }
+    commonList.forEach(item => {
+      const { createdAt, _id: newId } = item
+      const createdAtValue = Day(createdAt).valueOf()
+      for(let i = 0; i < origin.length; i ++) {
+        const originTarget = origin[i]
+        const { _id, createdAt } = originTarget
+        const prevCreateAtValue = Day(createdAt).valueOf()
+        if(prevCreateAtValue + 1000 > createdAtValue) break 
+        if(_id === newId) {
+          newOriginList[i] = merge({}, omit(originTarget, ["content"]), omit(item, ["content"]), {
+            content: contentMerge(originTarget.content, item.content)
+          }) as API_CHAT.IGetMessageDetailData
+        }
+      }
+    })
     return [
-      ...newList, 
-      ...origin
+      ...toAddList,
+      ...newOriginList,
     ]
   }
 }

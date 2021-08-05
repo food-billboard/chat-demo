@@ -1,6 +1,24 @@
 import { merge } from 'lodash-es'
 import mime from 'mime'
 
+function videoDimensions(video: HTMLVideoElement) {
+  // // Ratio of the video's intrisic dimensions
+  // var videoRatio = video.videoWidth / video.videoHeight;
+  // // The width and height of the video element
+  // var width = video.offsetWidth, 
+  //     height = video.offsetHeight;
+  // // The ratio of the element's width to its height
+  // var elementRatio = width / height;
+  // // If the video element is short and wide
+  // if(elementRatio > videoRatio) width = height * videoRatio;
+  // // It must be tall and thin, or exactly equal to the original ratio
+  // else height = width / videoRatio;
+  return {
+    width: video.videoWidth || 100,
+    height: video.videoHeight || 100
+  };
+}
+
 class PosterGetter {
 
   type: string = 'image/jpeg'
@@ -11,10 +29,10 @@ class PosterGetter {
   context: CanvasRenderingContext2D | null = null 
   video: HTMLVideoElement | null = null 
   filename: string = ''
-  size = {
-    width: 100,
-    height: 100 
-  }
+  size: {
+    width?: number 
+    height?: number 
+  } = {}
 
   init = () => {
     clearTimeout(this.timer)
@@ -51,8 +69,13 @@ class PosterGetter {
   }
 
   generate = async () => {
-    const { width, height } = this.size
+    let { width, height } = this.size
     if(this.video) {
+      if(!width || !height) {
+        const result = videoDimensions(this.video) 
+        width = result.width
+        height = result.height
+      }
       this.context?.drawImage(this.video, 0, 0, width, height)
       this.revokeUrl()
       return new Promise((resolve, reject) => {
@@ -72,10 +95,7 @@ class PosterGetter {
 
   revokeUrl = () => {
     URL.revokeObjectURL(this.url)
-    this.size = {
-      width: 100,
-      height: 100 
-    }
+    this.size = {}
   }
 
   clear = () => {
@@ -91,16 +111,4 @@ class PosterGetter {
 }
 
 export default PosterGetter
-
-// canvas.width = this.videoWidth
-// 		canvas.height = this.videoHeight
-// 		width = this.videoWidth
-// 		height = this.videoHeight
-// 		ctx.drawImage(this, 0, 0, width, height);
-// 		var src = canvas.toDataURL('image/jpeg');
-// 		img.src = src;
-
-// 		// var currentTime = this.currentTime
-// 		// duration = this.duration
-// 		// var fps = duration / 30
 		

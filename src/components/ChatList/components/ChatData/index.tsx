@@ -4,7 +4,7 @@ import Day from 'dayjs'
 import { connect } from 'react-redux' 
 import UserDetail from '../../../UserDetail'
 import ImageView from '../ViewImage'
-import UploadLoading from './uploadLoading'
+import UploadLoading, { isUpload } from './uploadLoading'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
@@ -46,7 +46,6 @@ const ChatData: FC<{
     content,
     createdAt,
     loading,
-    status,
   } = useMemo(() => {
     return value 
   }, [value]) 
@@ -71,7 +70,9 @@ const ChatData: FC<{
   }, [avatar, username, isMine, description, _id])
 
   const onDataChange = useCallback(async (value) => {
-    await messageListDetailSave(value, { insertAfter: true })
+    await messageListDetailSave({
+      message: value
+    }, { insertAfter: true })
   }, [messageListDetailSave])
 
   const PopoverMessage = useMemo(() => {
@@ -91,7 +92,7 @@ const ChatData: FC<{
         }
         {
           (media_type === 'IMAGE' || media_type === 'VIDEO') && (
-            status ? (
+            isUpload(value) ? (
               <UploadLoading
                 value={value}
                 onChange={onDataChange}
@@ -100,8 +101,8 @@ const ChatData: FC<{
             :
             (
               <ImageView
-                disabled={!!loading}
-                type={'VIDEO'}
+                // disabled={!!loading}
+                type={media_type}
                 src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
               />
             )
@@ -112,7 +113,7 @@ const ChatData: FC<{
         }
       </div>
     )
-  }, [media_type, content, isMine, value, onDataChange, loading, status])
+  }, [media_type, content, isMine, value, onDataChange, loading])
 
   return (
     <div

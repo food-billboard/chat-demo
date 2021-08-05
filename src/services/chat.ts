@@ -15,3 +15,11 @@ export const getMessageDetail = (params: API_CHAT.IGetMessageDetailParams) => {
     method: 'GET'
   })
 }
+
+//发送消息
+export const postMessage = (data: API_CHAT.IPostMessageParams) => {
+  return request('/api/chat/message', {
+    method: "POST",
+    data
+  })
+}

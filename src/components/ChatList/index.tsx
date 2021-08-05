@@ -69,7 +69,7 @@ const GroupChat = memo(forwardRef<IGroupChatRef, IGroupProps>((props, ref) => {
         insertAfter: true 
       })
     }
-  }, [currentRoom, socket, onFetchData, messageListDetailSave])
+  }, [currentRoom, socket, messageListDetailSave])
 
   const ChatHeaderDom = useMemo(() => {
     return (

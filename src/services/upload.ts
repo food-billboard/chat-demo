@@ -57,8 +57,10 @@ export const checkUploadFile = async (params: Partial<API_UPLOAD.ICheckUploadFil
   .then(data => {
     const { headers } = data as any 
     const offset = headers["upload-offset"] ?? headers["Upload-Offset"]
+    const fileId = headers["upload-id"] ?? headers["Upload-Id"]
     return {
-      data: offset
+      data: offset,
+      _id: fileId
     }
   })
 }

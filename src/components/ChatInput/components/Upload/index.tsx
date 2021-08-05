@@ -4,7 +4,6 @@ import { merge, pick } from 'lodash'
 import { connect } from 'react-redux'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { upload as Upload } from './upload'
-import PosterGetter from '@/utils/getVideoPoster'
 import styles from './index.less'
 
 const cursor: CSSProperties = {
@@ -15,8 +14,6 @@ const cursor: CSSProperties = {
 export type FileType = {
 
 }
-
-const posterGetter = new PosterGetter()
 
 export type UploadProps = {
   icon: "video" | "image"
@@ -31,7 +28,7 @@ const ImageUpload = memo((props: UploadProps) => {
 
   const inputRef = useRef<any>(null)
 
-  const { icon, userInfo, socket, messageListDetailSave } = useMemo(() => {
+  const { icon, userInfo, messageListDetailSave, currRoom } = useMemo(() => {
     return props 
   }, [props])
 
@@ -62,13 +59,9 @@ const ImageUpload = memo((props: UploadProps) => {
     return defaultConfig
   }, [icon])  
 
-  const getPoster = useCallback((file: File) => {
-    return posterGetter.start(file)
-  }, [])
-
   const onChange = useCallback(async (e) => {
     const file = e.target.files[0]
-    const result = Upload(file, {
+    const result = await Upload(file, currRoom!, {
       user_info: pick(userInfo || {}, [
         "username",
         "description",
@@ -84,9 +77,7 @@ const ImageUpload = memo((props: UploadProps) => {
     }, {
       insertAfter: true 
     })
-    const data = await getPoster(file)
-    console.log(data, 55555)
-  }, [userInfo, messageListDetailSave])
+  }, [userInfo, messageListDetailSave, currRoom])
 
   return (
     <Fragment>

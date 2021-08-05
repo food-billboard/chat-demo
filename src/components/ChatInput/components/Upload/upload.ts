@@ -1,7 +1,9 @@
 import { Upload } from 'chunk-file-upload'
 import { message } from 'antd'
 import Day from 'dayjs'
-import { checkUploadFile, uploadFile, getMediaData, putVideoPoster } from '@/services'
+import { checkUploadFile, uploadFile, putVideoPoster, postMessage } from '@/services'
+import { withTry } from '@/utils'
+import PosterGetter from '@/utils/getVideoPoster'
 import { merge } from 'lodash'
 
 const MAX_UPLOAD_FILE_SIZE = 1024 * 1024 * 5 
@@ -13,7 +15,28 @@ const VALID_FILE_TYPE = [
   "VIDEO"
 ]
 
-const exitDataFn = async (params: {
+const posterGetter = new PosterGetter()
+
+const watch = (success: boolean, name: Symbol, error: boolean) => {
+  if(!!success) {
+    return {
+      error: null,
+      progress: 1,
+      status: 4,
+    }
+  }
+  const result = INSTANCE.watch(name)
+  if(!result || !result.length || error) return false
+  const [ target ] = result
+  if(!target) return false 
+  return {
+    error: target?.error, 
+    progress: target?.progress, 
+    status: target?.status, 
+  }
+}
+
+const exitDataFn = (getResult: (data: any) => void) => async (params: {
   filename: string
   md5: string
   suffix: string
@@ -22,7 +45,7 @@ const exitDataFn = async (params: {
   chunksLength: number
 }) => {
   const { size, suffix, md5, chunkSize } = params
-  return checkUploadFile({
+  const data = await checkUploadFile({
     auth: "PUBLIC",
     mime: suffix,
     chunk: chunkSize,
@@ -30,6 +53,8 @@ const exitDataFn = async (params: {
     size,
     name: md5
   })
+  getResult(data)
+  return data 
 }
 
 const uploadFn = async (data: FormData, name: Symbol) => {
@@ -57,29 +82,87 @@ const uploadFn = async (data: FormData, name: Symbol) => {
   }
 }
 
-export const upload = (file: File, defaultMessageData: Partial<API_CHAT.IGetMessageDetailData>) => {
+export const uploadPoster = async (file: File): Promise<string> => {
+  const data = await posterGetter.start(file)
+  let posterId = ""
+  return new Promise((resolve, reject) => {
+    const [ name ] = INSTANCE.add({
+      file: {
+        file: data,
+      },
+      request: {
+        exitDataFn: exitDataFn((value) => {
+          posterId = value?._id
+        }),
+        uploadFn,
+        callback: (err: any) => {
+          resolve(posterId)
+        }
+      }
+    })
+  
+    if(!name) {
+      return reject("")
+    }
+  
+    INSTANCE.deal(name)
+  })
+}
+
+export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaultMessageData: Partial<API_CHAT.IGetMessageDetailData>) => {
   let [ mimeType ] = file.type.toUpperCase().split('/')
   let success = false 
   let error = false 
+  let isExists = false 
+  let contentId = ""
+  let posterId = ""
+  const TOTAL_SIZE = file.size 
+
   if(!VALID_FILE_TYPE.includes(mimeType)) {
     message.info("文件格式不正确~")
     return 
   }
   let content: any  = {
-    [mimeType!.toUpperCase()]: file,
+    [mimeType!.toLowerCase()]: file,
   }
-  if(mimeType === 'video') {
-    content.poster = ''
+
+  const [ , messageId ] = await withTry(postMessage)({
+    _id: room._id,
+    type: mimeType,
+    content: "", 
+    status: "LOADING"
+  })
+
+  if(!messageId) {
+    message.info("消息发送失败")
+    return 
   }
+
   const [ name ] = INSTANCE.add({
     file: {
       file,
     },
     request: {
-      exitDataFn,
+      exitDataFn: exitDataFn((data) => {
+        contentId = data?._id 
+        isExists = data?.data == TOTAL_SIZE
+      }),
       uploadFn,
-      callback: (err: any) => {
+      callback: async (err: any) => {
         if(!err) {
+          if(mimeType === "VIDEO") {
+            posterId = await uploadPoster(file)
+            await withTry(putVideoPoster)({
+              data: `${contentId}-${posterId}`
+            })
+          }
+          await postMessage({
+            _id: room._id,
+            type: mimeType as API_CHAT.TMessageMediaType,
+            content: contentId, 
+            message_id: messageId, 
+            status: "DONE"
+          })
           success = true 
         }else {
           error = true 
@@ -96,7 +179,7 @@ export const upload = (file: File, defaultMessageData: Partial<API_CHAT.IGetMess
   INSTANCE.deal(name)
 
   return merge({}, defaultMessageData, {
-    _id: `__local_prefix_id_${Date.now()}_${Math.random()}__`, 
+    _id: messageId, 
     media_type: mimeType,
     createdAt: Day(new Date()).format('YYYY-MM-DD HH:mm:ss'),
     updatedAt: Day(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -104,22 +187,7 @@ export const upload = (file: File, defaultMessageData: Partial<API_CHAT.IGetMess
     loading: true,
     status: 'upload',
     watch() {
-      if(!!success) {
-        return {
-          error: null,
-          progress: 1,
-          status: 4
-        }
-      }
-      const result = INSTANCE.watch(name)
-      if(!result || !result.length || error) return false
-      const [ target ] = result
-      if(!target) return false 
-      return {
-        error: target?.error, 
-        progress: target?.progress, 
-        status: target?.status, 
-      }
+      return watch(success, name, error)
     }
   })
 }

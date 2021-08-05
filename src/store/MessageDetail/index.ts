@@ -7,6 +7,11 @@ import {
 import { generateReducer } from '../utils'
 import { insertMessage } from '@/utils'
 
+const omitMessage = (list: API_CHAT.IGetMessageDetailData[]) => {
+  // return list.map(item => omit(item, ["status"]))
+  return list 
+}
+
 const DEFAULT_VALUE = {
   messageDetailList: {
     message: [],
@@ -35,19 +40,18 @@ export default generateReducer({
       const { insert: { insertBefore, insertAfter }, messageDetailList } = value
       let messageList: any = {}
       const { messageDetailList: originMessageDetailList } = state.value
+      const newMessage = omitMessage(messageDetailList.message || []) as API_CHAT.IGetMessageDetailData[]
       if(insertBefore || insertAfter) {
         messageList = {
           room: originMessageDetailList.room,
-          message: insertMessage(originMessageDetailList?.message || [], messageDetailList?.message || [], !insertBefore)
+          message: insertMessage(originMessageDetailList?.message || [], newMessage, !insertBefore)
         }
       }else {
         messageList = {
-          ...messageDetailList
+          room: messageDetailList.room,
+          message: newMessage
         }
       }
-      // try {
-      //   console.log(messageList.message[messageList.message.length- 1], 666666)
-      // }catch(err) {}
       return {
         ...(omit(state, ["value"])),
         loading: false,

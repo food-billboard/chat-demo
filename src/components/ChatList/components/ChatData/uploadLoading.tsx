@@ -1,23 +1,18 @@
 import React, { Component } from 'react'
 import { message, Progress as AntProgress } from 'antd'
 import { merge } from 'lodash'
+import { getMessageDetail } from '@/services'
 import styles from './index.less'
 
-export interface ProgressProps {
-  onChange: (value: API_CHAT.IGetMessageDetailData) => void 
-  value: API_CHAT.IGetMessageDetailData
+export function isUpload(value: API_CHAT.IGetMessageDetailData) {
+  const { loading, status } = value
+  return !(!loading || !status || status === 'DONE')
 }
 
-// enum ECACHE_STATUS {
-//   pending = 0,
-//   waiting = 1,
-//   reading = 2,
-//   uploading = 3,
-//   fulfilled = 4,
-//   rejected = -3,
-//   cancel = -2,
-//   stopping = -1,
-// }
+export interface ProgressProps {
+  onChange: (value: API_CHAT.IGetMessageDetailData[]) => void 
+  value: API_CHAT.IGetMessageDetailData
+}
 
 const getLoading = (result: any) => {
   const { status, progress, error } = result 
@@ -25,7 +20,7 @@ const getLoading = (result: any) => {
     loading: progress != 1 || (status != -1 && status != -2 && status != -3 && status != 4),
     status: progress == 1 ? null : (
       !!error ? 'error' : "upload"
-    )
+    ),
   }
   if(!data.status) {
     data = merge({}, data, {
@@ -45,7 +40,10 @@ class Progress extends Component<ProgressProps> {
   }
 
   componentDidMount = () => {
-    this.timer = setInterval(this.fetchData, 1000)
+    const { value } = this.props
+    if(value.status === "upload") {
+      this.timer = setInterval(this.fetchData, 1000)
+    }
   }
 
   componentWillUnmount = () => {
@@ -54,6 +52,16 @@ class Progress extends Component<ProgressProps> {
 
   clearInterval = () => {
     clearInterval(this.timer)
+  }
+
+  fetchRealMessage = async (params: API_CHAT.IGetMessageDetailParams) => {
+    return getMessageDetail(params)
+    .then(data => {
+      return data.message
+    })
+    .catch(_ => {
+      return [] as API_CHAT.IGetMessageDetailData[]
+    })
   }
 
   fetchData = () => {
@@ -76,15 +84,34 @@ class Progress extends Component<ProgressProps> {
       this.clearInterval()
       if(newValue.status === 'error') {
         message.info('消息发送失败')
+      }else {
+        this.fetchRealMessage({
+          messageId: newValue._id
+        })
+        .then(data => {
+          onChange(data.map(item => merge({}, item, { loading: false })))
+        })
+        return 
       }
     }
-    onChange(newValue)
+    onChange([newValue])
+  }
+
+  isError = () => {
+    const { value: { status } } = this.props
+    return status?.toUpperCase() === 'error'
+  }
+
+  isLoading = () => {
+    const { value: { loading } } = this.props
+    return !!loading && !this.isError()
   }
 
   render() {
 
     const { percent } = this.state 
-    const { value: { loading } } = this.props
+    const loading = this.isLoading()
+    const error = this.isError()
 
     return (
       <div className={styles["upload-progress-wrapper"]}>
@@ -100,6 +127,11 @@ class Progress extends Component<ProgressProps> {
                   '100%': '#87d068',
                 }} 
               />
+            )
+          }
+          {
+            !!error && (
+              <div></div>
             )
           }
         </div>
