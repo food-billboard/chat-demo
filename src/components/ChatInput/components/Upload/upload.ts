@@ -109,7 +109,7 @@ export const uploadPoster = async (file: File): Promise<string> => {
   })
 }
 
-export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaultMessageData: Partial<API_CHAT.IGetMessageDetailData>) => {
+export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaultMessageData: Partial<API_CHAT.IGetMessageDetailData>, postCompleteMessage: any) => {
   let [ mimeType ] = file.type.toUpperCase().split('/')
   let success = false 
   let error = false 
@@ -156,7 +156,7 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
               data: `${contentId}-${posterId}`
             })
           }
-          await postMessage({
+          await postCompleteMessage({
             _id: room._id,
             type: mimeType as API_CHAT.TMessageMediaType,
             content: contentId, 

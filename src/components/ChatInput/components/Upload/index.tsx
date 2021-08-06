@@ -11,13 +11,9 @@ const cursor: CSSProperties = {
   fontSize: 20
 }
 
-export type FileType = {
-
-}
-
 export type UploadProps = {
   icon: "video" | "image"
-  onChange?: (value: FileType) => void 
+  onChange?: (value: API_CHAT.IPostMessageParams) => void 
   userInfo?: STORE_USER.IUserInfo
   socket?: any 
   currRoom?: API_CHAT.IGetRoomListData
@@ -28,7 +24,7 @@ const ImageUpload = memo((props: UploadProps) => {
 
   const inputRef = useRef<any>(null)
 
-  const { icon, userInfo, messageListDetailSave, currRoom } = useMemo(() => {
+  const { icon, userInfo, messageListDetailSave, currRoom, onChange: propsOnChange } = useMemo(() => {
     return props 
   }, [props])
 
@@ -70,14 +66,14 @@ const ImageUpload = memo((props: UploadProps) => {
         "_id",
         "avatar"
       ]) as API_CHAT.IGetMessageDetailData["user_info"]
-    })
+    }, propsOnChange)
     if(!result) return 
     await messageListDetailSave?.({
       message: [result]
     }, {
       insertAfter: true 
     })
-  }, [userInfo, messageListDetailSave, currRoom])
+  }, [userInfo, messageListDetailSave, currRoom, propsOnChange])
 
   return (
     <Fragment>

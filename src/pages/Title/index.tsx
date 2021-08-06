@@ -28,6 +28,10 @@ const Title = memo((props: any) => {
     history.replace('/login')
   }, [fetchLogout])
 
+  const userInfoSet = useCallback(async () => {
+    history.push('/setting')
+  }, [])
+
   const DropDownOverlay = useMemo(() => {
     return (
       <Menu>
@@ -36,9 +40,14 @@ const Title = memo((props: any) => {
             退出登录
           </a>
         </Menu.Item>
+        <Menu.Item>
+          <a onClick={userInfoSet}>
+            个人信息设置
+          </a>
+        </Menu.Item>
       </Menu>
     )
-  }, [userInfo])
+  }, [logout, userInfoSet])
 
   const goIndex = useCallback(() => {
     history.push('/home')

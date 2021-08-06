@@ -6,6 +6,7 @@ import Title from './pages/Title'
 import Content, { SecurityContainer } from './pages/Content'
 import Login from './pages/Login'
 import HomePage from './pages/IndexPage'
+import Setting from './pages/Setting'
 import Chat from './pages/Chat'
 import Register from './pages/Register'
 import NotFound from './pages/404'
@@ -46,6 +47,11 @@ const App = () => {
                       path="/home"
                       exact
                       component={HomePage}
+                    />
+                    <Route 
+                      path="/setting"
+                      exact
+                      component={Setting}
                     />
                     <Route 
                       path="/login" 

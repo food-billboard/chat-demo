@@ -53,9 +53,9 @@ export default memo((props: IProps) => {
     })
   }, [])
 
-  const onUpload: UploadProps["onChange"] = useCallback((value) => {
-    console.log(value, 24444)
-  }, [])
+  const onUpload: UploadProps["onChange"] = useCallback(async (value) => {
+    handlePostMessage(value)
+  }, [handlePostMessage])
 
   const ToolBar = useMemo(() => {
     const cursor: CSSProperties = {

@@ -122,6 +122,7 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
       className={styles["room-icon-list"]}
       style={style}
       loading={!!loading}
+      bordered={false}
     >
       <Carousel
         arrows
