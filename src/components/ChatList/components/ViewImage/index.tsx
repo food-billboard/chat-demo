@@ -1,5 +1,6 @@
-import React, { memo, useCallback, useMemo } from 'react'
-import classnames from 'classnames'
+import React, { Fragment, memo, useCallback, useMemo } from 'react'
+import { Image, Space } from 'antd'
+import { EyeOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import styles from './index.less'
 
 interface IProps {
@@ -15,8 +16,23 @@ export default memo((props: IProps) => {
     return props 
   }, [props])
 
+  const preview = useMemo(() => {
+    if(disabled || type === 'VIDEO') return false 
+    const mask = (
+      <Fragment>
+        <Space>
+          <EyeOutlined />
+          预览
+        </Space>
+      </Fragment>
+    )
+    return {
+      mask
+    } 
+  }, [type, disabled])
+
   const handleClick = useCallback(() => {
-    onClick && onClick()
+    onClick?.()
   }, [onClick])
 
   return (
@@ -24,11 +40,17 @@ export default memo((props: IProps) => {
       className={styles["chat-view-image-container"]}
       onClick={handleClick}
     >
-      <img src={src} className={styles["chat-view-image-container-item"]} alt="message" />
-      <div className={classnames(styles["chat-view-cover"], {
-        [`${styles['chat-view-image-cover']}`]: !disabled && type === 'IMAGE',
-        [`${styles['chat-view-video-cover']}`]: !disabled && type === 'VIDEO'
-      })}></div>
+      <Image
+        preview={preview}
+        src={src}
+      />
+      {
+        type === 'VIDEO' && (
+          <div className={styles["chat-view-cover"]}>
+            <PlayCircleOutlined />
+          </div>
+        )
+      }
     </div>
   )
 

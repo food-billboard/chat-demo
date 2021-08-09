@@ -5,7 +5,7 @@ import { merge } from 'lodash-es'
 import { sleep, withTry } from '@/utils'
 import { readMessage as readMessageRequest } from '@/utils/socket'
 import { mapStateToProps, mapDispatchToProps } from './connect'
-import ChatData, { IProps, TMessageValue } from '../ChatData'
+import ChatData, { IProps, TMessageValue, VideoModal, VideoModalRef } from '../ChatData'
 
 export interface IChatListRef {
   fetchData: (params?: any, toBottom?: boolean) => Promise<any>
@@ -18,6 +18,7 @@ const ChatList = memo(forwardRef<IChatListRef, IProps & {
 }>((props, ref) => {
 
   let prevValueLength = useRef(-1)
+  const videoRef = useRef<VideoModalRef>(null)
 
   const [ currPage, setCurrPage ] = useState<number>(0)
   const [ bottomNode, setBottomNode ] = useState<Element>()
@@ -76,6 +77,10 @@ const ChatList = memo(forwardRef<IChatListRef, IProps & {
     }
   }, [scrollToBottom, loading, fetchData, currPage])
 
+  const handleViewVideo = useCallback(async (src) => {
+    videoRef.current?.open(src)
+  }, [videoRef])
+
   useImperativeHandle(ref, () => {
     return {
       fetchData: internalFetchData,
@@ -99,11 +104,12 @@ const ChatList = memo(forwardRef<IChatListRef, IProps & {
       {
         realValue.map(item => {
           return (
-            <ChatData key={item.createdAt} value={item} />
+            <ChatData key={item.createdAt} value={item} onVideoView={handleViewVideo} />
           )
         })
       }
       <div id="chat-item-bottom"></div>
+      <VideoModal ref={videoRef} />
     </div>
   )
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandl
 import Videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import { message } from 'antd'
 import { getMediaList } from '@/services'
-import { isObjectId } from '../Upload/util'
+import { isObjectId } from './util'
 import 'video.js/dist/video-js.css'
 import './index.less'
 
@@ -164,7 +164,6 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
       className="video-js vjs-big-play-centered"
       id="video"
     >
-      {/* <source src="http://localhost:8000/live/273dbc82f45552ff7b98d36bf1ad86a8/index.m3u8" type="application/x-mpegURL" id="target"></source> */}
     </video>
   )
 

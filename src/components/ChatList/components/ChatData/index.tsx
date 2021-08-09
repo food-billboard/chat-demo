@@ -1,13 +1,54 @@
-import React, { memo, useMemo, FC, useCallback } from 'react'
+import React, { memo, useMemo, FC, useCallback, useState, useImperativeHandle, forwardRef } from 'react'
 import { Avatar } from 'antd'
 import Day from 'dayjs'
+import { CloseOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux' 
+import classnames from 'classnames'
 import UserDetail from '../../../UserDetail'
 import ImageView from '../ViewImage'
+import Video from '../../../Video'
 import UploadLoading, { isUpload } from './uploadLoading'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
+
+export interface VideoModalRef {
+  open: (src: string) => void 
+}
+
+export const VideoModal = forwardRef((_, ref) => {
+
+  const [ videoData, setVideoData ] = useState<string>()
+  const [ visible, setVisible ] = useState<boolean>(false)
+
+  const handleClose = useCallback(() => {
+    setVisible(false)
+    setVideoData("")
+  }, [])
+
+  const open = useCallback((src: string) => {
+    setVisible(true)
+    setVideoData(src)
+  }, [])
+
+  useImperativeHandle(ref, () => {
+    return {
+      open
+    }
+  }, [])
+
+  return (
+    <div
+      className={classnames(styles["video-content"], {
+        [styles["video-content-show"]]: visible
+      })}
+    > 
+      <CloseOutlined className={styles["video-content-close"]} style={{color: 'white'}} onClick={handleClose} />
+      <Video src={videoData} />
+    </div>
+  )
+
+})
 
 export type TMessageValue = API_CHAT.IGetMessageDetailData & { isMine?: boolean }
 
@@ -25,11 +66,15 @@ export interface IProps {
 const ChatData: FC<{
   value: TMessageValue
   messageListDetailSave: (value: any, insert: { insertBefore?: boolean, insertAfter?: boolean }) => any 
+  onVideoView?: (value: string) => Promise<void> 
 }> = memo((props) => {
+
+  const [ videoLoading, setViewLoading ] = useState<boolean>(false)
 
   const { 
     value,
-    messageListDetailSave
+    messageListDetailSave,
+    onVideoView
   } = useMemo(() => {
     return props 
   }, [props])
@@ -45,7 +90,6 @@ const ChatData: FC<{
     media_type,
     content,
     createdAt,
-    loading,
   } = useMemo(() => {
     return value 
   }, [value]) 
@@ -75,8 +119,17 @@ const ChatData: FC<{
     }, { insertAfter: true })
   }, [messageListDetailSave])
 
+  const handleView = useCallback(async (src?: string) => {
+    if(onVideoView && src) {
+      if(videoLoading) return 
+      setViewLoading(true)
+      await onVideoView(src)
+      setViewLoading(false)
+    }
+  }, [videoLoading, onVideoView])
+
   const PopoverMessage = useMemo(() => {
-    const { poster, image, text } = content 
+    const { poster, image, text, video } = content 
     const margin = isMine ? { marginRight: 20 } : { marginLeft: 20 }
     return (
       <div
@@ -104,6 +157,7 @@ const ChatData: FC<{
                 // disabled={!!loading}
                 type={media_type}
                 src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
+                onClick={handleView.bind(this, video)}
               />
             )
           )
@@ -113,7 +167,7 @@ const ChatData: FC<{
         }
       </div>
     )
-  }, [media_type, content, isMine, value, onDataChange, loading])
+  }, [media_type, content, isMine, value, onDataChange, handleView])
 
   return (
     <div

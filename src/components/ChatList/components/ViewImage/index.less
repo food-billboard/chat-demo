@@ -2,67 +2,19 @@
   width: 100%;
   cursor: pointer;
   position: relative;
+  vertical-align: middle;
 }
-.chat-view-image-container-item {
-  width: 100%;
+:global(.ant-image) {
+  vertical-align: middle;
 }
 .chat-view-cover {
-  width: 100%;
-  height: 100%;
-}
-.chat-view-image-cover,
-.chat-view-video-cover,
-.chat-view-cover{
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 3em;
 }
-.chat-view-image-cover:hover,
-.chat-view-video-cover:hover {
-  background-color: rgba(0, 0, 0, 0.3);
-}
-.chat-view-image-cover:hover::after {
-  content: '图片预览';
+.chat-view-image-container:hover .chat-view-cover {
   color: white;
-  font-size: 24px;
-  display: block;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-.chat-view-video-cover::before {
-  content: '';
-  display: block;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 4em;
-  height: 4em;
-  border: 3px solid white;
-  border-radius: 50%;
-}
-.chat-view-video-cover::after {
-  content: '';
-  display: block;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-20%, -50%);
-  border-left: 1.2em solid white;
-  border-top: 1.2em solid transparent;
-  border-bottom: 1.2em solid transparent;
-  border-right: 1.2em solid transparent;
-}
-.chat-view-video-cover:hover::before {
-  content: '';
-  display: none;
-}
-.chat-view-video-cover:hover::after {
-  content: '视频预览';
-  color: white;
-  border: none;
-  font-size: 24px;
-  transform: translate(-50%, -50%);
 }
