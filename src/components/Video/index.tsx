@@ -117,18 +117,11 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
     return target?.info?.mime?.toLowerCase()
   }, [])
 
-  //重载
-  const reload = useCallback(async () => {
-    if(!instance) return 
-    await setSrc()
-    instance.load()
-  }, [instance])
-
   const setSrc = useCallback(async () => {
     if(!instance) return 
     const nowSrc = instance.src()
     if(!!nowSrc && !props.src) {
-      return message.info('视频地址错误')
+      return 
     }
     if(!props.src) return 
     if(nowSrc === props.src) return 
@@ -137,10 +130,16 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
     const src: Videojs.Tech.SourceObject = {
       src: props.src,
       type: type || 'video/mp4'
-      // type: 'application/x-mpegURL'
     }
     instance.src(src)
-  }, [props.src, instance])
+  }, [props.src, instance, mediaInfo])
+
+  //重载
+  const reload = useCallback(async () => {
+    if(!instance) return 
+    await setSrc()
+    instance.load()
+  }, [instance, setSrc])
 
   useEffect(() => {
     initVideoInstance()

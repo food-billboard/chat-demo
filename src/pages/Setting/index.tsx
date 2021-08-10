@@ -1,19 +1,36 @@
-import React, { memo } from 'react'
-import {  } from 'antd'
+import React, { Component } from 'react'
+import { Card } from 'antd'
 import { connect } from 'react-redux'
-import { mapStateToProps, mapDispatchToProps } from './connect'
-import './index.less'
+import classnames from 'classnames'
+import BaseView from './components/Base'
+import { mapDispatchToProps, mapStateToProps } from './connect'
+import styles from './index.less'
 
-interface SettingProps {
-  userInfo?: STORE_USER.IUserInfo
+interface IProps {
+  getUserInfo: () => Promise<API_USER.IGetUserInfoResData>
+  userInfo: STORE_USER.IUserInfo
+  loading: boolean
 }
 
-const Setting = memo((props: SettingProps) => {
+class Settings extends Component<IProps> {
 
-  return (
-    <div>2222</div>
-  )
+  async componentDidMount() {
+    const { getUserInfo } = this.props
+    if(getUserInfo) await getUserInfo()
+  }
 
-})
+  render() {
 
-export default connect(mapStateToProps, mapDispatchToProps)(Setting)
+    return (
+      <div className={styles["setting-card"]}>
+        <Card
+          className={classnames(styles["setting-card-size"])}  
+        >
+          <BaseView />
+        </Card>
+      </div>
+    )
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Settings)

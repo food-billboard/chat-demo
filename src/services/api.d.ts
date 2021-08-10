@@ -61,6 +61,15 @@ declare namespace API_USER {
 
   export interface IDeleteFriendsParams extends IUnBlackUserParams {}
 
+  export interface IPutUserInfoParams {
+    username: string
+    avatar: string
+    description: string
+    mobile: number 
+    email: string 
+    password: string 
+  }
+
 }
 
 declare namespace API_UPLOAD {

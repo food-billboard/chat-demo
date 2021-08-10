@@ -83,3 +83,11 @@ export const deleteRelation = (params: API_USER.IDeleteFriendsParams) => {
     method: 'DELETE'
   })
 }
+
+//修改个人信息
+export const PutUserInfo = (data: API_USER.IPutUserInfoParams) => {
+  return request('/api/manage/admin', {
+    method: 'PUT',
+    data
+  })
+}
