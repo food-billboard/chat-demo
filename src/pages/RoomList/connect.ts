@@ -10,6 +10,5 @@ export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
 }
 
 export const mapDispatchToProps = (dispatch: any) =>  ({
-  messageListDetail: (socket: any, params: API_CHAT.IGetMessageDetailParams) => dispatch(messageListDetail(socket, params)),
   exchangeRoom: (socket: any, room: API_CHAT.IGetRoomListData, isJoin: boolean) => dispatch(exchangeRoom(socket, room, isJoin)),
 })

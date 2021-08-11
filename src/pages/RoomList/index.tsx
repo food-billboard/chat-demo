@@ -1,29 +1,22 @@
-import React, { memo, useCallback, useState, useMemo, useEffect, useRef } from 'react'
+import React, { memo, useCallback, useState, useMemo } from 'react'
 import { Row, Col, Tooltip, Button } from 'antd'
 import { connect } from 'react-redux'
-import { merge } from 'lodash'
-import GroupChat, { IGroupChatRef } from '@/components/ChatList'
+import GroupChat from '@/components/ChatList'
 import RoomList from '@/components/RoomList'
 import AvatarList, { TAvatarData } from '@/components/AvatarList'
 import { getRoomMembers } from '@/services'
 import { inviteFriend } from '@/utils/socket' 
 import { mapStateToProps, mapDispatchToProps } from './connect'
-import { withTry, sleep } from '@/utils'
+import { withTry } from '@/utils'
 import styles from './index.less'
 
 export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) => {
 
   const [ postUserLoading, setPostUserLoading ] = useState<boolean>(false)
 
-  const chatRef = useRef<IGroupChatRef>(null)
-
-  const { socket, messageListDetail, userInfo, exchangeRoom, currRoom } = useMemo(() => {
+  const { socket, userInfo, exchangeRoom, currRoom } = useMemo(() => {
     return props 
   }, [props])
-
-  const fetchRoomMessageList = useCallback(async (params: Omit<API_CHAT.IGetMessageDetailParams, "_id">={ currPage: 0, pageSize: 10 }) => {
-    await messageListDetail(socket, merge({}, params, { _id: currRoom?._id }))
-  }, [messageListDetail, socket, currRoom])
 
   const quitRoom = useCallback(async () => {
     await exchangeRoom(socket, currRoom, false)
@@ -73,16 +66,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
     )
   }, [addFriends, postUserLoading, userInfo])
 
-  useEffect(() => {
-    if(currRoom) {
-      fetchRoomMessageList()
-      .then(_ => sleep(1000))
-      .then(_ => {
-        chatRef?.current?.scrollToBottom?.()
-      })
-    }
-  }, [currRoom])
-
   const chatHeader = useMemo(() => {
     return {
       title: currRoom?.info?.name || '某房间',
@@ -115,8 +98,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
           {
             !!currRoom && (
               <GroupChat  
-                ref={chatRef}
-                fetchData={fetchRoomMessageList}
                 header={chatHeader}
               />
             )

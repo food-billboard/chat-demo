@@ -1,4 +1,3 @@
-import { messageListDetail } from '@/store'
 
 export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
   return {
@@ -10,6 +9,6 @@ export const mapStateToProps = (state: STORE_GLOBAL.IState) => {
 
 export const mapDispatchToProps = (dispatch: any) => {
   return {
-    messageListDetail: (socket: any, params: API_CHAT.IGetMessageDetailParams) => dispatch(messageListDetail(socket, params)),
+    
   }
 }

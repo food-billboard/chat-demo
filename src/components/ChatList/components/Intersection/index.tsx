@@ -1,38 +1,43 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
-import {  } from 'antd'
+import React, {  Component } from 'react'
 
 interface IProps {
   onObserve?: () => void 
 }
 
-export default memo((props: IProps) => {
+export default class Observer extends Component<IProps> {
 
-  const [ observer, setObserver ] = useState<IntersectionObserver>()
+  public state: {
+    observer?: IntersectionObserver
+  } = {
+    observer: undefined
+  }
 
-  const { onObserve } = useMemo(() => {
-    return props
-  }, [props])
+  componentDidMount = () => {
+    this.initObserver()
+  }
 
-  const initObserver = useCallback(() => {
+  componentWillUnmount = () => {
+    this.state.observer?.disconnect()
+  }
+
+  initObserver = () => {
+    const { onObserve } = this.props
     const io = new IntersectionObserver(entries => {
       onObserve?.()
     }, {
       root: document.querySelector('#chat-list-wrapper')
     })
-    setObserver(io)
+    this.setState({ observer: io })
     const target = document.querySelector('#intersection-observer')
     target && io.observe(target)
-  }, [])
+  }
 
-  useEffect(() => {
-    initObserver()
-    return () => {
-      observer?.disconnect()
-    }
-  }, [])
+  render() {
 
-  return (
-    <div id="intersection-observer"></div>
-  )
+    return (
+      <div id="intersection-observer"></div>
+    )
 
-})
+  }
+
+}

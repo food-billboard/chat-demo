@@ -41,7 +41,7 @@ export default generateReducer({
       let messageList: any = {}
       const { messageDetailList: originMessageDetailList } = state.value
       const newMessage = omitMessage(messageDetailList.message || []) as API_CHAT.IGetMessageDetailData[]
-      if(insertBefore || insertAfter) {
+      if((insertBefore || insertAfter) && messageDetailList.room?._id === originMessageDetailList.room?._id) {
         messageList = {
           room: originMessageDetailList.room,
           message: insertMessage(originMessageDetailList?.message || [], newMessage, !insertBefore)

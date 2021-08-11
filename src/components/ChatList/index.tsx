@@ -1,18 +1,19 @@
-import React, { memo, useMemo, useCallback, useRef, forwardRef } from 'react'
+import React, { Component } from 'react'
 import { message } from 'antd'
 import { connect } from 'react-redux'
-import { merge, noop } from 'lodash-es'
+import { merge } from 'lodash-es'
 import { PageHeaderProps } from 'antd/es/page-header'
+import scrollIntoView from 'scroll-into-view-if-needed'
 import { IProps, TMessageValue } from './components/ChatData'
-import ChatList, { IChatListRef } from './components/ChatList'
+import ChatList from './components/ChatList'
 import ChatHeader from '../UserHeader'
 import ChatInput from '../ChatInput'
 import ObserverDom from './components/Intersection'
+import BackToBottom from './components/BackToBottom'
 import { postMessage } from '@/utils/socket'
 import { getMessageDetail } from '@/services'
 import { mapStateToProps, mapDispatchToProps } from './connect'
-import { withTry } from '@/utils'
-import { useImperativeHandle } from 'react'
+import { withTry, sleep } from '@/utils'
 
 export interface IGroupProps extends Omit<IProps, "value">{
   header: Partial<PageHeaderProps>
@@ -23,37 +24,69 @@ export interface IGroupProps extends Omit<IProps, "value">{
   value?: TMessageValue[] 
 }
 
-export interface IGroupChatRef {
-  scrollToBottom: () => void 
-}
+class GroupChat extends Component<IGroupProps> {
 
-const GroupChat = memo(forwardRef<IGroupChatRef, IGroupProps>((props, ref) => {
+  public state: {
+    currPage: number 
+    bottomNode?: Element
+  } = {
+    currPage: 0,
+    bottomNode: undefined,
+  }
 
-  const { currentRoom, socket, fetchLoading, messageListDetailSave, value=[], ...nextProps } = useMemo(() => {
-    const { style, ...nextProps } = props 
-    return merge({}, nextProps, { 
-      style: merge({}, style, 
-        {
-        paddingBottom: '30vh'
-      }),
-    }) 
-  }, [props])
+  first = true 
 
-  const header = useMemo(() => {
-    return props.header
-  }, [props.header])
+  getNode = () => {
+    const node = document.querySelector("#chat-item-bottom")
+    if(node) this.setState({
+      bottomNode: node
+    })
+    return node 
+  }
 
-  const listRef = useRef<IChatListRef>(null)
+  scrollToBottom = () => {
+    const { bottomNode } = this.state 
+    let node: any = bottomNode
+    if(!node) node = this.getNode()
+    if(node) scrollIntoView(node, {
+      scrollMode: 'if-needed',
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: 'smooth',
+    })
+  }
 
-  const onFetchData = useCallback(async () => {
-    await listRef.current?.fetchData()
-  }, [])
+  fetchData = async (params: Omit<API_CHAT.IGetMessageDetailParams, "_id">={ currPage: 0, pageSize: 10 }) => {
+    const { messageListDetail, currentRoom, socket } = this.props 
+    await messageListDetail?.(socket, merge({}, params, { _id: currentRoom?._id }))
+  }
 
-  const onBack = useCallback((e) => {
+  waitScrollToBottom = async (times=100) => {
+    await sleep(times)
+    this.scrollToBottom()
+  }
+
+  internalFetchData = async(params: Partial<{ currPage: number, pageSize: number, start: string }>={}, toBottom: boolean=false) => {
+    const { fetchLoading } = this.props 
+    const { currPage } = this.state 
+    if(fetchLoading) return 
+    const newParams = merge({ currPage, pageSize: 10 }, params)
+    await this.fetchData(newParams)
+    this.setState({
+      currPage: newParams.currPage + 1
+    })
+    if(toBottom) {
+      await this.waitScrollToBottom()
+    }
+  }
+
+  onBack = (e: any) => {
+    const { header } = this.props 
     header.onBack?.(e)
-  }, [header])
+  }
 
-  const handlePostMessage = useCallback(async (value) => {
+  handlePostMessage = async (value: any) => {
+    const { currentRoom, socket, messageListDetailSave } = this.props 
     let params: API_CHAT.IPostMessageParams = merge({}, value, {
       _id: currentRoom?._id
     })
@@ -68,10 +101,17 @@ const GroupChat = memo(forwardRef<IGroupChatRef, IGroupProps>((props, ref) => {
       await messageListDetailSave?.(newData, {
         insertAfter: true 
       })
+      await this.waitScrollToBottom()
     }
-  }, [currentRoom, socket, messageListDetailSave])
+  }
 
-  const ChatHeaderDom = useMemo(() => {
+  onObserver = () => {
+    this.internalFetchData({}, this.first)
+    if(this.first) this.first = false 
+  }
+
+  ChatHeaderDom = () => {
+    const { header } = this.props 
     return (
       <ChatHeader 
         style={{
@@ -83,37 +123,36 @@ const GroupChat = memo(forwardRef<IGroupChatRef, IGroupProps>((props, ref) => {
         title={"用户名"}
         subTitle={""}
         {...header}
-        onBack={onBack}
+        onBack={this.onBack}
       />
     )
-  }, [header, onBack])
+  }
 
-  useImperativeHandle(ref, () => {
-    return {
-      scrollToBottom: listRef.current?.scrollToBottom || noop
-    }
-  }, [listRef])
+  render() {
 
-  return (
-    <div  
-      style={{height: '100%', overflow: 'auto'}}
-      // loading={!!loading}
-    >
-      <div
-        style={{
-          height: 'calc(100% - 30vh)',
-          overflow: 'auto'
-        }}
-        id="chat-list-wrapper"
+    const { currentRoom, socket, fetchLoading, messageListDetailSave, messageListDetail, value=[], loading, header, ...nextProps } = this.props
+    return (
+      <div  
+        style={{height: '100%', overflow: 'auto'}}
       >
-        {ChatHeaderDom}
-        <ObserverDom onObserve={onFetchData} />
-        <ChatList ref={listRef} loading={!!fetchLoading} {...nextProps} value={value} />
+        <div
+          style={{
+            height: 'calc(100% - 30vh)',
+            overflow: 'auto'
+          }}
+          id="chat-list-wrapper"
+        >
+          {this.ChatHeaderDom()}
+          <ObserverDom onObserve={this.onObserver} />
+          <ChatList loading={!!fetchLoading} {...nextProps} value={value} />
+        </div>
+        <BackToBottom onClick={this.scrollToBottom} />
+        <ChatInput style={{height: '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={this.handlePostMessage} />
       </div>
-      <ChatInput style={{height: '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={handlePostMessage} />
-    </div>
-  )
+    )
 
-}))
+  }
+
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(GroupChat)

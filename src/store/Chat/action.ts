@@ -26,7 +26,15 @@ export function exchangeRoom(socket: any, room: API_CHAT.IGetRoomListData, isJoi
   return async (dispatch: any) => {  
     if(!room) return 
     dispatch(begin())
-    const method = isJoin ? joinRoom : putRoom
+    const method = isJoin ? joinRoom : (socket: any, params: API_CHAT.IDeleteRoomParams) => {
+      return messageListDetailSave({
+        message: [],
+        room: null
+      })(dispatch)
+      .then(_ => {
+        return putRoom(socket, params)
+      })
+    }
     return method(socket, {
       _id: room._id
     })

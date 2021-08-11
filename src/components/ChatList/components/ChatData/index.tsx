@@ -57,10 +57,7 @@ export interface IProps {
   style?: React.CSSProperties
   loading?: boolean 
   userInfo?: STORE_USER.IUserInfo
-  fetchData: (params: Partial<{
-    currPage: number 
-    pageSize: number 
-  }>) => Promise<void>
+  messageListDetail?: (socket: any, params: API_CHAT.IGetMessageDetailParams) => Promise<void>
 }
 
 const ChatData: FC<{
