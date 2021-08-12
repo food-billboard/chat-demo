@@ -69,7 +69,8 @@ const ImageUpload = memo((props: UploadProps) => {
     }, propsOnChange)
     if(!result) return 
     await messageListDetailSave?.({
-      message: [result]
+      message: [result],
+      room: currRoom
     }, {
       insertAfter: true 
     })

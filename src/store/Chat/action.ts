@@ -1,13 +1,20 @@
 import { generateAction } from '../utils'
 import { getMessageDetail } from '@/services'
 import { connect as internalConnect, parseValue, connectStoreUserData, putRoom, joinRoom, readMessage } from '@/utils/socket'
-import { setStorage } from '@/utils/socket/utils'
+import { setStorage, actionGet } from '@/utils/socket/utils'
 import { messageListSave, messageList } from '../Message/action'
 import { messageListDetailSave } from '../MessageDetail/action'
 import { roomList, roomListSave } from '../Room/action'
 import { inviteFriendList, inviteFriendListSave } from '../InviteList/action'
 
 export const { success, fail, begin, SUCCESS, FAIL, BEGIN } = generateAction<any>('SOCKET')
+
+const actionDeal = (key: string, value: any) => {
+  const actions = actionGet(key)
+  actions?.forEach((item: any) => {
+    item?.(value)
+  })
+}
 
 export function connect() {
   return (dispatch: any) => {
@@ -71,10 +78,17 @@ function eventBinding(dispatch: any, socket: any) {
       setStorage({
         temp_user_id: resData.temp_user_id
       })
-      dispatch(success({ socket }))
-      dispatch(messageList(socket))
-      dispatch(roomList(socket))
-      dispatch(inviteFriendList(socket))
+      Promise.all([
+        dispatch(success({ socket })),
+        dispatch(messageList(socket)),
+        dispatch(roomList(socket)),
+        dispatch(inviteFriendList(socket))
+      ])
+      .then(_ => {
+        return actionDeal("connect_user", value)
+      })
+    }else {
+      actionDeal("connect_user", value)
     }
   })
 
@@ -84,6 +98,11 @@ function eventBinding(dispatch: any, socket: any) {
     const { success, res: { data: resData } } = value 
     if(success) {
       dispatch(messageListSave(resData))
+      .then(() => {
+        return actionDeal("get", value)
+      })
+    }else {
+      actionDeal("get", value)
     }
   })
 
@@ -93,6 +112,11 @@ function eventBinding(dispatch: any, socket: any) {
     const { success, res: { data: resData } } = value 
     if(success) {
       dispatch(messageListDetailSave(resData))
+      .then(() => {
+        return actionDeal("message", value)
+      })
+    }else {
+      actionDeal("message", value)
     }
   })
 
@@ -102,67 +126,87 @@ function eventBinding(dispatch: any, socket: any) {
     const { success, res: { data: resData } } = value 
     if(success) {
       dispatch(roomListSave(resData))
+      .then(() => {
+        return actionDeal("room", value)
+      })
+    }else {
+      actionDeal("room", value)
     }
   })
 
   //read message 
   socket.on('put', () => {
-    console.log('读取消息完成')
-    dispatch(messageList(socket))
+    dispatch(messageList(socket)).then(() => {
+      return actionDeal("put", null)
+    })
   })
 
   //delete message 
   socket.on('delete', () => {
-    console.log('删除消息完成')
     dispatch(messageList(socket))
+    .then(() => {
+      return actionDeal("delete", null)
+    })
   })
 
   //room create 
   socket.on('create_room', () => {
-    console.log('创建房间完成')
     dispatch(roomList(socket))
+    .then(() => {
+      return actionDeal("create_room", null)
+    })
   })
 
   //invite list 
   socket.on('invite_friend_list', (data: string) => {
-    console.log('好友申请列表')
     const value: any = parseValue(data)
     const { success, res: { data: resData } } = value 
     if(success) {
       dispatch(inviteFriendListSave(resData?.friends || []))
+      .then(() => {
+        return actionDeal("invite_friend_list", value)
+      })
+    }else {
+      actionDeal("invite_friend_list", value)
     }
   })
 
   //invite 
   socket.on('invite_friend', (data: string) => {
     const value: any = parseValue(data)
-    console.log('响应好友申请', value)
-    // if(!value) {
-    //   dispatch(inviteFriendList(socket))
-    //   return 
-    // }
     const { success } = value 
     if(success) {
       dispatch(inviteFriendList(socket))
+      .then(() => {
+        return actionDeal("invite_friend", value)
+      })
+    }else {
+      actionDeal("invite_friend", value)
     }
   })
 
   socket.on('post', (data: string) => {
-    console.log('接收消息响应', data)
     const value: any = parseValue(data) 
     const { success, res: { data: id } } = value 
     if(success) {
-      //消息列表
-      dispatch(messageList(socket))
-      //消息详情
-      getMessageDetail({
-        messageId: id 
+      Promise.all([
+        //消息列表
+        dispatch(messageList(socket)),
+        //消息详情
+        getMessageDetail({
+          messageId: id 
+        })
+        .then(data => {
+          return dispatch(messageListDetailSave?.(data, {
+            insertAfter: true 
+          }))
+        })
+      ])
+      .then(() => {
+        return actionDeal("post", value)
       })
-      .then(data => {
-        return dispatch(messageListDetailSave?.(data, {
-          insertAfter: true 
-        }))
-      })
+    }else {
+      actionDeal("post", value)
     }
   })
 

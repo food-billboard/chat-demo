@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { message } from 'antd'
 import { connect } from 'react-redux'
-import { merge } from 'lodash-es'
+import { merge, throttle, debounce } from 'lodash-es'
 import { PageHeaderProps } from 'antd/es/page-header'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { IProps, TMessageValue } from './components/ChatData'
@@ -10,7 +10,7 @@ import ChatHeader from '../UserHeader'
 import ChatInput from '../ChatInput'
 import ObserverDom from './components/Intersection'
 import BackToBottom from './components/BackToBottom'
-import { postMessage } from '@/utils/socket'
+import { postMessage, bindActionStorage, unBindActionStorage } from '@/utils/socket'
 import { getMessageDetail } from '@/services'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { withTry, sleep } from '@/utils'
@@ -35,6 +35,25 @@ class GroupChat extends Component<IGroupProps> {
   }
 
   first = true 
+  private receiveMessageUuid = ''
+  private messageGetUuid = ''
+  fetchLoading = false 
+
+  componentDidMount = () => {
+    this.receiveMessageUuid = bindActionStorage("post", async () => {
+      await this.waitScrollToBottom()
+    })
+    this.messageGetUuid = bindActionStorage("message", async () => {
+      setTimeout(() => {
+        this.fetchLoading = false 
+      }, 2000)
+    })
+  }
+
+  componentWillUnmount = () => {
+    unBindActionStorage("post", this.receiveMessageUuid)
+    unBindActionStorage("message", this.messageGetUuid)
+  }
 
   getNode = () => {
     const node = document.querySelector("#chat-item-bottom")
@@ -67,9 +86,9 @@ class GroupChat extends Component<IGroupProps> {
   }
 
   internalFetchData = async(params: Partial<{ currPage: number, pageSize: number, start: string }>={}, toBottom: boolean=false) => {
-    const { fetchLoading } = this.props 
     const { currPage } = this.state 
-    if(fetchLoading) return 
+    if(this.fetchLoading) return 
+    this.fetchLoading = true 
     const newParams = merge({ currPage, pageSize: 10 }, params)
     await this.fetchData(newParams)
     this.setState({
@@ -101,7 +120,6 @@ class GroupChat extends Component<IGroupProps> {
       await messageListDetailSave?.(newData, {
         insertAfter: true 
       })
-      await this.waitScrollToBottom()
     }
   }
 

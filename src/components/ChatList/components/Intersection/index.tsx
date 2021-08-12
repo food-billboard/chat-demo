@@ -25,7 +25,7 @@ export default class Observer extends Component<IProps> {
     const io = new IntersectionObserver(entries => {
       onObserve?.()
     }, {
-      root: document.querySelector('#chat-list-wrapper')
+      root: document.querySelector('#chat-list-wrapper'),
     })
     this.setState({ observer: io })
     const target = document.querySelector('#intersection-observer')
@@ -35,7 +35,7 @@ export default class Observer extends Component<IProps> {
   render() {
 
     return (
-      <div id="intersection-observer"></div>
+      <div id="intersection-observer" style={{height: 12}}></div>
     )
 
   }

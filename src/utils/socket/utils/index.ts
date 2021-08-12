@@ -1,4 +1,4 @@
-
+import { nanoid } from 'nanoid'
 
 export const setStorage = (data: { [key: string]: any }) => {
   Object.entries(data).forEach(item => {
@@ -36,10 +36,42 @@ export const getStorage = (key?: string | string[]) => {
   }, {} as { [key: string]: any })
 }
 
-export const clearStorate = (key?: string | string[]) => {
+export const clearStorage = (key?: string | string[]) => {
   if(!key || !key.length) return localStorage.clear()
   let keys = Array.isArray(key) ? key : [key]
   keys.forEach(item => {
     localStorage.removeItem(item)
   })
+}
+
+const ACTION_STORAGE: {
+  [key: string]: any 
+} = {}
+
+const getMethod = (type: "array" | "object", value: any) => {
+  if(!value) return value 
+  if(type === "array") {
+    return Object.values(value)
+  }
+  return value 
+}
+
+export const actionGet = (key?: string, type: "array" | "object"="array") => {
+  if(key) return getMethod(type, ACTION_STORAGE[key])
+  return Object.entries(ACTION_STORAGE).reduce((acc, cur) => {
+    const [ key, value ] = cur
+    acc[key] = getMethod(type, value) 
+    return acc 
+  }, {} as any)
+}
+
+export const bindActionStorage = (key: string, action: any) => {
+  if(!ACTION_STORAGE[key]) ACTION_STORAGE[key] = {}
+  const uuid = nanoid()
+  ACTION_STORAGE[key][uuid] = action 
+  return uuid 
+}
+
+export const unBindActionStorage = (key: string, uuid: string) => {
+  delete ACTION_STORAGE[key][uuid]
 }
