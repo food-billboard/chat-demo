@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { message } from 'antd'
 import { connect } from 'react-redux'
-import { merge, throttle, debounce } from 'lodash-es'
+import { merge } from 'lodash-es'
 import { PageHeaderProps } from 'antd/es/page-header'
 import scrollIntoView from 'scroll-into-view-if-needed'
+import Day from 'dayjs'
 import { IProps, TMessageValue } from './components/ChatData'
 import ChatList from './components/ChatList'
 import ChatHeader from '../UserHeader'
@@ -38,6 +39,7 @@ class GroupChat extends Component<IGroupProps> {
   private receiveMessageUuid = ''
   private messageGetUuid = ''
   fetchLoading = false 
+  quit = false 
 
   componentDidMount = () => {
     this.receiveMessageUuid = bindActionStorage("post", async () => {
@@ -80,16 +82,25 @@ class GroupChat extends Component<IGroupProps> {
     await messageListDetail?.(socket, merge({}, params, { _id: currentRoom?._id }))
   }
 
-  waitScrollToBottom = async (times=100) => {
+  waitScrollToBottom = async (times=500) => {
     await sleep(times)
     this.scrollToBottom()
   }
 
+  getStartDate = () => {
+    const { value=[] } = this.props
+    const [ first ] = value
+    const startTime = first?.createdAt  
+    return !!startTime ? Day(startTime).toDate() : false 
+  }
+
   internalFetchData = async(params: Partial<{ currPage: number, pageSize: number, start: string }>={}, toBottom: boolean=false) => {
-    const { currPage } = this.state 
-    if(this.fetchLoading) return 
+    if(this.fetchLoading || this.quit) return 
     this.fetchLoading = true 
-    const newParams = merge({ currPage, pageSize: 10 }, params)
+    const { currPage } = this.state 
+    const startTime = this.getStartDate() 
+    const newParams = merge({ start: startTime, currPage, pageSize: 10 }, params)
+    if(newParams.currPage === currPage && !!startTime) newParams.currPage = 0
     await this.fetchData(newParams)
     this.setState({
       currPage: newParams.currPage + 1
@@ -100,6 +111,7 @@ class GroupChat extends Component<IGroupProps> {
   }
 
   onBack = (e: any) => {
+    this.quit = true 
     const { header } = this.props 
     header.onBack?.(e)
   }

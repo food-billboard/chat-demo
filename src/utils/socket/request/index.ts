@@ -5,9 +5,9 @@ import { getStorage } from '../utils'
 const mock = () => {
   const { userAgent } = window.navigator
   if(userAgent.includes('Chrome')) {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMCIsImlhdCI6MTYyODczODQzNiwiZXhwIjoxNjI4ODI0ODM2fQ.eOfQ386e4egelZ4uop2VhBYLUIL6f_O2jjJGEGY_LCU'
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMCIsImlhdCI6MTYyOTQyODMxMCwiZXhwIjoxNjI5NTE0NzEwfQ.ukpqsMhOU2f42c6X4a0QUAkazLNDEi9GUA1RELnQetw'
   }
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTg5MTI2NzJjMTEyMDlkZDVjNjdlYSIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMSIsImlhdCI6MTYyODczODU4NCwiZXhwIjoxNjI4ODI0OTg0fQ.lVXaT0kTqOgCci6BLxljYAq-Mpn5bRAXqiRCX294C10'
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTg5MTI2NzJjMTEyMDlkZDVjNjdlYSIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMSIsImlhdCI6MTYyOTQ1MTE0MSwiZXhwIjoxNjI5NTM3NTQxfQ.QWRiBtRub756ox7U8-cC9k418Y6Bf1qgNS9xxsHkCCo'
 }
 
 export const getToken = () => {
@@ -121,18 +121,18 @@ export const deleteMessage = (socket: any, params: API_CHAT.IDeleteMessageParams
 
 //退出房间
 export const quitRoom = async (socket: any, params: API_CHAT.IDeleteJoinRoomParams) => {
-  socket.emit('quit_room', {
+  return promisify(socket.emit.bind(socket, 'quit_room', {
     token: getToken(),
     ...params
-  })
+  }), socket.on.bind(socket, 'quit_room'))
 }
 
 //删除房间
 export const deleteRoom = (socket: any, params: API_CHAT.IDeleteRoomParams) => {
-  socket.emit('remove_room', {
+  return promisify(socket.emit.bind(socket, 'remove_room', {
     token: getToken(),
     ...params
-  })
+  }), socket.on.bind(socket, 'remove_room'))
 }
 
 //离开房间(下线)
