@@ -1,7 +1,6 @@
-import React, { memo, useMemo, FC, useCallback } from 'react'
+import React, { memo, useMemo, FC } from 'react'
 import { Tooltip, Card, Avatar } from 'antd'
 import { TooltipPropsWithTitle } from 'antd/es/tooltip'
-import { SettingOutlined, DeleteOutlined } from '@ant-design/icons'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
 
@@ -22,21 +21,13 @@ export interface IProps extends Partial<TooltipPropsWithTitle>{
 
 const UserDetail: FC<IProps> = memo((props: IProps) => {
 
-  const { children, value, actions, ...nextProps } = useMemo(() => {
+  const { children, value, ...nextProps } = useMemo(() => {
     return props 
   }, [props])
 
-  const handleSetting = useCallback((id: string) => {
-    console.log('用户设置')
-  }, [])
-
-  const handleDelete = useCallback((id: string) => {
-    console.log('用户删除')
-  }, [])
-
   const CardData = useMemo(() => {
 
-    const { avatar, username, _id, description } = value
+    const { avatar, username, description } = value
 
     return (
       <Card
@@ -46,10 +37,7 @@ const UserDetail: FC<IProps> = memo((props: IProps) => {
             src={avatar || IMAGE_FALLBACK}
           />
         }
-        actions={actions || [
-          <SettingOutlined key="setting" onClick={handleSetting.bind(this, _id)} />,
-          <DeleteOutlined key="delete" onClick={handleDelete.bind(this, _id)} />
-        ]}
+        actions={[]}
       >
         <Meta
           avatar={<Avatar src={avatar}>{username}</Avatar>}
@@ -58,7 +46,7 @@ const UserDetail: FC<IProps> = memo((props: IProps) => {
         />
       </Card>
     )
-  }, [value, actions])
+  }, [value])
 
   return (
     <Tooltip

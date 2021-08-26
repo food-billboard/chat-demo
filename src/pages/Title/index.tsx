@@ -1,7 +1,8 @@
-import React, { memo, useCallback, useMemo, useRef } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Space, Button, Badge, Avatar, Menu, Dropdown, Tooltip } from 'antd'
 import { BellOutlined } from '@ant-design/icons'
+import { withRouter } from 'react-router'
 import { history } from '@/utils'
 import Message, { inviteListFilter } from './components/Message'
 import { mapDispatchToProps, mapStateToProps } from './connect'
@@ -63,7 +64,7 @@ const Title = memo((props: any) => {
             <div
               className={styles["page-title-log"]}
             >
-              <img onClick={goIndex} src={LOGO} />
+              <img onClick={goIndex} src={LOGO} alt="快乐" />
             </div>
             <div>
               <Space>
@@ -107,4 +108,4 @@ const Title = memo((props: any) => {
   )
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Title)
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Title))

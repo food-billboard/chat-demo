@@ -141,6 +141,27 @@ declare namespace API_UPLOAD {
 
 declare namespace API_CHAT {
 
+  export interface IGetFriendsListParams {
+    currPage?: number 
+    pageSize?: number 
+  }
+
+  export interface IGetFriendsListData {
+    _id: string 
+    friend_id:	string
+    member: string
+    avatar?: string
+    username: string
+    description?:string
+    createdAt: string
+    status: "AGREE" | "DIS_AGREE" | "TO_AGREE" | "NORMAL"
+  }
+
+  export interface IGetFriendsListRes {
+    member: string 
+    friends: IGetFriendsListData[]
+  }
+
   export interface IGetMemberListParams {
     _id: string 
     currPage?: number 

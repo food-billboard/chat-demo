@@ -1,17 +1,15 @@
-import React, { memo, useEffect, useMemo } from 'react'
+import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import styles from './index.less'
 
 const Container = memo((props: any) => {
 
-  const { getUserInfo, userInfo } = useMemo(() => {
-    return props 
-  }, [props])
+  const { getUserInfo } = props
 
   useEffect(() => {
     getUserInfo()
-  }, [])
+  }, [getUserInfo])
 
   return (
     <div className={styles["page-container"]}>

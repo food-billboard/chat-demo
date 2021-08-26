@@ -1,9 +1,9 @@
-import React, { CSSProperties, memo, useCallback, useMemo, useState } from 'react'
-import { Input, Popover, Button, Space } from 'antd'
+import React, { memo, useCallback, useMemo, useState } from 'react'
+import { Input, Button, Space } from 'antd'
 import { merge } from 'lodash-es'
-import { Picker, EmojiData } from 'emoji-mart'
-import { MehOutlined } from '@ant-design/icons'
+import { BaseEmoji } from 'emoji-mart'
 import Upload, { UploadProps } from './components/Upload'
+import EmojiPicker from './components/EmojiPicker'
 import 'emoji-mart/css/emoji-mart.css'
 import styles from './index.less'
 
@@ -47,9 +47,10 @@ export default memo((props: IProps) => {
     onPostMessage?.(params)
   }, [value, onPostMessage])
 
-  const handleSelectEmoji = useCallback((value: EmojiData) => {
+  const handleSelectEmoji = useCallback((value: BaseEmoji) => {
+    const native = value.native
     setValue(prev => {
-      return prev
+      return prev + native
     })
   }, [])
 
@@ -58,20 +59,11 @@ export default memo((props: IProps) => {
   }, [handlePostMessage])
 
   const ToolBar = useMemo(() => {
-    const cursor: CSSProperties = {
-      cursor: 'pointer',
-      fontSize: 20
-    }
     return (
       <div className={styles["input-toolbar"]}>
         <div className={styles["input-toolbar-menu"]}>
           <Space size={20}>
-            <Popover
-              content={<Picker onSelect={handleSelectEmoji} />}
-              trigger="click"
-            >
-              <MehOutlined style={cursor} />
-            </Popover> 
+          <EmojiPicker onSelect={handleSelectEmoji} />
             <Upload icon="image" onChange={onUpload} />
             <Upload icon="video" onChange={onUpload} />
           </Space>

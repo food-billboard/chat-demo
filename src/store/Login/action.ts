@@ -1,6 +1,7 @@
 import { login } from '@/services'
 import { generateAction } from '../utils'
 import { history, getPageQuery } from '@/utils'
+import { fetchUserInfoData } from '../UserInfo/action'
 
 export const redirectPage = () => {
   const urlParams = new URL(window.location.href);
@@ -30,6 +31,7 @@ export function fetchLogin(params: API_USER.ILoginParams) {
     return login(params)
     .then(json => {
       dispatch(success(json))
+      dispatch(fetchUserInfoData())
       redirectPage()
       return json
     })

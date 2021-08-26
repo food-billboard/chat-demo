@@ -23,3 +23,11 @@ export const postMessage = (data: API_CHAT.IPostMessageParams) => {
     data
   })
 }
+
+//好友列表
+export const getFriendsList = (params: API_CHAT.IGetFriendsListParams) => {
+  return request<API_CHAT.IGetFriendsListRes[]>('/api/customer/manage/friends', {
+    params,
+    method: 'GET'
+  })
+}

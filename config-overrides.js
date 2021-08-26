@@ -47,7 +47,7 @@ const rewiredMap = () => config => {
 
   return config
 }
-process.env.PORT = 8000
+process.env.PORT = 8001
 
 process.env.GENERATE_SOURCEMAP !== 'false'
 

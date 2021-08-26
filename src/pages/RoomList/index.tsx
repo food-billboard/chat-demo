@@ -1,10 +1,10 @@
-import React, { memo, useCallback, useState, useMemo } from 'react'
+import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
 import { Row, Col, Tooltip, Button } from 'antd'
 import { connect } from 'react-redux'
 import GroupChat from '@/components/ChatList'
 import RoomList from '@/components/RoomList'
 import AvatarList, { TAvatarData } from '@/components/AvatarList'
-import { getRoomMembers } from '@/services'
+import { getRoomMembers, getFriendsList } from '@/services'
 import { inviteFriend } from '@/utils/socket' 
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { withTry } from '@/utils'
@@ -13,6 +13,7 @@ import styles from './index.less'
 export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) => {
 
   const [ postUserLoading, setPostUserLoading ] = useState<boolean>(false)
+  const [ friendList, setFriendList ] = useState<API_CHAT.IGetFriendsListData[]>([])
 
   const { socket, userInfo, exchangeRoom, currRoom } = useMemo(() => {
     return props 
@@ -55,7 +56,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
   const tooltip = useCallback((node: React.ReactNode, item: TAvatarData, props: any) => {
     const { _id } = item 
     const { friend_id } = userInfo
-    if(friend_id === _id) return node 
+    if(friend_id === _id || friendList.some(item => item.friend_id === _id)) return node 
     return (
       <Tooltip 
         key={_id}
@@ -64,7 +65,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
         {node}
       </Tooltip>
     )
-  }, [addFriends, postUserLoading, userInfo])
+  }, [addFriends, postUserLoading, userInfo, friendList])
 
   const chatHeader = useMemo(() => {
     return {
@@ -75,6 +76,15 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
       }} />
     }
   }, [currRoom, quitRoom, fetchRoomUserList, tooltip])
+
+  const fetchFriendsList = useCallback(async (roomInfo: API_CHAT.IGetRoomListData) => {
+    const [, value] = await withTry(getFriendsList)({ pageSize: 9999 })
+    setFriendList(value?.friends || [])
+  }, [])
+
+  useEffect(() => {
+    fetchFriendsList(currRoom)
+  }, [currRoom])
 
   return (
     <Row 
