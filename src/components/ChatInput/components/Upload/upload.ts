@@ -1,4 +1,4 @@
-import { Upload } from 'chunk-file-upload'
+import { TUploadFn, Upload } from 'chunk-file-upload'
 import { message } from 'antd'
 import Day from 'dayjs'
 import { checkUploadFile, uploadFile, putVideoPoster, postMessage } from '@/services'
@@ -57,9 +57,9 @@ const exitDataFn = (getResult: (data: any) => void) => async (params: {
   return data 
 }
 
-const uploadFn = async (data: FormData, name: Symbol) => {
+const uploadFn: TUploadFn = async (data, name) => {
   const task = INSTANCE.getTask(name)
-  const size = task.file.file.size 
+  const size = (task!.file.file as File).size 
   let response: any = {}
   const md5 = data.get('md5')
   const file = data.get('file')
@@ -88,7 +88,7 @@ export const uploadPoster = async (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const [ name ] = INSTANCE.add({
       file: {
-        file: data,
+        file: data as File,
       },
       request: {
         exitDataFn: exitDataFn((value) => {

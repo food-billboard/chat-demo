@@ -1,18 +1,22 @@
 import { message, FormInstance } from 'antd'
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form'
 import { connect } from 'react-redux'
 import { Store } from 'antd/lib/form/interface'
 import { merge } from 'lodash'
-// import Upload from '@/components/Upload'
-// import { fileValidator } from '../../DataEdit/utils'
+import Upload, { Upload as UploadInstance } from '@/components/Upload'
 import { mapStateToProps, mapDispatchToProps } from '../../connect'
 import { PutUserInfo } from '@/services'
 import { history } from '@/utils'
 import styles from './index.less'
 
+export const fileValidator = (length: number ) => (_: any, value: Array<string>) => {
+  return UploadInstance.valid(value, length) ? Promise.resolve() : Promise.reject('请先上传或添加文件')
+}
+
 interface IProps {
   userInfo: STORE_USER.IUserInfo
+  getUserInfo?: () => any 
 }
 
 const BaseView = (props: IProps) => {
@@ -40,6 +44,7 @@ const BaseView = (props: IProps) => {
       avatar: Array.isArray(avatar) ? avatar[0] : avatar
     }) as API_USER.IPutUserInfoParams)
     formRef.current?.resetFields()
+    await props?.getUserInfo?.()
     return new Promise<boolean>((resolve) => {
       message.info("操作成功", 1, () => {
         history.replace('/main/room')
@@ -108,7 +113,7 @@ const BaseView = (props: IProps) => {
             name="password" 
             label="密码" 
           />
-          {/* <Upload 
+          <Upload 
             wrapper={{
               label: '头像',
               name: 'avatar',
@@ -125,7 +130,7 @@ const BaseView = (props: IProps) => {
               acceptedFileTypes: ['image/*'],
               allowMultiple: false
             }}
-          /> */}
+          />
         </ProForm>
       </div>
     </div>
