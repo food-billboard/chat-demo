@@ -33,7 +33,7 @@ const BaseView = (props: IProps) => {
     if (userInfo) {
       const { avatar, ...nextUserInfo } = userInfo
       formRef.current?.setFieldsValue(merge({}, nextUserInfo, {
-        avatar: Array.isArray(avatar) ? avatar : [avatar]
+        avatar: Array.isArray(avatar) ? avatar : (avatar ? [avatar] : [])
       }))
     }
   }, [userInfo, formRef])

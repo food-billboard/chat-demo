@@ -83,7 +83,8 @@ const Room = memo((props: IWrapperProps) => {
 
   const onVisibleChange = useCallback((visible) => {
     setVisible(visible)
-  }, [])
+    roomList?.(socket)
+  }, [roomList, socket])
 
   const createRoom = useCallback(async (value: any) => {
     const { type, members } = value 

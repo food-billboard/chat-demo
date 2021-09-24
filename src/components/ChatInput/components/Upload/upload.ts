@@ -113,10 +113,10 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
   let [ mimeType ] = file.type.toUpperCase().split('/')
   let success = false 
   let error = false 
-  let isExists = false 
+  // let isExists = false 
   let contentId = ""
   let posterId = ""
-  const TOTAL_SIZE = file.size 
+  // const TOTAL_SIZE = file.size 
 
   if(!VALID_FILE_TYPE.includes(mimeType)) {
     message.info("文件格式不正确~")
@@ -145,7 +145,7 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
     request: {
       exitDataFn: exitDataFn((data) => {
         contentId = data?._id 
-        isExists = data?.data == TOTAL_SIZE
+        // isExists = Number(data?.data) === TOTAL_SIZE
       }),
       uploadFn,
       callback: async (err: any) => {

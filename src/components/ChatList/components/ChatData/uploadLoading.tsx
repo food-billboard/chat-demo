@@ -16,9 +16,11 @@ export interface ProgressProps {
 
 const getLoading = (result: any) => {
   const { status, progress, error } = result 
+  const numberStatus = Number(status)
+  const numberProgress = Number(progress)
   let data: any = {
-    loading: progress != 1 || (status != -1 && status != -2 && status != -3 && status != 4),
-    status: progress == 1 ? null : (
+    loading: numberProgress !== 1 || (numberStatus !== -1 && numberStatus !== -2 && numberStatus !== -3 && numberStatus !== 4),
+    status: numberProgress === 1 ? null : (
       !!error ? 'error' : "upload"
     ),
   }

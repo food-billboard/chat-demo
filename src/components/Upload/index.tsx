@@ -192,7 +192,7 @@ const Upload: ReactFC<IProps> = ({
         error(err.message)
         setValue(prevValue => {
           return prevValue.map(val => {
-            if(val.local?.md5 != md5) return val
+            if(val.local?.md5 !== md5) return val
             return {
               ...val,
               local: {
@@ -261,7 +261,7 @@ const Upload: ReactFC<IProps> = ({
       newValues.push(targetValue)
     }
     return newValues
-  }, [])
+  }, [fetchFileId])
 
   useEffect(() => {
     formatValue(propsValue)

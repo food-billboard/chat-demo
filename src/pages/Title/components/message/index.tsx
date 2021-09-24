@@ -205,6 +205,7 @@ const Message = memo((props: IProps) => {
   }, [])
 
   const readMessage = useCallback(async () => {
+    console.log(props.value, socket, 22222)
     if(!props.value || !socket) return 
     requestReadMessage(socket, {
       _id: props.value?.map(item => {

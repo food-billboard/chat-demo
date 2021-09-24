@@ -1,8 +1,6 @@
 import React, { memo, useMemo, useState, useEffect, useCallback } from 'react'
 import { Avatar, Tooltip } from 'antd'
 import { AvatarProps, GroupProps } from 'antd/es/avatar'
-import { UserOutlined, AntDesignOutlined } from '@ant-design/icons'
-import { IMAGE_FALLBACK } from '@/utils'
 
 export type TAvatarData = {
   username: string 

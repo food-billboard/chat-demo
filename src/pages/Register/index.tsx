@@ -129,8 +129,8 @@ const Register = (props: any) => {
               message: '请输入邮箱!',
             },
             {
-              pattern: /^1\d{10}$/,
-              message: '不合法的手机号格式!',
+              pattern: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
+              message: '不合法的邮箱格式!',
             },
           ]}
         />
