@@ -167,7 +167,7 @@ class GroupChat extends Component<IGroupProps> {
       >
         <div
           style={{
-            height: 'calc(100% - 30vh)',
+            height: currentRoom?.type === 'SYSTEM' ? "100%" : 'calc(100% - 30vh)',
             overflow: 'auto'
           }}
           id="chat-list-wrapper"
@@ -177,7 +177,7 @@ class GroupChat extends Component<IGroupProps> {
           <ChatList loading={!!fetchLoading} {...nextProps} value={value} />
         </div>
         <BackToBottom onClick={this.scrollToBottom} />
-        <ChatInput style={{height: '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={this.handlePostMessage} />
+        <ChatInput style={{height: currentRoom?.type === 'SYSTEM' ? 0 : '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={this.handlePostMessage} />
       </div>
     )
 

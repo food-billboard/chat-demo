@@ -5,14 +5,14 @@ import { getStorage } from '../utils'
 const mock = () => {
   const { userAgent } = window.navigator
   if(userAgent.includes('Chrome')) {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTM0ZGE1NjFjM2Q0MGJhNjhhNjZhOSIsIm1vYmlsZSI6MTM1MjcxMDY4NzksIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMCIsImlhdCI6MTYzMDExMzY3NCwiZXhwIjoxNjMwMjAwMDc0fQ.W0OcCxPqL_VZny-ar-PlbyLeLVf6cCdrydpm5SX2NbQ'
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNjY0N2NiMTM4ZGVkMTFmZDAyMzBiMyIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYxNjY0N2NiMTM4ZGVkMTFmZDAyMzBiNSIsImlhdCI6MTYzNDA5NDI5MSwiZXhwIjoxNjM0MTgwNjkxfQ.x-eHBcFcFWPSGdkeOouJx238bdF3BSN5G2PQYCfzZDI'
   }
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOTg5MTI2NzJjMTEyMDlkZDVjNjdlYSIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYwZTJkMzUwMmM5OGU0MmQyYmU2MjMxMSIsImlhdCI6MTYzMDExMzczMywiZXhwIjoxNjMwMjAwMTMzfQ.OfwomS-dKskPhX8Z3vjqZvPJdLM4kwU9GLeNc65itPw'
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNjY3ODUxN2VjNDAxMmUzYzU3MmIzZiIsIm1vYmlsZSI6MTgzNjgwMDMxOTEsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYxNjY3ODUxN2VjNDAxMmUzYzU3MmI0MSIsImlhdCI6MTYzNDExMzY5MCwiZXhwIjoxNjM0MjAwMDkwfQ.-JTG-7IJVjOfceDDCqLIwq6ts4_D4XBDBTahfCK6MAQ'
 }
 
 export const getToken = () => {
+  return mock()
   return JSCookie.get()
-  // return mock()
 }
 
 const promisify = (emit: any, on: any) => {

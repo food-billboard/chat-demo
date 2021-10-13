@@ -58,8 +58,6 @@ const exitDataFn = (getResult: (data: any) => void) => async (params: {
 }
 
 const uploadFn: TUploadFn = async (data, name) => {
-  const task = INSTANCE.getTask(name)
-  const size = (task!.file.file as File).size 
   let response: any = {}
   const md5 = data.get('md5')
   const file = data.get('file')
@@ -73,13 +71,7 @@ const uploadFn: TUploadFn = async (data, name) => {
   }catch(err) {
     console.log(err)
   }
-  const nextOffset = response["upload-offset"] ?? response["Upload-Offset"]
-  if(nextOffset >= size) return {
-    data: size
-  }
-  return {
-    data: nextOffset >= size ? size : nextOffset
-  }
+  return response
 }
 
 export const uploadPoster = async (file: File): Promise<string> => {
