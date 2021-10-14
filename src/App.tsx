@@ -1,5 +1,11 @@
 import React from 'react'
-import { Switch, Route, Redirect, Router } from 'react-router-dom'
+import { 
+  Switch, 
+  Route, 
+  Redirect, 
+  Router,
+  // HashRouter as Router
+} from 'react-router-dom'
 import { Provider } from 'react-redux'
 import Container from './pages/Container'
 import Title from './pages/Title'

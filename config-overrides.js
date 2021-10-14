@@ -89,6 +89,7 @@ const appBuildPathFile = () => config => {
     //更改生产模式输出的文件名
     config.output.filename = 'static/js/[name].js?_v=[chunkhash:8]'
     config.output.chunkFilename = 'static/js/[name].chunk.js?_v=[chunkhash:8]'
+    config.output.publicPath = "./"
   }
   return config
 }
@@ -309,7 +310,7 @@ module.exports = {
     // 允许使用.babelrc文件进行Babel配置。
     // useBabelRc(),
     // add webpack bundle visualizer if BUNDLE_VISUALIZE flag is enabled
-    process.env.BUNDLE_VISUALIZE == 1 && addBundleVisualizer(),
+    process.env.BUNDLE_VISUALIZE === 1 && addBundleVisualizer(),
 
     adjustWorkbox(wb =>
       Object.assign(wb, {

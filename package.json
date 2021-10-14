@@ -20,7 +20,7 @@
     "filepond-plugin-file-validate-size": "^2.2.4",
     "filepond-plugin-file-validate-type": "^1.2.6",
     "filepond-plugin-image-preview": "^4.6.10",
-    "history": "^4.1.0",
+    "history": "^4.0.1",
     "js-cookie": "^2.2.1",
     "lodash-es": "^4.17.21",
     "mime": "^2.5.2",

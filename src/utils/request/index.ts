@@ -1,13 +1,13 @@
 import axios, { Method, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { BackTopProps, message, notification } from 'antd'
-import { createBrowserHistory } from 'history'
+import { createBrowserHistory, createHashHistory } from 'history'
 import { debounce } from 'lodash-es'
 import { stringify } from 'querystring'
 import Qs from 'qs'
 import store, { fetchLogout } from '@/store'
 import { formatQuery } from '../tool'
 
-export const history: any = createBrowserHistory()
+export const history: any = createHashHistory()
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
