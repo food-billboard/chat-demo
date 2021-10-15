@@ -1,5 +1,5 @@
-import React, { Fragment, memo, useCallback, useMemo } from 'react'
-import { Image, Space } from 'antd'
+import React, { memo, useCallback, useMemo } from 'react'
+import { Image } from 'antd'
 import { EyeOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import styles from './index.less'
 
@@ -19,12 +19,7 @@ export default memo((props: IProps) => {
   const preview = useMemo(() => {
     if(disabled || type === 'VIDEO') return false 
     const mask = (
-      <Fragment>
-        <Space>
-          <EyeOutlined />
-          预览
-        </Space>
-      </Fragment>
+      <EyeOutlined />
     )
     return {
       mask

@@ -1,4 +1,4 @@
-import React, { memo, useMemo, FC, useCallback, useState, useImperativeHandle, forwardRef } from 'react'
+import React, { memo, useMemo, FC, useCallback, useState, useImperativeHandle, forwardRef, useRef } from 'react'
 import { Avatar } from 'antd'
 import Day from 'dayjs'
 import { CloseOutlined } from '@ant-design/icons'
@@ -20,6 +20,8 @@ export const VideoModal = forwardRef((_, ref) => {
 
   const [ videoData, setVideoData ] = useState<string>()
   const [ visible, setVisible ] = useState<boolean>(false)
+
+  const videoRef = useRef<any>(null)
 
   const handleClose = useCallback(() => {
     setVisible(false)
@@ -44,7 +46,11 @@ export const VideoModal = forwardRef((_, ref) => {
       })}
     > 
       <CloseOutlined className={styles["video-content-close"]} style={{color: 'white'}} onClick={handleClose} />
-      <Video src={videoData} />
+      <Video 
+        src={videoData} 
+        // @ts-ignore
+        ref={videoRef as any} 
+      />
     </div>
   )
 
@@ -72,9 +78,7 @@ const ChatData: FC<{
     value,
     messageListDetailSave,
     onVideoView
-  } = useMemo(() => {
-    return props 
-  }, [props])
+  } = props
 
   const {
     isMine,
@@ -134,7 +138,7 @@ const ChatData: FC<{
         style={{
           ...margin,
           maxWidth: 'calc(100% - 84px)',
-          backgroundColor: isMine ? 'rgb(28, 184, 78)' : 'white'
+          backgroundColor: isMine ? 'rgb(28, 184, 78, 0.7)' : 'white'
         }}
       >
         {
@@ -151,7 +155,6 @@ const ChatData: FC<{
             :
             (
               <ImageView
-                // disabled={!!loading}
                 type={media_type}
                 src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
                 onClick={handleView.bind(this, video)}

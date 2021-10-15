@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle, memo } from 'react'
+import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle, memo, useRef } from 'react'
 import Videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import { message } from 'antd'
 import { getMediaList } from '@/services'
@@ -8,6 +8,7 @@ import './index.less'
 
 interface IVideoRef {
   reload(): void
+  pause(): void 
 }
 
 interface IProps extends VideoJsPlayerOptions {}
@@ -18,7 +19,7 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
 
   useImperativeHandle(ref, () => ({
     ...instance!,
-    reload
+    reload,
   }))
 
   const eventBinding: (instance: VideoJsPlayer) => void = useCallback((instance) => {
@@ -51,7 +52,7 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
         // console.log("视频播放中")
     });
     instance.on("pause", function(){
-        // console.log("视频暂停播放")
+        console.log("视频暂停播放")
     });
     instance.on("ended", function(){
         // console.log("视频播放结束");
@@ -82,7 +83,7 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
   //播放器初始化
   const initVideoInstance = useCallback(async () => {
     const instance = Videojs('video', {
-      autoplay: true,
+      autoplay: false,
       controls: true,
       loop: false,
       muted: false,
@@ -117,14 +118,25 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
     return target?.info?.mime?.toLowerCase()
   }, [])
 
+  const pause = useCallback(() => {
+    if(!instance) return 
+    instance.currentTime(0)
+    instance.pause()
+  }, [instance])
+
   const setSrc = useCallback(async () => {
     if(!instance) return 
     const nowSrc = instance.src()
-    if(!!nowSrc && !props.src) {
+    if(nowSrc === props.src) {
+      if(instance.paused()) {
+        instance.play()
+      }
+      return 
+    } 
+    if(!props.src) {
+      pause()
       return 
     }
-    if(!props.src) return 
-    if(nowSrc === props.src) return 
     const type = await mediaInfo(props.src)
     instance.pause()
     const src: Videojs.Tech.SourceObject = {
@@ -132,20 +144,21 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
       type: type || 'video/mp4'
     }
     instance.src(src)
+    instance.play()
   }, [props.src, instance, mediaInfo])
 
   //重载
   const reload = useCallback(async () => {
     if(!instance) return 
     await setSrc()
-    instance.load()
+    // instance.load()
   }, [instance, setSrc])
 
   useEffect(() => {
-    initVideoInstance()
+    if(!instance) initVideoInstance()
     return () => {
       instance?.pause()
-      instance && instance.dispose()
+      instance?.dispose()
     }
   }, [])
 

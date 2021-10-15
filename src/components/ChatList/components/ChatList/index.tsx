@@ -14,9 +14,7 @@ const ChatList = (props: IProps & {
   let prevValueLength = useRef(-1)
   const videoRef = useRef<VideoModalRef>(null)
 
-  const { userInfo, style={}, value, socket, currRoom } = useMemo(() => {
-    return props 
-  }, [props])
+  const { userInfo, style={}, value, socket, currRoom } = props
 
   const globalStyle = useMemo(() => {
     return merge({}, style)
