@@ -36,6 +36,7 @@ export default memo((props: IProps) => {
   const handlePostMessage = useCallback((media: false | TMediaType) => {
     let params: TMediaType 
     if(!media) {
+      if(!value.length) return 
       params = {
         type: "TEXT",
         content: value 
@@ -73,12 +74,28 @@ export default memo((props: IProps) => {
     )
   }, [handlePostMessage, handleSelectEmoji, onUpload])
 
+  const inputAction = useCallback((e: any) => {
+    if((e.which === 13 && e.ctrlKey) || (e.which === 10 && e.ctrlKey)) {
+      setValue(prev => prev + "\n")
+    }else if((e.which === 13 && e.shiftKey) || (e.which === 10 && e.shiftKey)) {
+      // TODO
+    }else if(e.which === 13) {
+      e.preventDefault()
+      handlePostMessage(false)
+    }
+  }, [handlePostMessage])
+
   return (
     <div
       style={globalStyle}
     >
       {ToolBar}
-      <Input.TextArea style={{flex: 1}} value={value} onChange={onChange} onPressEnter={handlePostMessage.bind(this, false)} />
+      <Input.TextArea 
+        style={{flex: 1}} 
+        value={value} 
+        onChange={onChange} 
+        onKeyPress={inputAction}
+      />
     </div>
   )
 

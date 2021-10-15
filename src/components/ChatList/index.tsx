@@ -176,7 +176,7 @@ class GroupChat extends Component<IGroupProps> {
           <ObserverDom onObserve={this.onObserver} />
           <ChatList loading={!!fetchLoading} {...nextProps} value={value} />
         </div>
-        <BackToBottom onClick={this.scrollToBottom} />
+        <BackToBottom type="icon" onClick={this.scrollToBottom} />
         <ChatInput style={{height: currentRoom?.type === 'SYSTEM' ? 0 : '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={this.handlePostMessage} />
       </div>
     )

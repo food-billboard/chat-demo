@@ -31,6 +31,7 @@ const codeMessage = {
 export interface IRequestOptions extends AxiosRequestConfig {
   mis?: boolean
   file?: boolean 
+  authorization?: boolean 
 }
 
 const DEFAULT_REQUEST_SETTING: Partial<IRequestOptions> = {
@@ -121,7 +122,7 @@ const axiosInstance = axios.create(DEFAULT_REQUEST_SETTING)
 
 export const request = async <ResBody>(url: string, setting: IRequestOptions={}, origin: boolean=false): Promise<ResBody> => {
     // 过滤URL参数
-    const { params, data, mis=true, file=false, ...options } = setting
+    const { params, data, mis=true, file=false, authorization=false, ...options } = setting
 
     let body: any
     let error: any
@@ -141,7 +142,7 @@ export const request = async <ResBody>(url: string, setting: IRequestOptions={},
     if( error ){
       error.errorType = 'system';
       error.messageType = 'response';
-      mis && misManage(error);
+      mis && misManage(error, authorization);
       throw error
     }
   
@@ -157,7 +158,7 @@ export const request = async <ResBody>(url: string, setting: IRequestOptions={},
       return (origin ? body : body?.data?.res?.data || {}) as ResBody
     }
     error.mis = mis
-    mis && misManage(error)
+    mis && misManage(error, authorization)
     throw error
   }
   
@@ -173,19 +174,19 @@ export const request = async <ResBody>(url: string, setting: IRequestOptions={},
   }, 1000, {'leading': true, 'trailing': false} )
   
   // 处理报错
-  export const misManage = (error: any): any=>{
+  export const misManage = (error: any, authorization: boolean): any=>{
     if( error.messageType === 'body' ){
       const err = error.err || {}
   
       // 未登录处理
-      if( error.errorType === 'system' && err.code === '401' ){
+      if( authorization || (error.errorType === 'system' && err.code === '401') ){
         return dispatchLogin(err);
       }
       message.error(err.msg || '网络错误');
       return
     }
     const { response } = error;
-    if( response && response.status === 401 ){
+    if( authorization || (response && response.status === 401) ){
       return dispatchLogin(error);
     }
     if (response && response.status) {

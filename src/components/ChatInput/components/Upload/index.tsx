@@ -74,6 +74,7 @@ const ImageUpload = memo((props: UploadProps) => {
     }, {
       insertAfter: true 
     })
+    inputRef.current.value = ""
   }, [userInfo, messageListDetailSave, currRoom, propsOnChange])
 
   return (
