@@ -92,7 +92,7 @@ function eventBinding(dispatch: any, socket: any) {
     }
   })
 
-  //messagelist
+  // messagelist
   socket.on('get', (data: string) => {
     const value: any = parseValue(data)
     const { success, res: { data: resData } } = value 

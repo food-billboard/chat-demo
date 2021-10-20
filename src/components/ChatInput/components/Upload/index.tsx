@@ -14,6 +14,7 @@ const cursor: CSSProperties = {
 export type UploadProps = {
   icon: "video" | "image"
   onChange?: (value: API_CHAT.IPostMessageParams) => void 
+  preUpload?: (value: Partial<API_CHAT.IGetMessageDetailData>) => Promise<void>
   userInfo?: STORE_USER.IUserInfo
   socket?: any 
   currRoom?: API_CHAT.IGetRoomListData
@@ -24,9 +25,7 @@ const ImageUpload = memo((props: UploadProps) => {
 
   const inputRef = useRef<any>(null)
 
-  const { icon, userInfo, messageListDetailSave, currRoom, onChange: propsOnChange } = useMemo(() => {
-    return props 
-  }, [props])
+  const { icon, userInfo, messageListDetailSave, currRoom, onChange: propsOnChange, preUpload } = props
 
   const handleSelectFile = useCallback(() => {
     inputRef.current?.click()
@@ -74,16 +73,17 @@ const ImageUpload = memo((props: UploadProps) => {
     }, {
       insertAfter: true 
     })
+    preUpload?.(result)
     inputRef.current.value = ""
-  }, [userInfo, messageListDetailSave, currRoom, propsOnChange])
+  }, [userInfo, messageListDetailSave, currRoom, propsOnChange, preUpload])
 
   return (
-    <Fragment>
+    <>
       <input {...inputFileProps} ref={inputRef} className={styles["upload-input"]} onChange={onChange} />
       {
         IconNode
       }
-    </Fragment>
+    </>
   )
 
 })

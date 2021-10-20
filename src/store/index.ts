@@ -35,6 +35,6 @@ const reducers = combineReducers({
 
 export default createStore(reducers, applyMiddleware(
   thunkMiddleware,
-  createLogger()
+  // createLogger()
 ))
 

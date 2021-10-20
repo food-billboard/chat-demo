@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, ReactNode } from 'react'
 import { message, Progress as AntProgress } from 'antd'
 import { merge } from 'lodash'
 import { getMessageDetail } from '@/services'
@@ -12,6 +12,7 @@ export function isUpload(value: API_CHAT.IGetMessageDetailData) {
 export interface ProgressProps {
   onChange: (value: API_CHAT.IGetMessageDetailData[]) => void 
   value: API_CHAT.IGetMessageDetailData
+  children?: ReactNode
 }
 
 const getLoading = (result: any) => {
@@ -112,6 +113,10 @@ class Progress extends Component<ProgressProps> {
   render() {
 
     const { percent } = this.state 
+    const { children, value } = this.props 
+
+    if(!isUpload(value)) return children
+    
     const loading = this.isLoading()
     const error = this.isError()
 

@@ -42,13 +42,9 @@ class GroupChat extends Component<IGroupProps> {
   quit = false 
 
   componentDidMount = () => {
-    this.receiveMessageUuid = bindActionStorage("post", async () => {
-      await this.waitScrollToBottom()
-    })
     this.messageGetUuid = bindActionStorage("message", async () => {
-      setTimeout(() => {
-        this.fetchLoading = false 
-      }, 2000)
+      await sleep(2000)
+      this.fetchLoading = false 
     })
   }
 
@@ -177,7 +173,7 @@ class GroupChat extends Component<IGroupProps> {
           <ChatList loading={!!fetchLoading} {...nextProps} value={value} />
         </div>
         <BackToBottom type="icon" onClick={this.scrollToBottom} />
-        <ChatInput style={{height: currentRoom?.type === 'SYSTEM' ? 0 : '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={this.handlePostMessage} />
+        <ChatInput scrollToBottom={this.waitScrollToBottom} style={{height: currentRoom?.type === 'SYSTEM' ? 0 : '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={this.handlePostMessage} />
       </div>
     )
 

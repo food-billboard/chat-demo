@@ -1,10 +1,10 @@
 import { TUploadFn, Upload } from 'chunk-file-upload'
 import { message } from 'antd'
 import Day from 'dayjs'
-import { checkUploadFile, uploadFile, putVideoPoster, postMessage } from '@/services'
-import { withTry } from '@/utils'
-import PosterGetter from '@/utils/getVideoPoster'
 import { merge } from 'lodash'
+import { checkUploadFile, uploadFile, putVideoPoster, postMessage } from '@/services'
+import { withTry, sleep } from '@/utils'
+import PosterGetter from '@/utils/getVideoPoster'
 
 const MAX_UPLOAD_FILE_SIZE = 1024 * 1024 * 5 
 
@@ -44,6 +44,7 @@ const exitDataFn = (getResult: (data: any) => void) => async (params: {
   chunkSize: number
   chunksLength: number
 }) => {
+
   const { size, suffix, md5, chunkSize } = params
   const data = await checkUploadFile({
     auth: "PUBLIC",
@@ -142,6 +143,7 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
       uploadFn,
       callback: async (err: any) => {
         if(!err) {
+          success = true 
           if(mimeType === "VIDEO") {
             posterId = await uploadPoster(file)
             await withTry(putVideoPoster)({
@@ -155,7 +157,6 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
             message_id: messageId, 
             status: "DONE"
           })
-          success = true 
         }else {
           error = true 
         }
@@ -179,7 +180,8 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
     loading: true,
     status: 'upload',
     watch() {
-      return watch(success, name, error)
+      const result = watch(success, name, error)
+      return result
     }
   })
 }

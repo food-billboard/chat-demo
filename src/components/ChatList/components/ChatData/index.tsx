@@ -7,7 +7,7 @@ import classnames from 'classnames'
 import UserDetail from '../../../UserDetail'
 import ImageView from '../ViewImage'
 import Video from '../../../Video'
-import UploadLoading, { isUpload } from './uploadLoading'
+import UploadLoading from './uploadLoading'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
@@ -70,6 +70,7 @@ const ChatData: FC<{
   value: TMessageValue
   messageListDetailSave: (value: any, insert: { insertBefore?: boolean, insertAfter?: boolean }) => any 
   onVideoView?: (value: string) => Promise<void> 
+  currentRoom?: API_CHAT.IGetRoomListData
 }> = memo((props) => {
 
   const [ videoLoading, setViewLoading ] = useState<boolean>(false)
@@ -77,7 +78,8 @@ const ChatData: FC<{
   const { 
     value,
     messageListDetailSave,
-    onVideoView
+    onVideoView,
+    currentRoom
   } = props
 
   const {
@@ -91,9 +93,7 @@ const ChatData: FC<{
     media_type,
     content,
     createdAt,
-  } = useMemo(() => {
-    return value 
-  }, [value]) 
+  } = value
 
   const UserAvatar = useMemo(() => {
     const UserAvatar = (
@@ -116,9 +116,10 @@ const ChatData: FC<{
 
   const onDataChange = useCallback(async (value) => {
     await messageListDetailSave({
-      message: value
+      message: value,
+      room: currentRoom
     }, { insertAfter: true })
-  }, [messageListDetailSave])
+  }, [messageListDetailSave, currentRoom])
 
   const handleView = useCallback(async (src?: string) => {
     if(onVideoView && src) {
@@ -142,28 +143,22 @@ const ChatData: FC<{
         }}
       >
         {
-          media_type === 'AUDIO' && '语音消息'
-        }
-        {
-          (media_type === 'IMAGE' || media_type === 'VIDEO') && (
-            isUpload(value) ? (
-              <UploadLoading
-                value={value}
-                onChange={onDataChange}
-              />
-            )
-            :
-            (
-              <ImageView
-                type={media_type}
-                src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
-                onClick={handleView.bind(this, video)}
-              />
-            )
+          media_type === 'AUDIO' ? '语音消息' : (
+            <UploadLoading
+              value={value}
+              onChange={onDataChange}
+            >
+              {
+                media_type === "TEXT" ? text! : (
+                  <ImageView
+                    type={media_type}
+                    src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
+                    onClick={handleView.bind(this, video)}
+                  />
+                )
+              }
+            </UploadLoading>
           )
-        }
-        {
-          media_type === 'TEXT' && text!
         }
       </div>
     )

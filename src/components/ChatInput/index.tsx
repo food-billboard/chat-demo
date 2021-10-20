@@ -11,15 +11,14 @@ type TMediaType = Pick<API_CHAT.IPostMessageParams, "content" | "type">
 export interface IProps {
   style?: React.CSSProperties
   onPostMessage?: (params: TMediaType) => Promise<void>
+  scrollToBottom?: (times?: number) => Promise<void> 
 }
 
 export default memo((props: IProps) => {
 
   const [ value, setValue ] = useState<string>('')
 
-  const { style={}, onPostMessage } = useMemo(() => {
-    return props 
-  }, [props])
+  const { style={}, onPostMessage, scrollToBottom } = props
 
   const globalStyle = useMemo(() => {
     return merge({}, {
@@ -59,20 +58,24 @@ export default memo((props: IProps) => {
     handlePostMessage(value)
   }, [handlePostMessage])
 
+  const preUpload = useCallback(async (value) => {
+    scrollToBottom?.()
+  }, [scrollToBottom])
+
   const ToolBar = useMemo(() => {
     return (
       <div className={styles["input-toolbar"]}>
         <div className={styles["input-toolbar-menu"]}>
           <Space size={20}>
           <EmojiPicker onSelect={handleSelectEmoji} />
-            <Upload icon="image" onChange={onUpload} />
-            <Upload icon="video" onChange={onUpload} />
+            <Upload icon="image" onChange={onUpload} preUpload={preUpload} />
+            <Upload icon="video" onChange={onUpload} preUpload={preUpload} />
           </Space>
         </div>
         <Button type="primary" style={{borderRadius: 10}} onClick={handlePostMessage.bind(this, false)}>发送</Button>
       </div>
     )
-  }, [handlePostMessage, handleSelectEmoji, onUpload])
+  }, [handlePostMessage, handleSelectEmoji, onUpload, preUpload])
 
   const inputAction = useCallback((e: any) => {
     if((e.which === 13 && e.ctrlKey) || (e.which === 10 && e.ctrlKey)) {
@@ -82,8 +85,9 @@ export default memo((props: IProps) => {
     }else if(e.which === 13) {
       e.preventDefault()
       handlePostMessage(false)
+      scrollToBottom?.()
     }
-  }, [handlePostMessage])
+  }, [handlePostMessage, scrollToBottom])
 
   return (
     <div
