@@ -1,12 +1,13 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, CSSProperties } from 'react'
 import { Affix, Button } from 'antd'
 import { VerticalAlignBottomOutlined, DownOutlined } from '@ant-design/icons'
 import styles from './index.less'
 
 const BackToBottom = ({
   onClick,
-  type="icon"
-}: { onClick: any, type: "icon" | "message" }) => {
+  type="icon",
+  style
+}: { onClick: any, type: "icon" | "message", style?: CSSProperties }) => {
 
   const content = useMemo(() => {
     if(type === "icon") {
@@ -22,7 +23,7 @@ const BackToBottom = ({
   }, [type, onClick])
 
   return (
-    <Affix style={{ position: 'fixed', bottom: '40vh', right: 12 }}>
+    <Affix style={{ position: 'fixed', bottom: '40vh', right: 12, ...style }}>
       {content}
     </Affix>
   )

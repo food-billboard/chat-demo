@@ -20,7 +20,6 @@ interface IProps {
   inviteList?: API_CHAT.IGetInviteFriendListRes[]
   messageList?: (socket: any) => Promise<any>
   userInfo?: STORE_USER.IUserInfo
-  // room?: API_CHAT.IGetRoomListData[]
   currRoom?: API_CHAT.IGetRoomListData
   exchangeRoom?: (socket: any, currentRoom: API_CHAT.IGetRoomListData, isjoin: boolean) => Promise<any>
   [key: string]: any 
@@ -67,7 +66,7 @@ const List = memo((props: IListProps) => {
           >
             <Meta
               avatar={<Avatar src={avatar}>{username}</Avatar>}
-              title={<a>{username}</a>}
+              title={<Button type="link">{username}</Button>}
               description={message}
             />
             <div style={{textAlign: 'center'}}>
@@ -205,7 +204,6 @@ const Message = memo((props: IProps) => {
   }, [])
 
   const readMessage = useCallback(async () => {
-    console.log(props.value, socket, 22222)
     if(!props.value || !socket) return 
     requestReadMessage(socket, {
       _id: props.value?.map(item => {

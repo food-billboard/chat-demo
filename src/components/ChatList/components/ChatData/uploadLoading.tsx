@@ -1,6 +1,7 @@
 import React, { Component, ReactNode } from 'react'
 import { message, Progress as AntProgress } from 'antd'
 import { merge } from 'lodash'
+import classnames from 'classnames'
 import { getMessageDetail } from '@/services'
 import styles from './index.less'
 
@@ -12,7 +13,7 @@ export function isUpload(value: API_CHAT.IGetMessageDetailData) {
 export interface ProgressProps {
   onChange: (value: API_CHAT.IGetMessageDetailData[]) => void 
   value: API_CHAT.IGetMessageDetailData
-  children?: ReactNode
+  children?: (state: { uploading: boolean }) => ReactNode
 }
 
 const getLoading = (result: any) => {
@@ -39,7 +40,8 @@ class Progress extends Component<ProgressProps> {
   private timer: any
 
   state = {
-    percent: 0
+    percent: 0,
+    mediaSize: []
   }
 
   componentDidMount = () => {
@@ -110,18 +112,36 @@ class Progress extends Component<ProgressProps> {
     return !!loading && !this.isError()
   }
 
+  isMedia = (value: ProgressProps["value"]) => {
+    return value.media_type === "IMAGE" || value.media_type === "VIDEO"
+  }
+
+  getPoster = (value: ProgressProps["value"]) => {
+    if(!this.isMedia(value)) return null 
+    return value.content.image || value.content.poster
+  }
+
   render() {
 
     const { percent } = this.state 
     const { children, value } = this.props 
 
-    if(!isUpload(value)) return children
+    if(!isUpload(value)) return children?.({ uploading: false })
     
     const loading = this.isLoading()
     const error = this.isError()
 
     return (
-      <div className={styles["upload-progress-wrapper"]}>
+      <div 
+        className={classnames(styles["upload-progress-wrapper"], {
+          [styles["upload-progress-wrapper-pre"]]: this.isMedia(value)
+        })}
+      >
+        {
+          !!loading && (
+            children?.({ uploading: true })
+          )
+        }
         <div className={styles["upload-progress-shadow"]}>
           {
             !!loading && (
@@ -133,6 +153,7 @@ class Progress extends Component<ProgressProps> {
                   '0%': '#108ee9',
                   '100%': '#87d068',
                 }} 
+                format={_ => `发送中...`}
               />
             )
           }

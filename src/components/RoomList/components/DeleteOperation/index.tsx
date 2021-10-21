@@ -10,13 +10,14 @@ interface IDeleteOperationProps {
   onShow: () => API_CHAT.IGetRoomListData 
   socket: any 
   roomList?: (...args: any) => any
+  messageList?: (socket: any) => Promise<any>
 }
 
 const DeleteOperation = memo((props: IDeleteOperationProps) => {
 
   const [ roomInfo, setRoomInfo ] = useState<API_CHAT.IGetRoomListData>()
 
-  const { children, onShow, socket, roomList } = props
+  const { children, onShow, socket, roomList, messageList } = props
 
   const roomValid = useCallback((roomInfo?: API_CHAT.IGetRoomListData) => {
     if(!roomInfo) {
@@ -44,9 +45,10 @@ const DeleteOperation = memo((props: IDeleteOperationProps) => {
         message.info("删除房间错误")
       }else {
         roomList?.(socket)
+        messageList?.(socket)
       }
     }
-  }, [roomInfo, roomValid, socket, roomList])
+  }, [roomInfo, roomValid, socket, roomList, messageList])
 
   // const DeleteWrapper = useCallback((action: (...args: any[]) => Promise<void>, children: any) => {
   //   return (

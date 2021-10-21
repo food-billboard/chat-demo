@@ -59,11 +59,10 @@ const ChatList = (props: IProps & {
       {
         realValue.map(item => {
           return (
-            <ChatData key={item.createdAt} value={item} onVideoView={handleViewVideo} />
+            <ChatData key={item._id} value={item} onVideoView={handleViewVideo} />
           )
         })
       }
-      <div id="chat-item-bottom"></div>
       <VideoModal ref={videoRef} />
     </div>
   )

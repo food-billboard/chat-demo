@@ -76,12 +76,11 @@ const uploadFn: TUploadFn = async (data, name) => {
 }
 
 export const uploadPoster = async (file: File): Promise<string> => {
-  const data = await posterGetter.start(file)
   let posterId = ""
   return new Promise((resolve, reject) => {
     const [ name ] = INSTANCE.add({
       file: {
-        file: data as File,
+        file: file as File,
       },
       request: {
         exitDataFn: exitDataFn((value) => {
@@ -109,14 +108,19 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
   // let isExists = false 
   let contentId = ""
   let posterId = ""
+  let poster: any = null 
+  let tempPoster: any = null 
   // const TOTAL_SIZE = file.size 
 
   if(!VALID_FILE_TYPE.includes(mimeType)) {
     message.info("文件格式不正确~")
     return 
   }
+
+  const objectUrl = URL.createObjectURL(file)
+
   let content: any  = {
-    [mimeType!.toLowerCase()]: file,
+    [mimeType!.toLowerCase()]: objectUrl || file,
   }
 
   const [ , messageId ] = await withTry(postMessage)({
@@ -144,12 +148,17 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
       callback: async (err: any) => {
         if(!err) {
           success = true 
-          if(mimeType === "VIDEO") {
-            posterId = await uploadPoster(file)
-            await withTry(putVideoPoster)({
-              data: `${contentId}-${posterId}`
+
+          if(poster) {
+            await uploadPoster(poster as File)
+            .then(data => {
+              posterId = data 
+              return withTry(putVideoPoster)({
+                data: `${contentId}-${posterId}`
+              })
             })
           }
+
           await postCompleteMessage({
             _id: room._id,
             type: mimeType as API_CHAT.TMessageMediaType,
@@ -160,6 +169,9 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
         }else {
           error = true 
         }
+        await sleep(1000)
+        if(objectUrl) URL.revokeObjectURL(objectUrl)
+        if(tempPoster) URL.revokeObjectURL(tempPoster)
       }
     }
   })
@@ -171,12 +183,20 @@ export const upload = async (file: File, room: API_CHAT.IGetRoomListData, defaul
 
   INSTANCE.deal(name)
 
+  if(mimeType === "VIDEO") {
+    poster = await posterGetter.start(file)
+    tempPoster = URL.createObjectURL(poster) 
+  }
+
   return merge({}, defaultMessageData, {
     _id: messageId, 
     media_type: mimeType,
     createdAt: Day(new Date()).format('YYYY-MM-DD HH:mm:ss'),
     updatedAt: Day(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-    content,
+    content: {
+      ...content,
+      poster: tempPoster
+    },
     loading: true,
     status: 'upload',
     watch() {

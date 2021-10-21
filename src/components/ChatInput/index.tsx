@@ -72,10 +72,13 @@ export default memo((props: IProps) => {
             <Upload icon="video" onChange={onUpload} preUpload={preUpload} />
           </Space>
         </div>
-        <Button type="primary" style={{borderRadius: 10}} onClick={handlePostMessage.bind(this, false)}>发送</Button>
+        <Button type="primary" style={{borderRadius: 10}} onClick={() => {
+          handlePostMessage(false)
+          scrollToBottom?.()
+        }}>发送</Button>
       </div>
     )
-  }, [handlePostMessage, handleSelectEmoji, onUpload, preUpload])
+  }, [handlePostMessage, handleSelectEmoji, onUpload, preUpload, scrollToBottom])
 
   const inputAction = useCallback((e: any) => {
     if((e.which === 13 && e.ctrlKey) || (e.which === 10 && e.ctrlKey)) {

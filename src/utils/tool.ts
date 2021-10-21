@@ -92,10 +92,10 @@ export const insertMessage = (origin: API_CHAT.IGetMessageDetailData[]=[], list:
     ...origin
   ]
   if(insertAfter) {
-    const [ { createdAt: lastCreatedAt, _id: lastId } ] = origin.slice(-1)
+    const [ { createdAt: lastCreatedAt } ] = origin.slice(-1)
     const lastCreateDateValue = Day(lastCreatedAt).valueOf()
     let toAddListIndex = newList.findIndex(item => {
-      return Day(item.createdAt).valueOf() > lastCreateDateValue && lastId !== item._id
+      return Day(item.createdAt).valueOf() > lastCreateDateValue 
     })
     let commonList: any[] = []
     let toAddList: any[] = []
@@ -125,17 +125,17 @@ export const insertMessage = (origin: API_CHAT.IGetMessageDetailData[]=[], list:
       ...toAddList
     ]
   }else {
-    const [ { createdAt: firstCreatedAt, _id: firstId } ] = origin
+    const [ { createdAt: firstCreatedAt } ] = origin
     const firstCreateDateValue = Day(firstCreatedAt).valueOf()
-    const tempNewList = [...newList]
-    const toAddListIndex = tempNewList.reverse().findIndex(item => {
-      return Day(item.createdAt).valueOf() < firstCreateDateValue && firstId !== item._id
+    const tempNewList = [...newList].reverse()
+    const toAddListIndex = tempNewList.findIndex(item => {
+      return Day(item.createdAt).valueOf() <= firstCreateDateValue 
     })
     let commonList: any[] = []
     let toAddList: any[] = []
     if(!!~toAddListIndex) {
-      commonList = newList.slice(0, toAddListIndex)
-      toAddList = newList.slice(toAddListIndex)
+      commonList = tempNewList.slice(0, toAddListIndex + 1).reverse()
+      toAddList = tempNewList.slice(toAddListIndex + 1).reverse()
     }else {
       commonList = newList.slice()
     }

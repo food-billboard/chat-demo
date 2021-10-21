@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { message } from 'antd'
 import { connect } from 'react-redux'
-import { merge } from 'lodash-es'
+import { merge, uniqueId } from 'lodash-es'
 import { PageHeaderProps } from 'antd/es/page-header'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import Day from 'dayjs'
@@ -23,6 +23,7 @@ export interface IGroupProps extends Omit<IProps, "value">{
   fetchLoading?: boolean 
   messageListDetailSave?: (value: any, insert: { insertBefore?: boolean, insertAfter?: boolean }) => Promise<void>
   value?: TMessageValue[] 
+  userInfo?: STORE_USER.IUserInfo
 }
 
 class GroupChat extends Component<IGroupProps> {
@@ -30,18 +31,37 @@ class GroupChat extends Component<IGroupProps> {
   public state: {
     currPage: number 
     bottomNode?: Element
+    bottom: boolean,
+    hasNewMessage: boolean 
   } = {
     currPage: 0,
     bottomNode: undefined,
+    bottom: false,
+    hasNewMessage: false 
   }
 
   first = true 
-  private receiveMessageUuid = ''
   private messageGetUuid = ''
+  private postMessageGetUuid = ""
   fetchLoading = false 
   quit = false 
+  bottomId = uniqueId("intersection-observer-bottom")
 
   componentDidMount = () => {
+    this.postMessageGetUuid = bindActionStorage("post", async (response: any) => {
+      const { value } = this.props
+      const currentId = response.res?.data
+      const target = value?.find(item => item._id === currentId)
+      if(target && !this.isMinePost(target)) {
+        if(this.state.bottom) {
+          this.waitScrollToBottom()
+        }else {
+          this.setState({
+            hasNewMessage: true 
+          })
+        }
+      }
+    })
     this.messageGetUuid = bindActionStorage("message", async () => {
       await sleep(2000)
       this.fetchLoading = false 
@@ -49,12 +69,17 @@ class GroupChat extends Component<IGroupProps> {
   }
 
   componentWillUnmount = () => {
-    unBindActionStorage("post", this.receiveMessageUuid)
     unBindActionStorage("message", this.messageGetUuid)
+    unBindActionStorage("post", this.postMessageGetUuid)
+  }
+
+  isMinePost = (message: TMessageValue) => {
+    const { userInfo } = this.props
+    return userInfo?._id === message.user_info._id 
   }
 
   getNode = () => {
-    const node = document.querySelector("#chat-item-bottom")
+    const node = document.querySelector(`#${this.bottomId}`)
     if(node) this.setState({
       bottomNode: node
     })
@@ -154,9 +179,20 @@ class GroupChat extends Component<IGroupProps> {
     )
   }
 
+  onObserverDomToBottom = (target: IntersectionObserverEntry) => {
+    const toBottom = !(target.intersectionRatio === 0)
+    let changeState: any = {
+      bottom: toBottom,
+    }
+    if(toBottom) changeState.hasNewMessage = false 
+    this.setState(changeState)
+  }
+
   render() {
 
     const { currentRoom, socket, fetchLoading, messageListDetailSave, messageListDetail, value=[], loading, header, ...nextProps } = this.props
+    const { hasNewMessage } = this.state 
+
     return (
       <div  
         style={{height: '100%', overflow: 'auto'}}
@@ -169,10 +205,18 @@ class GroupChat extends Component<IGroupProps> {
           id="chat-list-wrapper"
         >
           {this.ChatHeaderDom()}
-          <ObserverDom onObserve={this.onObserver} />
+          <ObserverDom onObserve={this.onObserver} root={"chat-list-wrapper"} />
           <ChatList loading={!!fetchLoading} {...nextProps} value={value} />
+          <ObserverDom onObserve={this.onObserverDomToBottom} root={"chat-list-wrapper"} id={this.bottomId} />
         </div>
         <BackToBottom type="icon" onClick={this.scrollToBottom} />
+        {
+          hasNewMessage && <BackToBottom type="message" onClick={() => {
+            this.setState({
+              hasNewMessage: false
+            }, this.scrollToBottom)
+          }} />
+        }
         <ChatInput scrollToBottom={this.waitScrollToBottom} style={{height: currentRoom?.type === 'SYSTEM' ? 0 : '30vh', visibility: currentRoom?.type === 'SYSTEM' ? 'hidden' : 'visible' }} onPostMessage={this.handlePostMessage} />
       </div>
     )

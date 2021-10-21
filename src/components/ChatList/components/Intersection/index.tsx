@@ -1,7 +1,10 @@
 import React, {  Component } from 'react'
+import { uniqueId } from 'lodash'
 
 interface IProps {
-  onObserve?: () => void 
+  onObserve?: (target: IntersectionObserverEntry) => void
+  root: string 
+  id?: string 
 }
 
 export default class Observer extends Component<IProps> {
@@ -12,6 +15,8 @@ export default class Observer extends Component<IProps> {
     observer: undefined
   }
 
+  readonly id = this.props.id || uniqueId("intersection-observer")
+
   componentDidMount = () => {
     this.initObserver()
   }
@@ -21,21 +26,21 @@ export default class Observer extends Component<IProps> {
   }
 
   initObserver = () => {
-    const { onObserve } = this.props
+    const { onObserve, root } = this.props
     const io = new IntersectionObserver(entries => {
-      onObserve?.()
+      onObserve?.(entries[0])
     }, {
-      root: document.querySelector('#chat-list-wrapper'),
+      root: document.querySelector(`#${root}`),
     })
     this.setState({ observer: io })
-    const target = document.querySelector('#intersection-observer')
+    const target = document.querySelector(`#${this.id}`)
     target && io.observe(target)
   }
 
   render() {
 
     return (
-      <div id="intersection-observer" style={{height: 12}}></div>
+      <div id={this.id} style={{height: 12}}></div>
     )
 
   }

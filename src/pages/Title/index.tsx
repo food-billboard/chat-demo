@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import { connect } from 'react-redux'
 import { Space, Button, Badge, Avatar, Menu, Dropdown, Tooltip } from 'antd'
 import { BellOutlined } from '@ant-design/icons'
@@ -36,15 +36,15 @@ const Title = memo((props: any) => {
   const DropDownOverlay = useMemo(() => {
     return (
       <Menu>
-        <Menu.Item>
-          <a onClick={logout}>
-            退出登录
-          </a>
+        <Menu.Item
+          key="logout"
+        >
+          <Button type="link" onClick={logout}>退出登录</Button>
         </Menu.Item>
-        <Menu.Item>
-          <a onClick={userInfoSet}>
-            个人信息设置
-          </a>
+        <Menu.Item
+          key="setting"
+        >
+          <Button type="link" onClick={userInfoSet}>个人信息设置</Button>
         </Menu.Item>
       </Menu>
     )

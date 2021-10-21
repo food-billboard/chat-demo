@@ -149,13 +149,16 @@ const ChatData: FC<{
               onChange={onDataChange}
             >
               {
-                media_type === "TEXT" ? text! : (
-                  <ImageView
-                    type={media_type}
-                    src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
-                    onClick={handleView.bind(this, video)}
-                  />
-                )
+                ({ uploading }) => {
+                  return media_type === "TEXT" ? text! : (
+                    <ImageView
+                      type={media_type}
+                      src={media_type === 'IMAGE' ? image! : (poster || IMAGE_FALLBACK)}
+                      onClick={handleView.bind(this, video)}
+                      uploading={uploading}
+                    />
+                  )
+                }
               }
             </UploadLoading>
           )
