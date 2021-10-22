@@ -1,0 +1,78 @@
+.popover-chat {
+  color: black;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  word-break: break-all;
+  white-space: pre;
+}
+.chat-item-container {
+  width: 100%;
+  padding: 0 20px;
+  margin: 20px 0;
+}
+.chat-item-date {
+  text-align: center;
+  width: 100%;
+  color: gray;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+.chat-item-content {
+  display: flex;
+}
+
+//progress 
+.upload-progress-wrapper {
+  position: relative;
+  overflow: hidden;
+  width: 140px;
+  height: 140px;
+  min-width: 140px;
+  min-height: 140px;
+}
+.upload-progress-wrapper-pre {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.upload-progress-shadow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+//video 
+.video-content {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  user-select: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: .2s;
+}
+.video-content-close {
+  position: absolute;
+  cursor: pointer;
+  font-size: 3em;
+  right: 0;
+  top: 0;
+}
+.video-content-show {
+  width: 100vw;
+  height: 100vh;
+  padding: 20vw;
+}

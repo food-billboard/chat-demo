@@ -1,0 +1,21 @@
+.chat-view-image-container {
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  text-align: center;
+}
+:global(.ant-image) {
+  vertical-align: middle;
+}
+.chat-view-cover {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 3em;
+}
+.chat-view-image-container:hover .chat-view-cover {
+  color: white;
+}

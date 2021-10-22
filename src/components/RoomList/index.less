@@ -1,0 +1,70 @@
+.room-icon-list {
+  width: 650px;
+  min-height: 250px;
+  :global {
+    .ant-carousel .slick-prev,
+    .ant-carousel .slick-next,
+    .ant-carousel .slick-prev:hover,
+    .ant-carousel .slick-next:hover {
+      font-size: 1.8em;
+      color: currentColor;
+      width: auto;
+      height: auto;
+    }
+    .ant-carousel .slick-prev::before,
+    .ant-carousel .slick-next::before {
+      content: "";
+    }
+  }
+}
+.room-icon-list-item-wrapper {
+  width: 600px;
+  height: 250px;
+}
+.room-icon-list-item-wrapper-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
+  &-data {
+    width: 45%;
+    height: 40%;
+  }
+  &-container {
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: relative;
+  }
+  &-bg {
+    background-size: cover;
+    filter: blur(8px);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+  &-container:hover &-bg {
+    filter: blur(0);
+    transition: filter .6s;
+  }
+}
+.room-list-popover {
+  :global {
+    .ant-popover-content {
+      .ant-popover-inner {
+        .ant-popover-inner-content {
+          padding: 12px 32px;
+        }
+      }
+    }
+  }
+}
+.white-text {
+  color: white;
+}
