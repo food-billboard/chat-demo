@@ -21,8 +21,6 @@ export const VideoModal = forwardRef((_, ref) => {
   const [ videoData, setVideoData ] = useState<string>()
   const [ visible, setVisible ] = useState<boolean>(false)
 
-  const videoRef = useRef<any>(null)
-
   const handleClose = useCallback(() => {
     setVisible(false)
     setVideoData("")
@@ -37,7 +35,7 @@ export const VideoModal = forwardRef((_, ref) => {
     return {
       open
     }
-  }, [])
+  }, [open])
 
   return (
     <div
@@ -47,9 +45,7 @@ export const VideoModal = forwardRef((_, ref) => {
     > 
       <CloseOutlined className={styles["video-content-close"]} style={{color: 'white'}} onClick={handleClose} />
       <Video 
-        src={videoData} 
-        // @ts-ignore
-        ref={videoRef as any} 
+        src={videoData}
       />
     </div>
   )
@@ -181,7 +177,26 @@ const ChatData: FC<{
         style={{justifyContent: isMine ? 'flex-end' : 'flex-start'}}
       >
         {
-          isMine ? [PopoverMessage, UserAvatar] : [UserAvatar, PopoverMessage]
+          isMine ? (
+            <>
+              {
+                PopoverMessage
+              }
+              {
+                UserAvatar
+              }
+            </>
+          ) : 
+          (
+            <>
+              {
+                UserAvatar
+              }
+              {
+                PopoverMessage
+              }
+            </>
+          )
         }
       </div>
     </div>

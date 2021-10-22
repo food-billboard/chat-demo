@@ -10,7 +10,7 @@ const BASE64_MAPPING = [
 ]
 
 var _toBinary = function(ascii: number){
-  var binary = new Array()
+  var binary = []
   while(ascii > 0){
       var b = ascii%2;
       ascii = Math.floor(ascii/2);

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle, memo, useRef } from 'react'
 import Videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
-import { message } from 'antd'
 import { getMediaList } from '@/services'
 import { isObjectId } from './util'
 import 'video.js/dist/video-js.css'
@@ -151,7 +150,6 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
   const reload = useCallback(async () => {
     if(!instance) return 
     await setSrc()
-    // instance.load()
   }, [instance, setSrc])
 
   useEffect(() => {
@@ -160,12 +158,12 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
       instance?.pause()
       instance?.dispose()
     }
-  }, [])
+  }, [instance])
 
   useEffect(() => {
     if(!instance) return 
     reload()
-  }, [setSrc, instance, props.src])
+  }, [setSrc, instance, props.src, reload])
 
   return (
     <video

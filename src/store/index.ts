@@ -33,8 +33,11 @@ const reducers = combineReducers({
   InviteFriend
 })
 
-export default createStore(reducers, applyMiddleware(
-  thunkMiddleware,
-  // createLogger()
-))
+const args: any = [
+  thunkMiddleware
+]
+
+process.env.NODE_ENV === "development" && args.push(createLogger())
+
+export default createStore(reducers, applyMiddleware(...args))
 

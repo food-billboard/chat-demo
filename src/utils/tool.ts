@@ -92,10 +92,10 @@ export const insertMessage = (origin: API_CHAT.IGetMessageDetailData[]=[], list:
     ...origin
   ]
   if(insertAfter) {
-    const [ { createdAt: lastCreatedAt } ] = origin.slice(-1)
+    const [ { createdAt: lastCreatedAt, _id: originLastId } ] = origin.slice(-1)
     const lastCreateDateValue = Day(lastCreatedAt).valueOf()
     let toAddListIndex = newList.findIndex(item => {
-      return Day(item.createdAt).valueOf() > lastCreateDateValue 
+      return Day(item.createdAt).valueOf() > lastCreateDateValue && item._id !== originLastId
     })
     let commonList: any[] = []
     let toAddList: any[] = []
