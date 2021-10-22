@@ -2,6 +2,10 @@ import Client from 'socket.io-client'
 import JSCookie from 'js-cookie'
 import { getStorage } from '../utils'
 
+const development = process.env.NODE_ENV === "development"
+
+const SOCKET_IO_ADDRESS = development ? "ws://localhost:3001" : {}
+
 const mock = () => {
   const { userAgent } = window.navigator
   if(userAgent.includes('Chrome')) {
@@ -11,8 +15,7 @@ const mock = () => {
 }
 
 export const getToken = () => {
-  return mock()
-  return JSCookie.get("a6a7420d799ace72fefb1de7ec0be12f0ae900b29dad50ea9ebf832d999fc7d4")
+  return development ? mock() : JSCookie.get("a6a7420d799ace72fefb1de7ec0be12f0ae900b29dad50ea9ebf832d999fc7d4")
 }
 
 const promisify = (emit: any, on: any) => {
@@ -46,7 +49,7 @@ export const parseValue = (value: string) => {
 
 //连接
 export const connect = async () => {
-  const socket = Client('ws://localhost:3001')
+  const socket = Client(SOCKET_IO_ADDRESS)
   return new Promise((resolve) => {
     socket.once('connect', () => {
       resolve(socket)
