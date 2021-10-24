@@ -5,7 +5,8 @@ import {
   DesktopOutlined, 
   PaperClipOutlined,
   MenuUnfoldOutlined,
-  MenuFoldOutlined
+  MenuFoldOutlined,
+  TeamOutlined
 } from '@ant-design/icons'
 import { debounce } from 'lodash-es'
 import classnames from 'classnames'
@@ -15,6 +16,7 @@ import { mapStateToProps, mapDispatchToProps } from './connect'
 import Black from '../BlackUser'
 import Friends from '../Friends'
 import Room from '../RoomList'
+import UserList from '../UserList'
 import { history } from '@/utils'
 import styles from './index.less'
 
@@ -23,7 +25,8 @@ const { Item } = Menu
 const CHAT_ROUTE_MAP = {
   room: '/main/room',
   user: '/main/friends',
-  black: '/main/black'
+  black: '/main/black',
+  member: '/main/member'
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((props: any) => {
@@ -38,6 +41,9 @@ export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((pro
   const MenuList = useMemo(() => {
     return (
       <Fragment>
+        <Item key="member" icon={<TeamOutlined />}>
+          用户列表
+        </Item>
         <Item key="room" icon={<PieChartOutlined />}>
           聊天室
         </Item>
@@ -133,6 +139,7 @@ export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((pro
           <Route component={Black} path="/main/black" />
           <Route component={Friends} path="/main/friends" />
           <Route component={Room} path="/main/room" />
+          <Route component={UserList} path="/main/member" />
           <Redirect from="/main" to="/main/friends" />
         </Switch>
       </div>

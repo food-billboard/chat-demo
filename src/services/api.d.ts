@@ -163,9 +163,10 @@ declare namespace API_CHAT {
   }
 
   export interface IGetMemberListParams {
-    _id: string 
+    _id?: string 
     currPage?: number 
     pageSize?: number 
+    content?: string 
   }
 
   export type TUserData = {
