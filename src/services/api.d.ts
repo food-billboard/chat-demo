@@ -1,3 +1,4 @@
+
 declare namespace API_USER {
 
   export interface ILoginParams {
@@ -177,6 +178,18 @@ declare namespace API_CHAT {
 
   export type TUserStatus = "ONLINE" | "OFFLINE"
 
+  export interface IGetMemberListRes {
+    total: number 
+    list: IGetMemberListData[]
+  }
+
+  export interface MemberRoomData {
+    name?: string 
+    _id: string 
+    avatar?: string 
+    description?: string 
+  }
+
   export interface IGetMemberListData {
     user: TUserData & { friend_id: string }
     _id: string 
@@ -184,6 +197,7 @@ declare namespace API_CHAT {
     sid: string 
     createdAt: string 
     updatedAt: string 
+    room: MemberRoomData[]
   }
 
   export type TRoomType = "SYSTEM" | "USER"

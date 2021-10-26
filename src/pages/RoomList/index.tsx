@@ -1,23 +1,17 @@
-import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import { Row, Col, Tooltip, Button } from 'antd'
 import { connect } from 'react-redux'
 import GroupChat from '@/components/ChatList'
 import RoomList from '@/components/RoomList'
+import FriendInvite from '@/components/FriendInvite'
 import AvatarList, { TAvatarData } from '@/components/AvatarList'
-import { getRoomMembers, getFriendsList } from '@/services'
-import { inviteFriend } from '@/utils/socket' 
+import { getRoomMembers } from '@/services'
 import { mapStateToProps, mapDispatchToProps } from './connect'
-import { withTry } from '@/utils'
 import styles from './index.less'
 
 export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) => {
 
-  const [ postUserLoading, setPostUserLoading ] = useState<boolean>(false)
-  const [ friendList, setFriendList ] = useState<API_CHAT.IGetFriendsListData[]>([])
-
-  const { socket, userInfo, exchangeRoom, currRoom } = useMemo(() => {
-    return props 
-  }, [props])
+  const { socket, exchangeRoom, currRoom } = props
 
   const quitRoom = useCallback(async () => {
     await exchangeRoom(socket, currRoom, false)
@@ -35,7 +29,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
       currPage: 0,
       pageSize: 100      
     })
-    return data?.map(item => {
+    return data?.list.map(item => {
       const { user } = item 
       return {
         _id: user.friend_id,
@@ -45,27 +39,35 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
     }) || []
   }, [currRoom])
 
-  const addFriends = useCallback(async (item: TAvatarData) => {
-    setPostUserLoading(true)
-    await withTry(inviteFriend)(socket, {
-      _id: item._id
-    })
-    setPostUserLoading(false)
-  }, [socket])
-
   const tooltip = useCallback((node: React.ReactNode, item: TAvatarData, props: any) => {
     const { _id } = item 
-    const { friend_id } = userInfo
-    if(friend_id === _id || friendList.some(item => item.friend_id === _id)) return node 
     return (
-      <Tooltip 
-        key={_id}
-        title={<Button loading={postUserLoading} type="link" onClick={addFriends.bind(this, item)}>添加好友</Button>}
+      <FriendInvite
+        value={item}
+        force
       >
-        {node}
-      </Tooltip>
+        {
+          ({
+            isFriends,
+            action,
+            loading
+          }) => {
+
+            if(isFriends) return node 
+            return (
+              <Tooltip 
+                key={_id}
+                title={<Button loading={loading} type="link" onClick={action}>添加好友</Button>}
+              >
+                {node}
+              </Tooltip>
+            )
+
+          }
+        }
+      </FriendInvite>
     )
-  }, [addFriends, postUserLoading, userInfo, friendList])
+  }, [])
 
   const chatHeader = useMemo(() => {
     return {
@@ -76,15 +78,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(memo((props: any) =>
       }} />
     }
   }, [currRoom, quitRoom, fetchRoomUserList, tooltip])
-
-  const fetchFriendsList = useCallback(async (roomInfo: API_CHAT.IGetRoomListData) => {
-    const [, value] = await withTry(getFriendsList)({ pageSize: 9999 })
-    setFriendList(value?.friends || [])
-  }, [])
-
-  useEffect(() => {
-    fetchFriendsList(currRoom)
-  }, [currRoom])
 
   return (
     <Row 

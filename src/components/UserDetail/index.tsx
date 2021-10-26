@@ -1,6 +1,7 @@
 import React, { memo, useMemo, FC } from 'react'
 import { Tooltip, Card, Avatar } from 'antd'
 import { TooltipPropsWithTitle } from 'antd/es/tooltip'
+import type { CardProps, CardMetaProps } from 'antd/es/card'
 import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
 
@@ -19,15 +20,9 @@ export interface IProps extends Partial<TooltipPropsWithTitle>{
   actions?: React.ReactNode[]
 }
 
-const UserDetail: FC<IProps> = memo((props: IProps) => {
+export const CardData = (props: IUserData & Partial<CardProps> & { metaProps?: Partial<CardMetaProps> }) => {
 
-  const { children, value, ...nextProps } = useMemo(() => {
-    return props 
-  }, [props])
-
-  const CardData = useMemo(() => {
-
-    const { avatar, username, description } = value
+  const { avatar, username, description, metaProps={}, ...nextProps } = props
 
     return (
       <Card
@@ -38,20 +33,28 @@ const UserDetail: FC<IProps> = memo((props: IProps) => {
           />
         }
         actions={[]}
+        {...nextProps}
       >
         <Meta
           avatar={<Avatar src={avatar}>{username}</Avatar>}
           title={username}
           description={description || '这个人很懒，什么都没有留下'}
+          {...metaProps}
         />
       </Card>
     )
-  }, [value])
+}
+
+const UserDetail: FC<IProps> = memo((props: IProps) => {
+
+  const { children, value, ...nextProps } = useMemo(() => {
+    return props 
+  }, [props])
 
   return (
     <Tooltip
       {...nextProps}
-      title={CardData}
+      title={<CardData {...value} />}
       color={'white'}
       overlayClassName={styles["user-detail-card"]}
       overlayStyle={{padding: 0}}

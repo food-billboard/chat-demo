@@ -9,7 +9,7 @@ const SOCKET_IO_ADDRESS = development ? "ws://localhost:3001" : {}
 const mock = () => {
   const { userAgent } = window.navigator
   if(userAgent.includes('Chrome')) {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNzIwZjc5M2ZlOTI5MGFhNTc1NzUyOSIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYxNzIwZjc5M2ZlOTI5MGFhNTc1NzUyYiIsImlhdCI6MTYzNDg2NTQ5OSwiZXhwIjoxNjM0OTUxODk5fQ.gpphZCLsDUoHldT5Ufpxl_GDb0gELXzpAuvuK0-P9Zs'
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNzc1OTdkNmZlYWE1MGI5NjFkMzVmNyIsIm1vYmlsZSI6MTgzNjgwMDMxOTAsIm1pZGRlbCI6Ik1JRERFTCIsImlhdCI6MTYzNTIxMTY0NSwiZXhwIjoxNjM1Mjk4MDQ1fQ.BiuiGcU9iFwN3a819-_gtkbHuc55seOPQuQ9H-N0KTE'
   }
   return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNzIwZmVhM2ZlOTI5MGFhNTc1NzUyZCIsIm1vYmlsZSI6MTgzNjgwMDMxOTEsIm1pZGRlbCI6Ik1JRERFTCIsImZyaWVuZF9pZCI6IjYxNzIwZmVhM2ZlOTI5MGFhNTc1NzUyZiIsImlhdCI6MTYzNDg2NTU4NSwiZXhwIjoxNjM0OTUxOTg1fQ.ZYrM2Y5En_XfUnLnptnGAgwlQod-DxRTtintsaCxGOc'
 }

@@ -12,7 +12,7 @@ const UserList = (props: {
   const { onSearch } = props 
 
   const onChange = useCallback((value) => {
-    setSearchValue(value)
+    setSearchValue(value.target.value)
   }, [])
 
   const handleSearch = useCallback(() => {

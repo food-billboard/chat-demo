@@ -1,11 +1,11 @@
-import React, { memo, useMemo, useState, useEffect, useCallback } from 'react'
-import { Avatar, Tooltip } from 'antd'
+import React, { memo, useState, useEffect, useCallback, ReactNode } from 'react'
+import { Avatar, Tooltip, Empty } from 'antd'
 import { AvatarProps, GroupProps } from 'antd/es/avatar'
 
 export type TAvatarData = {
   username: string 
   _id: string 
-  avatar: string 
+  avatar?: string 
 }
 
 interface IAvatarListProps {
@@ -13,15 +13,14 @@ interface IAvatarListProps {
   groupProps?: Partial<GroupProps>
   fetchData: () => Promise<TAvatarData[]>
   onClick?: (item: TAvatarData) => void 
+  empty?: boolean | ReactNode
 }
 
 export default memo((props: IAvatarListProps) => {
 
   const [ value, setValue ] = useState<TAvatarData[]>([])
 
-  const { avatarProps={}, groupProps={}, fetchData, onClick } = useMemo(() => {
-    return props 
-  }, [props])
+  const { avatarProps={}, groupProps={}, fetchData, onClick, empty } = props
 
   const internalFetchData = useCallback(async () => {
     const data = await fetchData()
@@ -31,6 +30,12 @@ export default memo((props: IAvatarListProps) => {
   useEffect(() => {
     internalFetchData()
   }, [])
+
+  if(!value.length && !!empty) {
+    return typeof empty === "boolean" ? (
+      <Empty description={false} />
+    ) : empty as any 
+  }
 
   return (
     <Avatar.Group
