@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { redirectPage } from '@/store'
 import { history, getPageQuery } from '@/utils'
+import { LOGO } from '../Title/constants'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import styles from './index.less'
 
@@ -83,7 +84,7 @@ const Login = (props: any) => {
               marginRight: 16,
             }}
             alt="logo"
-            src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"
+            src={LOGO}
           />
           聊天室
         </h1>
