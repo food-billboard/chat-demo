@@ -32,8 +32,8 @@ const ChatList = (props: IProps & {
     })
   }, [value, userInfo])
 
-  const readMessage = useCallback((_: TMessageValue[], socket: any, currRoom: API_CHAT.IGetRoomListData) => {
-    withTry(readMessageRequest)(socket, {
+  const readMessage = useCallback(async (_: TMessageValue[], socket: any, currRoom: API_CHAT.IGetRoomListData) => {
+    await withTry(readMessageRequest)(socket, {
       _id: currRoom?._id,
       type: 1
     })

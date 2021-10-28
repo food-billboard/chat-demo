@@ -27,6 +27,7 @@ declare namespace STORE_USER {
     member: string 
     friend_id
     description: string 
+    token: string 
   }
 
   export interface ISocketData {

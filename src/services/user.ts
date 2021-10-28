@@ -34,6 +34,13 @@ export const sendEmail = (data: API_USER.ISendEmailParams) => {
   })
 }
 
+export const getToken = () => {
+  return request<string>("/api/customer/manage/token", {
+    method: "GET",
+    authorization: true 
+  })
+}
+
 export const getUserInfo = () => {
   return request<API_USER.IGetUserInfoResData>('/api/customer/manage', {
     method: 'GET',

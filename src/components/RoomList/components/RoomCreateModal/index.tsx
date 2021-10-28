@@ -29,9 +29,7 @@ const RoomCreateModal = memo(forwardRef<IRoomCreateModalRef, {
   const [ friendList, setFriendList ] = useState<API_USER.IGetFriendsRes[]>([])
   const [form] = Form.useForm()
 
-  const { onOk: propsOnOk } = useMemo(() => {
-    return props 
-  }, [props])
+  const { onOk: propsOnOk } = props
 
   const onValuesChange = useCallback((value) => {
     if(value.type) {
@@ -78,7 +76,7 @@ const RoomCreateModal = memo(forwardRef<IRoomCreateModalRef, {
       currPage: 0,
       pageSize: 9999
     })
-    setFriendList(data.friends)
+    setFriendList(data.friends || [])
   }, [])
 
   const friendsOptions = useMemo(() => {

@@ -205,7 +205,7 @@ const Message = memo((props: IProps) => {
 
   const readMessage = useCallback(async () => {
     if(!props.value || !socket) return 
-    requestReadMessage(socket, {
+    await requestReadMessage(socket, {
       _id: props.value?.map(item => {
         return item._id
       }).join(','),

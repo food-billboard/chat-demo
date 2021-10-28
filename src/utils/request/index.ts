@@ -155,7 +155,10 @@ export const request = async <ResBody>(url: string, setting: IRequestOptions={},
   
     // 返回真正的response body res 内容
     if( !error ){
-      return (origin ? body : body?.data?.res?.data || {}) as ResBody
+      if(origin) return body 
+      let bodyData = body?.data 
+      bodyData = typeof bodyData === "string" ? JSON.parse(bodyData) : bodyData
+      return bodyData?.res?.data 
     }
     error.mis = mis
     mis && misManage(error, authorization)

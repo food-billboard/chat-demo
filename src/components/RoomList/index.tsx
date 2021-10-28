@@ -40,9 +40,7 @@ const Room = memo((props: IWrapperProps) => {
 
   const [ visible, setVisible ] = useState<boolean>(false)
 
-  const { popover, style={}, clickClose, onClick, socket, roomList, ...nextProps } = useMemo(() => {
-    return props
-  }, [props])
+  const { popover, style={}, clickClose, onClick, socket, roomList, ...nextProps } = props
 
   const roomListRef = useRef<IRoomListRef>(null)
   const roomCreteModalRef = useRef<IRoomCreateModalRef>(null)

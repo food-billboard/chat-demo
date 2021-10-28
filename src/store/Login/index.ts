@@ -6,7 +6,9 @@ import {
 } from './action'
 import { generateReducer } from '../utils'
 
-const DEFAULT_VALUE = {}
+const DEFAULT_VALUE = {
+
+}
 
 const initialState = {
   value: merge({}, DEFAULT_VALUE),
