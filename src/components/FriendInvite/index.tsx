@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo, useEffect } from 'react'
+import { useCallback, useState, useMemo, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { withTry } from '@/utils'
 import { inviteFriend } from '@/utils/socket' 
@@ -55,6 +55,7 @@ const FriendInvite = (props: IProps) => {
 
   useEffect(() => {
     fetchFriendsList()
+  // eslint-disable-next-line 
   }, [])
 
   return children({ 

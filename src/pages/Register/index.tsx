@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { message } from 'antd'
 import ProForm, { ProFormText, ProFormCaptcha } from '@ant-design/pro-form'
 import { MobileOutlined, MailOutlined, UserOutlined, LockOutlined, MessageOutlined } from '@ant-design/icons'
@@ -27,7 +27,7 @@ const Register = (props: any) => {
   const onSubmit = useCallback(async (values) => {
     message.success('提交成功')
     await fetchRegister(values)
-  }, [])
+  }, [fetchRegister])
 
   return (
     <div

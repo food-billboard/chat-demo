@@ -49,6 +49,7 @@ const ChatList = (props: IProps & {
     return () => {
       prevValueLength.current = currentLength
     }
+    // eslint-disable-next-line
   }, [value, currRoom, socket])
   
   return (

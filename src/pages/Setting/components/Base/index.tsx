@@ -1,5 +1,5 @@
 import { message, FormInstance } from 'antd'
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form'
 import { connect } from 'react-redux'
 import { Store } from 'antd/lib/form/interface'
@@ -23,20 +23,18 @@ const BaseView = (props: IProps) => {
 
   const viewRef = useRef<HTMLDivElement>(null)
 
-  const { userInfo } = useMemo(() => {
-    return props
-  }, [props])
+  const { userInfo, getUserInfo } = props
 
   const formRef = useRef<FormInstance>(null)
 
-  const setBaseInfo = useCallback(() => {
+  const setBaseInfo = () => {
     if (userInfo) {
       const { avatar, ...nextUserInfo } = userInfo
       formRef.current?.setFieldsValue(merge({}, nextUserInfo, {
         avatar: Array.isArray(avatar) ? avatar : (avatar ? [avatar] : [])
       }))
     }
-  }, [userInfo, formRef])
+  }
 
   const handlerSubmit = useCallback(async (values: Store) => {
     const { avatar, ...nextValues } = values
@@ -44,18 +42,21 @@ const BaseView = (props: IProps) => {
       avatar: Array.isArray(avatar) ? avatar[0] : avatar
     }) as API_USER.IPutUserInfoParams)
     formRef.current?.resetFields()
-    await props?.getUserInfo?.()
+    await getUserInfo?.()
     return new Promise<boolean>((resolve) => {
       message.info("操作成功", 1, () => {
         history.replace('/main/room')
         resolve(true)
       })
     })
-  }, [])
+  }, [getUserInfo])
 
   useEffect(() => {
     setBaseInfo()
-  }, [])
+  }, 
+    // eslint-disable-next-line
+    []
+  )
 
   return (
     <div className={styles.baseView} ref={viewRef}>

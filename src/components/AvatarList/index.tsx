@@ -29,6 +29,7 @@ export default memo((props: IAvatarListProps) => {
 
   useEffect(() => {
     internalFetchData()
+  // eslint-disable-next-line
   }, [])
 
   if(!value.length && !!empty) {

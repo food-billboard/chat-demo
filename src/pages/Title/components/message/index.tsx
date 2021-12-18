@@ -290,7 +290,7 @@ const Message = memo((props: IProps) => {
     }))
   }, [currRoom, onSelectRoom])
 
-  const chatRoomMessageFormat = useCallback(async (list: TListData[]) => {
+  const chatRoomMessageFormat = async (list: TListData[]) => {
     let newList: TListData[] = []
     for(let i = 0; i < list.length; i ++) {
       const roomData = list[i]
@@ -325,11 +325,14 @@ const Message = memo((props: IProps) => {
       }
     }
     setRealChatMessage(newList)
-  }, [userInfo, realChatMessage])
+  }
 
   useEffect(() => {
     chatRoomMessageFormat(chatMessage)
-  }, [chatMessage])
+  }, 
+    // eslint-disable-next-line
+    [chatMessage]
+  )
  
   return (
     <Fragment>

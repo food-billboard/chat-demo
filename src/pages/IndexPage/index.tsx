@@ -25,7 +25,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
 
     useEffect(() => {
       fetchData()
-    }, [])
+    }, [fetchData])
   
     return (
       <div className={style["homepage"]}>
@@ -46,7 +46,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(
           </Paragraph>
           <Title style={FONT_COLOR} level={2}>设计资源</Title>
           <Paragraph style={FONT_COLOR}>
-            如果对源码感兴趣，可以去Github上参考（<a href="https://github.com/food-billboard/chat-demo" target="_blank">这里</a>）
+            如果对源码感兴趣，可以去Github上参考（<a href="https://github.com/food-billboard/chat-demo" rel="noreferrer" target="_blank">这里</a>）
           </Paragraph>
           <Paragraph style={FONT_COLOR}>
             如果到这里你依旧感兴趣，那就进入聊天室感受一下吧<Text style={{cursor: 'pointer', fontSize: 20}} onClick={goRoom} mark underline strong>主页</Text>

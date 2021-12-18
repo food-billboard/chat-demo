@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect } from 'react'
+import React, { memo, useCallback, useEffect, useRef } from 'react'
 import classnames from 'classnames'
 import styles from './index.less'
 import { useState } from 'react'
@@ -118,7 +118,7 @@ class Bubble {
 export default memo(() => {
 
   const [ bubbleList, setBubbleList ] = useState<Bubble[]>([])
-  let timer: NodeJS.Timeout 
+  let timer = useRef<NodeJS.Timeout>()
 
   const init = useCallback((initList:boolean=true) => {
     const oCanvas: HTMLCanvasElement | null = document.querySelector('.index-canvas')
@@ -152,21 +152,24 @@ export default memo(() => {
         }
       }
       createBubble(100, 500)
-      timer = setInterval(render, 1000 / 60)
+      timer.current = setInterval(render, 1000 / 60)
     }
   }, [bubbleList])
 
   useEffect(() => {
     init()
     const resizeInit = () => {
-      clearInterval(timer)
+      timer.current ?? clearInterval(timer.current)
       init(false) 
     }
     window.addEventListener('resize', resizeInit)
     return () => {
       window.removeEventListener('resize', resizeInit)
     }
-  }, [])
+  },
+    // eslint-disable-next-line 
+    []
+  )
 
   return (
     <canvas className={classnames(styles["index-canvas"], 'index-canvas')}>

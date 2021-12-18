@@ -33,13 +33,13 @@ const UserList = () => {
   const [ currentPage, setCurrentPage ] = useState<number>(1)
   const [ total, setTotal ] = useState<number>(0)
 
-  const fetchData = useCallback(async (params: Partial<API_CHAT.IGetMemberListParams>={}) => {
+  const fetchData = async (params: Partial<API_CHAT.IGetMemberListParams>={}) => {
     const data = await getRoomMembers(merge({}, { pageSize: 8 }, params))
     const { total=0, list=[] } = data || {}
     setMemberList(list)
     setTotal(total)
     return list 
-  }, [])
+  }
 
   const onPageChange = useCallback((page: number) => {
     setCurrentPage(page)

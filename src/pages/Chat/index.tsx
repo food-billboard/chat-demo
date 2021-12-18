@@ -97,11 +97,17 @@ export default withRouter(connect(mapStateToProps, mapDispatchToProps)(memo((pro
     return () => {
       window.removeEventListener('resize', debounceResize)
     }
-  }, [])
+  }, 
+    // eslint-disable-next-line
+    []
+  )
 
   useEffect(() => {
     props.connect?.()
-  }, [])
+  }, 
+  // eslint-disable-next-line
+  []
+)
 
   return (
     <div

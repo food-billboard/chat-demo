@@ -1,4 +1,4 @@
-export default {
+const Locale = {
   labelIdle: '拖放文件，或者 <span class="filepond--label-action"> 浏览 </span>',
   labelInvalidField: '字段包含无效文件',
   labelFileWaitingForSize: '计算文件大小',
@@ -37,3 +37,5 @@ export default {
   imageValidateSizeLabelExpectedMinResolution: '最小分辨率：{minResolution}',
   imageValidateSizeLabelExpectedMaxResolution: '最大分辨率：{maxResolution}'
 };
+
+export default Locale

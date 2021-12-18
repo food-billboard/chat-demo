@@ -60,7 +60,7 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
     }, [] as API_CHAT.IGetRoomListData[][])
   }, [realList])
 
-  const fetchRealList = useCallback(async () => {
+  const fetchRealList = async () => {
     let newList:API_CHAT.IGetRoomListData[]  = []
     for(let i = 0; i < value.length; i ++) {
       const item = value[i]
@@ -72,7 +72,7 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
       }
     }
     setRealList(newList)
-  }, [value, realList, userInfo])
+  }
 
   const domList = useMemo(() => {
     return list.map(item => {
@@ -115,6 +115,7 @@ const RoomList = connect(mapStateToProps, mapDispatchToProps)(memo(forwardRef<IR
 
   useEffect(() => {
     fetchRealList()
+  // eslint-disable-next-line
   }, [value])
 
   return (

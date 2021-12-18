@@ -15,9 +15,9 @@ const UserList = (props: {
     setSearchValue(value.target.value)
   }, [])
 
-  const handleSearch = useCallback(() => {
+  const handleSearch = () => {
     onSearch?.({ content: searchValue })
-  }, [searchValue])
+  }
 
   return (
     <Search

@@ -5,7 +5,7 @@ import { MobileOutlined, LockOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { redirectPage } from '@/store'
-import { history, getPageQuery } from '@/utils'
+import { history } from '@/utils'
 import { LOGO } from '../Title/constants'
 import { mapStateToProps, mapDispatchToProps } from './connect'
 import styles from './index.less'
@@ -38,7 +38,7 @@ const Login = (props: any) => {
   const onSubmit = useCallback(async (values) => {
     await fetchLogin(values)
     message.success('提交成功')
-  }, [])
+  }, [fetchLogin])
 
   const goToRegister = useCallback(() => {
     history.push('/register')

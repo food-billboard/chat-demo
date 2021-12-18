@@ -71,13 +71,13 @@ const RoomCreateModal = memo(forwardRef<IRoomCreateModalRef, {
     init()
   }, [init])
 
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     const data = await getRelation({
       currPage: 0,
       pageSize: 9999
     })
     setFriendList(data.friends || [])
-  }, [])
+  }
 
   const friendsOptions = useMemo(() => {
     return friendList.map(item => {

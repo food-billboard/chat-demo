@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle, memo, useRef } from 'react'
+import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle, memo } from 'react'
 import Videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import { getMediaList } from '@/services'
 import { isObjectId } from './util'
@@ -23,8 +23,8 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
 
   const eventBinding: (instance: VideoJsPlayer) => void = useCallback((instance) => {
     instance.on('timeupdate', function() {
-      const currTime: number = instance.currentTime()
-      const duration: number = instance.duration()
+      // const currTime: number = instance.currentTime()
+      // const duration: number = instance.duration()
       // console.log(currTime, duration)
     })
 
@@ -80,7 +80,7 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
   }, [])
 
   //播放器初始化
-  const initVideoInstance = useCallback(async () => {
+  const initVideoInstance = async () => {
     const instance = Videojs('video', {
       autoplay: false,
       controls: true,
@@ -97,7 +97,7 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
     setInstance(instance)
     eventBinding(instance)
     reload()
-  }, [])
+  }
 
   const mediaInfo = useCallback(async (src: string) => {
     const paths = src?.split('/') || []
@@ -144,6 +144,7 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
     }
     instance.src(src)
     instance.play()
+  // eslint-disable-next-line
   }, [props.src, instance, mediaInfo])
 
   //重载
@@ -158,6 +159,7 @@ const Video: React.FC<IProps> = forwardRef<IVideoRef & VideoJsPlayer, IProps>((p
       instance?.pause()
       instance?.dispose()
     }
+  // eslint-disable-next-line
   }, [instance])
 
   useEffect(() => {

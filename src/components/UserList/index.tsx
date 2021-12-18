@@ -1,8 +1,7 @@
 import React, { CSSProperties, forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
-import { List, Avatar, Skeleton, Image } from 'antd'
+import { List, Avatar, Skeleton } from 'antd'
 import { unstable_batchedUpdates } from 'react-dom'
 import { ListProps } from 'antd/es/list'
-import { IMAGE_FALLBACK } from '@/utils'
 import styles from './index.less'
 
 export interface IProps extends ListProps<API_USER.IGetFriendsRes> {
@@ -38,7 +37,7 @@ export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
     return {
       fetchData: internalFetchData
     }
-  }, [])
+  })
 
   useEffect(() => {
     internalFetchData()
@@ -66,7 +65,8 @@ export const UserList = memo(forwardRef<IUserListRef, IProps>((props, ref) => {
                   <Avatar src={avatar} >{username}</Avatar>
                 }
                 title={
-                  <a className={styles["user-list-username"]} onClick={userAction?.bind(this, item)}>{username}</a>
+                  // eslint-disable-next-line
+                  <a href="javascript:;" className={styles["user-list-username"]} onClick={userAction?.bind(this, item)}>{username}</a>
                   // <Tooltip
                   //   title={
                   //     <UserDetail />

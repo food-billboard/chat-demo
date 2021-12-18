@@ -71,9 +71,9 @@ const hotLoader = () => (config, env) => {
 // build--->prod --->文件设置
 const appBuildPathFile = () => config => {
   if (config.mode === 'development') {
-    console.log('evn is development, skip build path change...')
+    console.log('env is development, skip build path change...')
   } else if (config.mode === 'production') {
-    console.log('evn is production, change build path...')
+    console.log('env is production, change build path...')
     // 关闭sourceMap
     config.devtool = false
     //  // 配置打包后的文件位置修改path目录

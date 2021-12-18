@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { message } from 'antd'
 import { Upload as TusUpload, isSupported, PreviousUpload, HttpRequest } from 'tus-js-client'
-import { supported, FilePondFile, FilePondErrorDescription, RevertServerConfigFunction, ProcessServerConfigFunction, LoadServerConfigFunction, FilePondInitialFile as IInitFileType } from 'filepond'
+import { supported, FilePondFile, FilePondErrorDescription, RevertServerConfigFunction, ProcessServerConfigFunction, FilePondInitialFile as IInitFileType } from 'filepond'
 import { FilePond, registerPlugin, FilePondProps } from 'react-filepond'
 import FilePondPluginFileRename from 'filepond-plugin-file-rename'
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size'
@@ -279,6 +279,7 @@ const Upload: ReactFC<IProps> = ({
         return internalList
       })
     })
+    // eslint-disable-next-line
   }, [ propsValue, uploadRef ])
 
   useDeepCompareEffect(() => {
